@@ -213,6 +213,7 @@ enum Error {
     InvalidInput { msg: String },
     Unauthorized { msg: String },
     AppointmentConflict { msg: String },
+    AlreadyExists { msg: String },
 }
 
 #[ic_cdk::query]
@@ -476,7 +477,39 @@ fn list_messages() -> Vec<Message> {
 }
 
 #[ic_cdk::update]
+fn create_medical_record(record_id: u64, patient_id: u64, lab_results: String, treatment_history: String) -> Result<MedicalRecord, Error> {
+    // Input validation
+    if lab_results.trim().is_empty() || treatment_history.trim().is_empty() {
+        return Err(Error::InvalidInput {
+            msg: "Lab results and treatment history cannot be empty".to_string(),
+        });
+    }
+
+    let new_record = MedicalRecord {
+        id: record_id,
+        patient_id,
+        lab_results,
+        treatment_history,
+    };
+
+    // Insert the new medical record into storage
+    match MEDICAL_RECORD_STORAGE.with(|service| service.borrow_mut().insert(record_id, new_record.clone())) {
+        Some(_) => Err(Error::AlreadyExists {
+            msg: format!("Medical record with id={} already exists", record_id),
+        }),
+        None => Ok(new_record),
+    }
+}
+
+#[ic_cdk::update]
 fn update_medical_record(record_id: u64, patient_id: u64, lab_results: String, treatment_history: String) -> Result<MedicalRecord, Error> {
+    // Input validation
+    if lab_results.trim().is_empty() || treatment_history.trim().is_empty() {
+        return Err(Error::InvalidInput {
+            msg: "Lab results and treatment history cannot be empty".to_string(),
+        });
+    }
+
     let updated_record = MedicalRecord {
         id: record_id,
         patient_id,
@@ -495,6 +528,13 @@ fn update_medical_record(record_id: u64, patient_id: u64, lab_results: String, t
 
 #[ic_cdk::update]
 fn delete_medical_record(record_id: u64) -> Result<(), Error> {
+    // Input validation
+    if record_id == 0 {
+        return Err(Error::InvalidInput {
+            msg: "Record ID cannot be zero".to_string(),
+        });
+    }
+
     // Remove medical record from storage
     match MEDICAL_RECORD_STORAGE.with(|service| service.borrow_mut().remove(&record_id)) {
         Some(_) => Ok(()),
@@ -775,3 +815,4 @@ fn send_reminder_to_patient(patient_id: u64, content: String, multimedia_content
 
 // Export Candid interface
 ic_cdk::export_candid!();
+
