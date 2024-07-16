@@ -1,47 +1,51 @@
-import { MdOutlineKeyboardArrowDown } from "react-icons/md";
+import React, { useState } from 'react';
+import logo from '../../images/helcon_logo.png';
+import { MdOutlineKeyboardArrowDown, MdMenu, MdClose } from "react-icons/md";
+import { NavLink } from "react-router-dom";
 
-import { NavLink } from "react-router-dom"
 const Header = () => {
+   const [menuOpen, setMenuOpen] = useState(false);
+
+   const toggleMenu = () => {
+      setMenuOpen(!menuOpen);
+   };
+
    return (
-      <div className="w-full h-20  flex items-center gap-x-[236px] border-b-[1px] border-[#E3E3E3] mb-10">
-         <div className="
-             w-[147px] h-[38px]">
-            <h2 className="w-[112px] h-[38px] font-bold text-2xl text-center leading-[38.36px] text-primary_1">HelCon</h2>
+      <div className="w-full h-20 flex items-center border-b-[1px] border-[#E3E3E3] mb-10 px-5 relative justify-between">
+         <div className="flex items-center relative">
+            <div className="absolute -left-5 w-32 h-24 flex items-center ">
+               <img src={logo} alt="HelCon Logo" className="w-full h-full object-fit mt-2 ml-2" />
+            </div>
+            <h2 className="font-bold text-2xl leading-[38.36px] text-primary_1 ml-4 sm:ml-20 md:ml-16">HelCon</h2>
          </div>
-         <ul className="w-[483.37px] h-[22px] flex gap-[30px]">
-            <li className="font-medium w-[53px] h-[22px] text-[#404040] text-[18px] leading-[22px]"><NavLink
-               to=""
-               className={({ isActive }) => isActive ? 'text-primary_1' : ''}>Home</NavLink></li>
-            <li className=" font-medium w-[97.37px] h-[22px] text-[#404040] text-[18px] leading-[22px] flex relative">
-               <NavLink
-               to=""
-               className={({ isActive }) => isActive ? 'text-primary_1' : ''}>Services </NavLink><MdOutlineKeyboardArrowDown className=" text-primary absolute right-2  text-2xl" /></li>
-
-
-
-
-
-
-
-
-            <li className="w-[96px] font-medium h-[22px] text-[#404040] text-[18px] leading-[22px]"><NavLink
-               to=""
-               className={({ isActive }) => isActive ? 'text-primary_1' : ''}>Specialists</NavLink></li>
-            <li className="w-[80px] h-[22px] font-medium text-[#404040] text-[18px] leading-[22px]"><NavLink
-               to=""
-               className={({ isActive }) => isActive ? 'text-primary_1' : ''}>About us</NavLink></li>
-            <li className="w-[36px] h-[22px]  font-medium text-[#404040] text-[18px] leading-[22px]"> <NavLink
-               to=""
-               className={({ isActive }) => isActive ? 'text-primary_1' : ''}>FAQ
-            </NavLink></li>
+         <div className="md:hidden flex items-center">
+            <button onClick={toggleMenu} className="text-2xl">
+               {menuOpen ? <MdClose /> : <MdMenu />}
+            </button>
+         </div>
+         <ul className={`md:flex gap-5 lg:gap-10 absolute md:relative top-20 md:top-auto left-0 w-full md:w-auto bg-white md:bg-transparent md:flex-row flex-col items-center ${menuOpen ? 'flex z-50' : 'hidden'}`}>
+            <li className="font-medium text-[#404040] text-[18px] leading-[22px]">
+               <NavLink to="" className={({ isActive }) => isActive ? 'text-primary_1' : ''}>Home</NavLink>
+            </li>
+            <li className="font-medium text-[#404040] text-[18px] leading-[22px] flex relative">
+               <NavLink to="" className={({ isActive }) => isActive ? 'text-primary_1' : ''}>Services</NavLink>
+               <MdOutlineKeyboardArrowDown className="text-primary text-2xl" />
+            </li>
+            <li className="font-medium text-[#404040] text-[18px] leading-[22px]">
+               <NavLink to="" className={({ isActive }) => isActive ? 'text-primary_1' : ''}>Specialists</NavLink>
+            </li>
+            <li className="font-medium text-[#404040] text-[18px] leading-[22px]">
+               <NavLink to="" className={({ isActive }) => isActive ? 'text-primary_1' : ''}>About us</NavLink>
+            </li>
+            <li className="font-medium text-[#404040] text-[18px] leading-[22px]">
+               <NavLink to="" className={({ isActive }) => isActive ? 'text-primary_1' : ''}>FAQ</NavLink>
+            </li>
          </ul>
-         <div className="w-[215px] h-[46px] flex gap-[10px] items-center">
-            <button className="bg-primary_1 h-full w-full rounded-[6px] text-white  py-[12px] px-[12px]">Get Started</button>
+         <div className="hidden md:flex items-center">
+            <button className="bg-primary_1 h-10 w-32 sm:w-36 lg:w-40 rounded-[6px] text-white py-2 px-4">Get Started</button>
          </div>
-
       </div>
-   )
-}
+   );
+};
 
-
-export default Header
+export default Header;

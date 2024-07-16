@@ -1,70 +1,71 @@
 import { IoMdSend } from "react-icons/io";
 import { CgFacebook } from "react-icons/cg";
-import { BsTwitterX } from "react-icons/bs";
+import { BsTwitter } from "react-icons/bs";
 import { FaInstagram } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
+import logo from '../../images/helcon_logo.png';
 
-const Footer = ()=>{
-return (
-   <div className="flex flex-col  items-center w-full h-[427px] bg-primary_1 text-white rounded-t-[30px] relative pt-20 mt-14">
+const Footer = () => {
+  return (
+    <div className="bg-primary_1 text-white rounded-t-[32px] mt-8">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-12 md:py-20">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 md:mb-16 space-y-8 md:space-y-0">
+          <div className="flex items-center">
+            <img src={logo} alt="HelCon Logo" className="w-24 h-auto mr-4 relative left-12 -mt-3 " />
+            <div>
+              <h2 className="font-semibold text-2xl">HelCon</h2>
+              <p className="mt-2 text-base">Your health is our priority</p>
+            </div>
+          </div>
 
-  <div className="flex w-full justify-between px-20">
-<div className="w-[232.5px] h-[83px] flex flex-col">
-   <div className="w-[148px] h-[38px] flex">
-      <img src="" alt="" className="w-[35px] h-full"/>
-      <h2 className="w-[112px] h-full font-[600] leading-[38.6px] text-center">Helcon</h2>
-   </div>
-   <p className="w-[225px] h-[25px] font-normal text-[18px] leading-[25.2px]">Your health is our priority</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full md:w-2/3">
+            <div>
+              <h2 className="font-semibold text-xl mb-4">Important links</h2>
+              <ul className="text-sm space-y-2">
+                <li className="text-gray-600"><NavLink to="">Appointment</NavLink></li>
+                <li className="text-gray-600"><NavLink to="">Specialists</NavLink></li>
+                <li className="text-gray-600"><NavLink to="">Services</NavLink></li>
+                <li className="text-gray-600"><NavLink to="">About us</NavLink></li>
+              </ul>
+            </div>
 
-</div>
-<div className="w-[142px] h-[169px] flex flex-col mb-6">
-   <h2 className="w-full h-[21px] leading-[21px] text-[18px]  mb-6">Important links</h2>
-   <ul className="flex flex-col w-[102px] h-[109px] text-[#F6F6F6] space-y-2">
-      <li className=" leading-[22px] h-[22px] text-[16px]  text-[#7A7D84]">
-         <NavLink to="">Appointment</NavLink>
-      </li>
-      <li className=" leading-[22px] h-[22px] text-[16px] text-[#7A7D84]">
-         <NavLink to="">Specialists</NavLink>
-      </li>
-      <li className=" leading-[22px] h-[22px] text-[16px] text-[#7A7D84]">
-         <NavLink to="">Services</NavLink>
-      </li>
-      <li className=" leading-[22px] h-[22px] text-[16px] text-[#7A7D84]">
-         <NavLink to="">About us</NavLink>
-      </li>
-   </ul>
-</div>
-<div className="w-[215px] h-[169px]">
-   <h2 className="w-full h-[21px] leading-[21px] text-[18px] mb-6 ">Contact</h2>
-   <ul className="text-[#F6F6F6] w-full h-[109px] space-y-2">
-      <li className="text-[16px] text-[#7A7D84]">Call:(+254)720113559</li>
-      <li className="text-[16px] text-[#7A7D84]">Emailexample@gmail.com</li>
-      <li className="text-[16px] text-[#7A7D84]">Address: Mombasa 200</li>
-      <li className="text-[16px] text-[#7A7D84]">Kenya</li>
-   </ul>
-</div>
-<div className="w-[272px] h-[110px] flex flex-col relative">
-   <h2 className="w-full h-[21px] leading-[21px] text-[18px] mb-6">Newsletter</h2>
-    <div className="relative  p-0 w-full h-[50px] flex bg-[#F6F6F6] text-primary_1 rounded-2xl ">
-      <input type="email" name="" id="" className="pl-2 rounded-2xl w-full h-full border-none outline-none bg-none"
-      placeholder="Enter your email"/>
-      <IoMdSend  className="h-[19px] w-[22px] absolute top-4 right-2"/>
+            <div>
+              <h2 className="font-semibold text-xl mb-4">Contact</h2>
+              <ul className="text-sm space-y-2">
+                <li className="text-gray-600">Call: (+254)720113559</li>
+                <li className="text-gray-600">Email: example@gmail.com</li>
+                <li className="text-gray-600">Address: Mombasa 200, Kenya</li>
+              </ul>
+            </div>
+
+            <div>
+              <h2 className="font-semibold text-xl mb-4">Newsletter</h2>
+              <div className="relative">
+                <input
+                  type="email"
+                  className="w-full py-2 px-4 rounded-lg border-none bg-gray-200 text-gray-800"
+                  placeholder="Enter your email"
+                />
+                <IoMdSend className="absolute top-1/2 transform -translate-y-1/2 right-3 text-primary h-6 w-6" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr className="border-gray-300 mb-12" />
+
+        <div className="flex justify-between items-center flex-col md:flex-row">
+          <p className="text-sm text-gray-600 mb-4 md:mb-0">&copy; 2024 HealthConnect. All Rights Reserved by HelCon</p>
+          <ul className="flex space-x-4">
+            <li><CgFacebook className="w-8 h-8 text-primary_1 bg-white rounded-full p-2" /></li>
+            <li><BsTwitter className="w-8 h-8 text-primary_1 bg-white rounded-full p-2" /></li>
+            <li><FaInstagram className="w-8 h-8 text-primary_1 bg-white rounded-full p-2" /></li>
+          </ul>
+        </div>
+
+      </div>
     </div>
-</div>
-  </div>
-  <hr  className="text-[#BFD2F8] w-[95%] mb-6"/>
-  <div className="flex justify-between  w-full px-20 mt-10">
-   <p className=" text-[16px] leading-[18px] text-start self-start">&copy;2024 HealthConnect All Rights Reserved by HelCon</p>
-   <ul className="flex items-center space-x-6">
-      <li className=" w-[24px] h-[24px] text-center rounded-full bg-white text-primary flex items-center justify-center"><CgFacebook /></li>
-      <li className=" w-[24px] h-[24px] text-center rounded-full bg-white text-primary flex items-center justify-center"><BsTwitterX /></li>
-      <li className=" w-[24px] h-[24px] text-center rounded-full bg-white text-primary flex items-center justify-center"><FaInstagram /></li>
-   </ul>
-  </div>
-
-   </div>
-)
+  );
 }
 
-
-export default Footer
+export default Footer;
