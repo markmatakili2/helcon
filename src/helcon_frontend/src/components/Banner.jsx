@@ -47,7 +47,7 @@ const Banner = () => {
             <div className="w-64 h-3/5 absolute -top-6 right-6 bg-none">
                <img src={image} alt="" className="h-full w-full object-cover" />
             </div>
-         </div>
+         </div> 
       </div>
    )
 }

@@ -8,7 +8,8 @@ export default {
       colors:{
          "primary":"#1f2937",
          "primary_1":'#0A1F4B'
-      }
+      },
+      
     },
   },
   plugins: [],
