@@ -4,8 +4,14 @@ import Footer from '../components/Footer';
 import image from '../../images/image_2.png'
 import Frame from './Frame'
 import doc from '../../images/doc5.png'
+import { useDispatch } from 'react-redux';
+import { login } from '../features/authSlice';
 
 const Specialists = () => {
+   const dispatch = useDispatch()
+   const handleLogin = async ()=>{
+      dispatch(login())
+  }
 
    const [availability, setAvailability] = useState(false);
 
@@ -31,7 +37,8 @@ const Specialists = () => {
   Become one of our HealthConnect Specialists and get to help even more patients.
 </p>
 
-<button className="bg-primary_1 text-white px-10 py-4 rounded-[13.03px] text-lg md:text-base shadow-lg hover:bg-primary_2 transition duration-300">
+<button className="bg-primary_1 text-white px-10 py-4 rounded-[13.03px] text-lg md:text-base shadow-lg hover:bg-primary_2 transition duration-300"
+onClick={handleLogin}>
   Get Started
 </button>
 

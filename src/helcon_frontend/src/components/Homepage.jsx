@@ -8,7 +8,9 @@ import {Outlet} from 'react-router-dom'
 
 
 
+
 const HomePage = () => {
+ 
 
    return (
       <div className=' overflow-x-hidden w-full'>
