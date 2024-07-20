@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import image from '../../images/image_2.png'
+import image from '../images/image_2.png'
 import Frame from './Frame'
-import doc from '../../images/doc5.png'
+import doc from '../images/doc5.png'
 import { useDispatch } from 'react-redux';
 import { login } from '../features/authSlice';
 

@@ -1,4 +1,4 @@
-import image from '../../images/image_2.png'
+import image from '../images/image_2.png'
 
 
 const Frame = ()=>{

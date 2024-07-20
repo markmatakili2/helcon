@@ -1,7 +1,7 @@
 import React from 'react';
 import { HiMagnifyingGlass } from "react-icons/hi2";
 import { CiLocationOn } from "react-icons/ci";
-import image from '../../images/doctors.png';
+import image from '../images/doctors.png';
 
 const Banner = () => {
    return (

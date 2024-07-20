@@ -4,7 +4,7 @@ import { FaClock, FaDollarSign, FaGreaterThan } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { FaLocationDot } from 'react-icons/fa6';
 
-import image from '../../images/doctors.png';
+import image from '../images/doctors.png';
 
 const ProfileCard = () => {
   const profile = useSelector((state) => state.profile.profile);

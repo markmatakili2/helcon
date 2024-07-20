@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
-import logo from '../../images/helcon_logo.png';
+import logo from '../images/helcon_logo.png';
 import { MdOutlineKeyboardArrowDown, MdMenu, MdClose } from "react-icons/md";
 import { NavLink } from "react-router-dom";
 import { login } from '../features/authSlice';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+
 
 const Header = () => {
-
+   const isAuth = useSelector((state) => state.auth.authClient)
    const dispatch = useDispatch()
-
+   const navigate = useNavigate()
 
 
    const [menuOpen, setMenuOpen] = useState(false);
@@ -16,8 +18,9 @@ const Header = () => {
    const toggleMenu = () => {
       setMenuOpen(!menuOpen);
    };
-   const handleLogin = async ()=>{
-       dispatch(login())
+   const handleLogin = async () => {
+      await dispatch(login({ navigate }))
+
    }
 
    return (
@@ -53,7 +56,7 @@ const Header = () => {
          </ul>
          <div className="hidden md:flex items-center">
             <button className="bg-primary_1 h-10 w-32 sm:w-36 lg:w-40 rounded-[6px] text-white py-2 px-4"
-            onClick={handleLogin}>Get Started</button>
+               onClick={handleLogin}>Get Started</button>
          </div>
       </div>
    );

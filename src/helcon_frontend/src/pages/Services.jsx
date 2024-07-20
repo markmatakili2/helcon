@@ -1,4 +1,4 @@
-import img from '../../images/doctors.png'
+import img from '../images/doctors.png'
 import Header from '../components/Header'
 import { FaMicroscope } from 'react-icons/fa';
 import { FaAmbulance } from 'react-icons/fa';
