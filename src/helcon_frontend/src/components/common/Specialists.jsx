@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import image from '../images/image_2.png'
+import Header from './Header';
+import Footer from './Footer';
+import image from '../../images/image_2.png'
 import Frame from './Frame'
-import doc from '../images/doc5.png'
+import doc from '../../images/doc5.png'
 import { useDispatch } from 'react-redux';
-import { login } from '../features/authSlice';
+import { login } from '../../features/auth/authSlice';
 
 const Specialists = () => {
    const dispatch = useDispatch()

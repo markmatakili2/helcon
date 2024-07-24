@@ -1,8 +1,9 @@
 // src/authSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { AuthClient } from '@dfinity/auth-client';
-import { internet_identity } from '../../../declarations/internet_identity';
 import { HttpAgent } from '@dfinity/agent';
+import { helcon_backend } from '../../../../declarations/helcon_backend';
+import { Principal } from '@dfinity/principal';
 
 let authClient;
 
@@ -15,7 +16,7 @@ const initializeAuthClient = async () => {
 
 export const login = createAsyncThunk(
   'auth/login',
-  async ({ navigate }, { dispatch, rejectWithValue }) => {
+  async (_, { dispatch, rejectWithValue }) => {
     try {
       const client = await initializeAuthClient();
 
@@ -25,38 +26,33 @@ export const login = createAsyncThunk(
             const identity = await client.getIdentity();
             const agent = new HttpAgent({ identity, host: "http://localhost:8080" });
 
-            // Fetch root key for certificate validation during development
-            if (process.env.DFX_NETWORK !== "ic") {
-              try {
-                await agent.fetchRootKey();
-              } catch (fetchRootKeyError) {
-                console.warn("Unable to fetch root key. Check to ensure that your local replica is running");
-                console.error(fetchRootKeyError.message);
-              }
-            }
+            const principal = identity.getPrincipal().toString()
 
-            // Use internet_identity for interacting with the canister
-           // const userInfo = await internet_identity?.get_principal(); // Replace `whoami` with your canister's method
-
-            const principal = identity.getPrincipal().toText();
             dispatch(setAuthClient(true));
             dispatch(setActor(true));
-            dispatch(setPrincipal(principal));
-            // dispatch(setUserInfo(userInfo));
+           
+            localStorage.setItem('principal', principal);
 
-            if (navigate) {
-              navigate('/dashboard');
+            if (principal) {
+
+              try {
+                //const userExists = await helcon_backend.get_patient(principalObj);
+                console.log("user_principal:", principal);
+
+                return { principal, };
+              } catch (error) {
+                console.error("Error fetching user from backend:", error.message);
+                return rejectWithValue("Error fetching user from backend");
+              }
             }
-
-            return { principal,  };
           } catch (error) {
             console.error("Error during login onSuccess callback:", error.message);
-            throw error;
+            return rejectWithValue(error.message);
           }
         },
         onError: (error) => {
           console.error("Login failed:", error.message);
-          throw new Error(error.message);
+          return rejectWithValue(error.message);
         }
       });
     } catch (error) {
@@ -93,7 +89,7 @@ const authSlice = createSlice({
     authClient: null,
     actor: null,
     principal: null,
-    userInfo: null,
+    userExists: null,
     status: 'idle',
     error: null,
   },
@@ -107,9 +103,6 @@ const authSlice = createSlice({
     setPrincipal: (state, action) => {
       state.principal = action.payload;
     },
-    setUserInfo: (state, action) => {
-      state.userInfo = action.payload;
-    },
   },
   extraReducers: (builder) => {
     builder
@@ -119,7 +112,7 @@ const authSlice = createSlice({
       .addCase(login.fulfilled, (state, action) => {
         state.status = 'succeeded';
         state.principal = action.payload?.principal || null;
-        state.userInfo = action.payload?.userInfo || null;
+        state.userExists = action.payload?.userExists || null;
       })
       .addCase(login.rejected, (state, action) => {
         state.status = 'failed';
@@ -130,7 +123,6 @@ const authSlice = createSlice({
         state.authClient = null;
         state.actor = null;
         state.principal = null;
-        state.userInfo = null;
       });
   },
 });

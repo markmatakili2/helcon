@@ -3,7 +3,7 @@ import { CgFacebook } from "react-icons/cg";
 import { BsTwitter } from "react-icons/bs";
 import { FaInstagram } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
-import logo from '../images/helcon_logo.png';
+import logo from '../../images/helcon_logo.png';
 
 const Footer = () => {
   return (

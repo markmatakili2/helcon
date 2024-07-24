@@ -1,10 +1,10 @@
-import img from '../images/doctors.png'
-import Header from '../components/Header'
+import img from '../../images/doctors.png'
+import Header from './Header'
 import { FaMicroscope } from 'react-icons/fa';
 import { FaAmbulance } from 'react-icons/fa';
 import { FaPhoneAlt } from 'react-icons/fa';
 import { MdBookOnline } from "react-icons/md";
-import Footer from '../components/Footer'
+import Footer from './Footer'
 const Services = () => {
    return (
       <>

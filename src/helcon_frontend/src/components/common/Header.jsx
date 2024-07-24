@@ -1,13 +1,19 @@
-import React, { useState } from 'react';
-import logo from '../images/helcon_logo.png';
+import React, { useState,useEffect } from 'react';
+import logo from '../../images/helcon_logo.png';
 import { MdOutlineKeyboardArrowDown, MdMenu, MdClose } from "react-icons/md";
 import { NavLink } from "react-router-dom";
-import { login } from '../features/authSlice';
+import { login } from '../../features/auth/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { health_backend } from '../../../../declarations/health_backend';
 
 
 const Header = () => {
+
+  
+   
+   //  const  register_patient = 
+
    const isAuth = useSelector((state) => state.auth.authClient)
    const dispatch = useDispatch()
    const navigate = useNavigate()
@@ -19,7 +25,14 @@ const Header = () => {
       setMenuOpen(!menuOpen);
    };
    const handleLogin = async () => {
-      await dispatch(login({ navigate }))
+      try {
+         const result = await dispatch(login()).unwrap(); // Unwraps the action payload
+         console.log('Login Result:', result);
+         
+         // Optional: Navigate or perform actions based on result
+       } catch (error) {
+         console.error('Login failed:', error);
+       }
 
    }
 

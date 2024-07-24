@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import Header from './Header';
+import Footer from './Footer';
 import { CiPlay1 } from "react-icons/ci";
 import { VscWorkspaceTrusted } from "react-icons/vsc";
 import { FaDatabase } from "react-icons/fa6";
@@ -8,7 +8,7 @@ import { MdBookOnline } from "react-icons/md";
 import { FaLaptopMedical } from "react-icons/fa";
 import { AiFillStar } from 'react-icons/ai';
 import Frame from './Frame'
-
+import image  from '../../images/doctors.png'
 const About = () => {
 
    const [availability, setAvailability] = useState(false);
@@ -65,8 +65,8 @@ const About = () => {
 
          <Header />
          <div className=" w-full  absolute right-10 md:block hidden">
-         <Frame/>
-        </div>
+            <Frame />
+         </div>
          <div className="flex flex-col  mx-20 pt-6  ">
             <div className="flex flex-col items-start">
                <div className="">
@@ -164,7 +164,7 @@ const About = () => {
                   <div className="mt-4 flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-6 justify-between w-full">
                      {testimonials.map((testimonial, index) => (
                         <div key={index} className="bg-white text-[#404040] py-10 flex items-center rounded-lg shadow-lg flex-1 justify-center">
-                           <img src={testimonial.image} alt={testimonial.name} className="w-16 h-16 rounded-full mr-4 -mt-8" />
+                           <img src={image} alt={testimonial.name} className="w-16 h-16 rounded-full mr-4 -mt-8" />
                            <div className="flex flex-col items-center">
                               <p className="font-semibold">{testimonial.name}</p>
                               <p className="text-sm text-[#B4B4B4] mb-2">{testimonial.role}</p>

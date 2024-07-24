@@ -1,16 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { FaClock, FaDollarSign, FaGreaterThan } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { FaLocationDot } from 'react-icons/fa6';
+import { useLocation } from 'react-router-dom';
+import image from '../../images/doctors.png';
 
-import image from '../images/doctors.png';
 
 const ProfileCard = () => {
+
+  const location = useLocation()
+  useEffect(() => { }, [location])
   const profile = useSelector((state) => state.profile.profile);
 
   return (
-    <div className="mx-4 md:mx-[60px] flex flex-col px-2">
+    <div className={`flex flex-col ${location.pathname === '/' ? 'mx-4 md:mx-[60px]  px-2' : ' '}`}>
       <div className="flex justify-between items-center py-2 mb-4">
         <h2 className='text-2xl font-bold text-primary'>Recommended Doctors</h2>
         <Link to="/view-all" className='font-semibold flex items-center text-xl relative px-6'>
@@ -20,7 +24,7 @@ const ProfileCard = () => {
         </Link>
       </div>
 
-      <div className='flex flex-wrap gap-4 md:gap-[16px] mb-4'>
+      <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
         {[1, 2, 3].map((_, index) => (
           <div key={index} className="border-2 rounded-[16px] p-5 pl-[30px] border-slate-300 text-primary flex-1 min-w-[300px]">
             <div className="flex">
@@ -58,11 +62,10 @@ const ProfileCard = () => {
           </div>
         ))}
       </div>
-
-      <div className="space-y-4 w-full">
-        <h2 className='text-2xl font-bold text-primary'>Nearby Doctors</h2>
+      <div className={`${location.pathname === '/' ? 'space-y-4 w-full' : 'hidden'}`}>
+        <h2 className='text-2xl font-bold text-primary py-4'>Nearby Doctors</h2>
         <div className="flex flex-col items-center border rounded-[16px] border-gray py-8">
-        <FaLocationDot className='text-3xl text-primary mb-4' />
+          <FaLocationDot className='text-3xl text-primary mb-4' />
           <p className='text-2xl text-center'>Please enable your location, so we can find nearby doctors</p>
         </div>
       </div>
