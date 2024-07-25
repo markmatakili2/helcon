@@ -8,6 +8,7 @@ import MyCalendar from '../common/Calendar';
 import { MdEventBusy } from 'react-icons/md';
 import { HiMagnifyingGlass } from "react-icons/hi2";
 import { CiLocationOn } from "react-icons/ci";
+import { FaUserCircle } from "react-icons/fa";
 
 const MainDashboard = () => {
   return (
@@ -36,14 +37,14 @@ const MainDashboard = () => {
             {/* Add more languages as needed */}
           </select>
           <FaBell className="text-xl text-gray-700" />
-          <div className="rounded-full w-10 h-10  flex items-center">
-          <img src={image} alt="Profile" className="w-full h-full object-fit" />
-          </div>
-          <p className=''>Kevlin</p>
+        
+          <FaUserCircle className='text-2xl ml-4'/>
+          
+          <p className='-mr-10'>Kevlin</p>
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 w-full gap-3">
-        <div className="col-span-2 w-full">
+      <div className="grid grid-cols-1 md:grid-cols-1 w-full gap-3 lg:grid-cols-3">
+        <div className="lg:col-span-2 w-full ">
           <Banner />
           <div className="space-y-4 mt-4">
             <h2 className="text-2xl font-bold text-primary">Nearby Doctors</h2>
@@ -55,14 +56,16 @@ const MainDashboard = () => {
             </div>
           </div>
         </div>
-        <div className="flex-1 bg-white rounded-lg border border-gray-300 p-6 shadow-lg">
-          <div className="flex justify-between items-center mb-4">
+        <div className="lg:col-span-1 bg-white rounded-lg border border-gray-300  shadow-lg">
+          <div className="flex justify-between items-center mb-4 md:p-4 lg:p-auto">
             <h2 className="text-md font-bold text-primary">Upcoming Appointments</h2>
             <button className="bg-primary_1 text-white py-1 px-3 rounded hover:bg-primary-dark transition">
               View All
             </button>
           </div>
+          <div className="md:w-4/5 lg:w-auto md:ml-20 lg:ml-0  md:p-4 lg:p-auto">
           <MyCalendar />
+          </div>
           <div className="flex flex-col items-center mt-6">
             <MdEventBusy size={50} color="#ccc" />
             <p className="text-gray-500 mt-2">No upcoming events</p>

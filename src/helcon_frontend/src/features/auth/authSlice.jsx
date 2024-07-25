@@ -2,8 +2,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { AuthClient } from '@dfinity/auth-client';
 import { HttpAgent } from '@dfinity/agent';
-import { helcon_backend } from '../../../../declarations/helcon_backend';
-import { Principal } from '@dfinity/principal';
+
 
 let authClient;
 
@@ -23,23 +22,18 @@ export const login = createAsyncThunk(
       await client.login({
         onSuccess: async () => {
           try {
-            const identity = await client.getIdentity();
+            const identity = client.getIdentity();
             const agent = new HttpAgent({ identity, host: "http://localhost:8080" });
-
-            const principal = identity.getPrincipal().toString()
-
-            dispatch(setAuthClient(true));
-            dispatch(setActor(true));
-           
-            localStorage.setItem('principal', principal);
+            const principal = identity.getPrincipal().toString();
 
             if (principal) {
-
               try {
-                //const userExists = await helcon_backend.get_patient(principalObj);
-                console.log("user_principal:", principal);
+            
+                dispatch(setAuthClient(true));
+             
+                localStorage.setItem('principal', principal);
 
-                return { principal, };
+                return { principal };
               } catch (error) {
                 console.error("Error fetching user from backend:", error.message);
                 return rejectWithValue("Error fetching user from backend");
@@ -64,7 +58,7 @@ export const login = createAsyncThunk(
 
 export const logout = createAsyncThunk(
   'auth/logout',
-  async ({ navigate }, { dispatch }) => {
+  async (_, { dispatch }) => {
     try {
       const client = await initializeAuthClient();
       await client.logout();
@@ -72,11 +66,7 @@ export const logout = createAsyncThunk(
       dispatch(setAuthClient(null));
       dispatch(setActor(null));
       dispatch(setPrincipal(null));
-      dispatch(setUserInfo(null));
-
-      if (navigate) {
-        navigate('/');
-      }
+      localStorage.removeItem('principal');
     } catch (error) {
       console.error('Logout failed:', error.message);
     }
@@ -87,9 +77,9 @@ const authSlice = createSlice({
   name: 'auth',
   initialState: {
     authClient: null,
-    actor: null,
+  
     principal: null,
-    userExists: null,
+ 
     status: 'idle',
     error: null,
   },
@@ -97,9 +87,7 @@ const authSlice = createSlice({
     setAuthClient: (state, action) => {
       state.authClient = action.payload;
     },
-    setActor: (state, action) => {
-      state.actor = action.payload;
-    },
+    
     setPrincipal: (state, action) => {
       state.principal = action.payload;
     },
@@ -112,7 +100,7 @@ const authSlice = createSlice({
       .addCase(login.fulfilled, (state, action) => {
         state.status = 'succeeded';
         state.principal = action.payload?.principal || null;
-        state.userExists = action.payload?.userExists || null;
+        state.authClient = action.payload;
       })
       .addCase(login.rejected, (state, action) => {
         state.status = 'failed';
@@ -121,7 +109,7 @@ const authSlice = createSlice({
       .addCase(logout.fulfilled, (state) => {
         state.status = 'idle';
         state.authClient = null;
-        state.actor = null;
+       
         state.principal = null;
       });
   },
@@ -129,9 +117,8 @@ const authSlice = createSlice({
 
 export const {
   setAuthClient,
-  setActor,
+  
   setPrincipal,
-  setUserInfo,
 } = authSlice.actions;
 
 export default authSlice.reducer;

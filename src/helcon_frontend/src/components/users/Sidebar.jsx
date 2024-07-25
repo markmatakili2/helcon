@@ -1,16 +1,31 @@
 import React from 'react';
 import { FaTachometerAlt, FaCalendarAlt, FaUser, FaQuestionCircle, FaSignOutAlt } from 'react-icons/fa';
 import logo from '../../images/helcon_logo.png';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Navigate } from 'react-router-dom';
+import { logout } from '../../features/auth/authSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 const Sidebar = () => {
+  const auth = useSelector((state) => state.auth.authClient)
+  const dispatch = useDispatch
+  const handleLogout = () => {
+    dispatch(logout())
+
+  }
+
+  if (!auth) {
+    return <Navigate to='/' replace />
+  }
+
   const links = [
     { name: 'Dashboard', icon: <FaTachometerAlt />, path: '/home' },
     { name: 'Profile', icon: <FaUser />, path: '/home/profile' },
     { name: 'Calendar', icon: <FaCalendarAlt />, path: '/home/calendar' },
     { name: 'Help', icon: <FaQuestionCircle />, path: '/home/help' },
-    { name: 'Logout', icon: <FaSignOutAlt />, path: '/home/logout' }
+
+
   ];
+
 
   return (
     <div className="fixed top-0 left-0 h-full w-64 text-white border-r-2 border-primary flex flex-col">
@@ -35,6 +50,8 @@ const Sidebar = () => {
               </NavLink>
             </li>
           ))}
+          <button className='p-4 my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer'
+            onClick={handleLogout}> <span className="mr-3"><FaSignOutAlt /></span>logout</button>
         </ul>
       </nav>
       <div className="self-center mt-auto p-4 flex items-center justify-center text-center text-md text-white rounded-tr-full rounded-tl-full h-64 w-64 bg-[#2E2E2E]  pt-10 ">

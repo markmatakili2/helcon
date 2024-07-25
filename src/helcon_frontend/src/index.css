@@ -80,15 +80,15 @@
  .highlighted-date {
    background-color: #0A1F4B; /* Background color for highlighted dates */
    color: white; /* Text color */
-   border-radius: 50%; /* Make the date circle rounded */
+  /* Make the date circle rounded */
    font-weight: bold; /* Bold text to stand out */
  }
  
  /* Optional: Add some padding and margin to make the highlighted dates look better */
- .react-calendar__tile--highlighted-date {
+ /* .react-calendar__tile--highlighted-date {
    padding: 2px;
    margin: 1px;
- }
+ } */
  .react-calendar__navigation__next2-button,
  .react-calendar__navigation__prev2-button {
    display: none;

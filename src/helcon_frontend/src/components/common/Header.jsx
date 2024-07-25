@@ -1,22 +1,19 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import logo from '../../images/helcon_logo.png';
 import { MdOutlineKeyboardArrowDown, MdMenu, MdClose } from "react-icons/md";
 import { NavLink } from "react-router-dom";
 import { login } from '../../features/auth/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { health_backend } from '../../../../declarations/health_backend';
+import { Navigate } from 'react-router-dom';
+
 
 
 const Header = () => {
 
-  
-   
-   //  const  register_patient = 
+   const dispatch = useDispatch();
+   const authClient = useSelector((state) => state.auth.authClient);
 
-   const isAuth = useSelector((state) => state.auth.authClient)
-   const dispatch = useDispatch()
-   const navigate = useNavigate()
+
 
 
    const [menuOpen, setMenuOpen] = useState(false);
@@ -24,17 +21,19 @@ const Header = () => {
    const toggleMenu = () => {
       setMenuOpen(!menuOpen);
    };
-   const handleLogin = async () => {
+   const handleLogin = () => {
       try {
-         const result = await dispatch(login()).unwrap(); // Unwraps the action payload
-         console.log('Login Result:', result);
-         
-         // Optional: Navigate or perform actions based on result
-       } catch (error) {
+         dispatch(login())
+
+      } catch (error) {
          console.error('Login failed:', error);
-       }
+      }
 
    }
+   if (authClient) {
+      return <Navigate to='/home' replace />
+   }
+
 
    return (
       <div className="w-full h-20 flex items-center border-b-[1px] border-[#E3E3E3] mb-10 px-5 relative justify-between">

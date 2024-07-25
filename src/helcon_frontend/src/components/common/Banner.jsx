@@ -8,7 +8,7 @@ import { useLocation } from 'react-router-dom';
 const Banner = () => {
    const location = useLocation()
    useEffect(()=>{
-      console.log(location.pathname)
+      
 
 
    },[location])
@@ -34,7 +34,7 @@ const Banner = () => {
                </div>
             </div>
 
-            <div className={`${location.pathname ==='/home'?'hidden':'block'} w-full md:w-[610px] rounded-[16px] bg-white py-3 px-5 flex flex-col md:flex-row justify-between shadow-md items-center text-[#7A7D84] -mt-8 relative z-20`}>
+            <div className={`${location.pathname ==='/home'?'hidden':'block'} w-full md:w-[610px] rounded-[16px] bg-white py-3 px-5 flex flex-col md:flex-row justify-between shadow-md items-center text-[#7A7D84] lg:-mt-8 md:-mt-7 relative z-20`}>
                <div className="flex gap-[4px] items-center w-full md:w-auto mb-2 md:mb-0 z-20">
                   <HiMagnifyingGlass className="text-xl" />
                   <input type="text" className="bg-none text-[14px] outline-none w-full md:w-auto" placeholder="Find doctors" />
@@ -53,7 +53,7 @@ const Banner = () => {
                <div className="bg-[#01BC8F] w-[6px] h-[6px] rounded-full"></div>
                <div className="bg-[#01BC8F] w-[6px] h-[6px] rounded-full"></div>
             </div>
-            <div className={`absolute ${location.pathname==='/'?'  -top-6 right-6 bg-none':'top-2 -right-2'} w-64 h-3/5`}>
+            <div className={`absolute ${location.pathname==='/'?'  lg:-top-6 md:right-2 right-6 bg-none':'top-2 -right-2'} w-64 h-3/5`}>
                <img src={image} alt="" className="h-full w-full object-cover" />
             </div>
          </div> 

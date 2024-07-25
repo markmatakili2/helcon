@@ -1,11 +1,27 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
+import { registerPatient } from '../../features/Patient/PatientSlice';
+import { registerDoctor } from '../../features/Doctors/DoctorSlice';
 
 const SignupForm = () => {
+   const dispatch = useDispatch()
+
+   //  const  name = 'kevin'
+   //  const medical_history='been never admitted'
+   //  const contact_details = '0722110113559'
+
+   //    function rp(){
+   //       dispatch(registerPatient({name,medical_history,contact_details}))
+   //    }
+
+     // rp()
+
+
    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm();
 
    const onSubmit = async (data) => {
-      console.log(data);
+         dispatch(registerDoctor(data))
    };
 
    return (
@@ -59,16 +75,16 @@ const SignupForm = () => {
                <input
                   type="text"
                   className="w-full p-1 border rounded-md border-gray-400 focus:outline-none focus:border-primary_1"
-                  {...register('city', { required: 'City is required' })}
+                  {...register('city', { required: 'City is required'})}
                />
                {errors.city && <span className="text-red-500 text-sm">{errors.city.message}</span>}
             </div>
             <div className="mb-3">
                <label className="block text-gray-700 mb-1">License No</label>
                <input
-                  type="text"
+                  type="number"
                   className="w-full p-1 border rounded-md border-gray-400 focus:outline-none focus:border-primary_1"
-                  {...register('licence_no', { required: 'License number is required' })}
+                  {...register('licence_no', { required: 'License number is required',valueAsNumber: true })}
                />
                {errors.licence_no && <span className="text-red-500 text-sm">{errors.licence_no.message}</span>}
             </div>
@@ -84,15 +100,15 @@ const SignupForm = () => {
             <div className="mb-3">
                <label className="block text-gray-700 mb-1">ID No</label>
                <input
-                  type="text"
+                  type="number"
                   className="w-full p-1 border rounded-md border-gray-400 focus:outline-none focus:border-primary_1"
-                  {...register('id_no', { required: 'ID number is required' })}
+                  {...register('id_no', { required: 'ID number is required',valueAsNumber: true })}
                />
                {errors.id_no && <span className="text-red-500 text-sm">{errors.id_no.message}</span>}
             </div>
 
 
-            <div className="mb-3">
+            {/* <div className="mb-3">
                <label className="block text-gray-700 mb-1">Contact Details</label>
                <input
                   type="text"
@@ -108,7 +124,7 @@ const SignupForm = () => {
                   {...register('medical_history')}
                ></textarea>
                {errors.medical_history && <span className="text-red-500 text-sm">{errors.medical_history.message}</span>}
-            </div>
+            </div> */}
 
 
             <button
