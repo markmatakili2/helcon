@@ -26,7 +26,6 @@ const ProfileCard = () => {
   }
   const markCalendar = () => {
     if (auth) {
-
       const getNewestObjectWithLink = (array) => {
         if (array.length === 0) return null; // Check if the array is empty
       
@@ -40,8 +39,8 @@ const ProfileCard = () => {
         }
       };
       const newestObjectWithLink = getNewestObjectWithLink(doctors);
-      navigate(newestObjectWithLink)
 
+      window.location.href = newestObjectWithLink
     }
     else {
       alert('log in first to book an appointment')
@@ -94,7 +93,7 @@ const ProfileCard = () => {
               </div>
             </div> */}
             <button className="mt-4 w-full py-2 bg-primary_1 text-white rounded"
-              onClick={markCalendar}>
+            onClick={markCalendar}>
               Book Appointment
             </button>
           </div>
