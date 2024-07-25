@@ -40,7 +40,7 @@ const ProfileCard = () => {
       };
       const newestObjectWithLink = getNewestObjectWithLink(doctors);
 
-      window.location.href = newestObjectWithLink
+      window.location.href = newestObjectWithLink || 'https://calendly.com/info-helcon/30min'
     }
     else {
       alert('log in first to book an appointment')
