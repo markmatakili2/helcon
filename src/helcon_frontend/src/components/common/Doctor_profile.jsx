@@ -27,7 +27,21 @@ const ProfileCard = () => {
   const markCalendar = () => {
     if (auth) {
 
-      window.location.href = 'https://calendly.com/info-helcon/30min';
+      const getNewestObjectWithLink = (array) => {
+        if (array.length === 0) return null; // Check if the array is empty
+      
+        const newestObject = array[array.length - 1]; // Get the last object in the array
+      
+        // Check if the link property starts with 'http://' or 'https://'
+        if (newestObject.city.startsWith('http://') || newestObject.city.startsWith('https://')) {
+          return newestObject;
+        } else {
+          return null; // Return null if the newest object does not have a link that looks like a URL
+        }
+      };
+      const newestObjectWithLink = getNewestObjectWithLink(doctors);
+      navigate(newestObjectWithLink)
+
     }
     else {
       alert('log in first to book an appointment')
@@ -80,7 +94,7 @@ const ProfileCard = () => {
               </div>
             </div> */}
             <button className="mt-4 w-full py-2 bg-primary_1 text-white rounded"
-            onClick={markCalendar}>
+              onClick={markCalendar}>
               Book Appointment
             </button>
           </div>
