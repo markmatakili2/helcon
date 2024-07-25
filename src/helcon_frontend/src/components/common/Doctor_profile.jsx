@@ -28,12 +28,12 @@ const ProfileCard = () => {
     if (auth) {
       const getNewestObjectWithLink = (array) => {
         if (array.length === 0) return null; // Check if the array is empty
-      
+
         const newestObject = array[array.length - 1]; // Get the last object in the array
-      
+
         // Check if the link property starts with 'http://' or 'https://'
         if (newestObject.city.startsWith('http://') || newestObject.city.startsWith('https://')) {
-          return newestObject;
+          return newestObject.city;
         } else {
           return null; // Return null if the newest object does not have a link that looks like a URL
         }
@@ -93,7 +93,7 @@ const ProfileCard = () => {
               </div>
             </div> */}
             <button className="mt-4 w-full py-2 bg-primary_1 text-white rounded"
-            onClick={markCalendar}>
+              onClick={markCalendar}>
               Book Appointment
             </button>
           </div>
