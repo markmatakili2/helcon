@@ -19,9 +19,8 @@ struct MultiMediaContent {
 #[derive(candid::CandidType, Serialize, Deserialize, Default, Clone)]
 struct Patient {
     id: u64,
-    name: String,
-    contact_details: String,
-    medical_history: String,
+    username: String,
+    identity_id: u64,
 }
 
 impl Storable for Patient {
@@ -166,6 +165,26 @@ impl BoundedStorable for Report {
     const IS_FIXED_SIZE: bool = false;
 }
 
+#[derive(candid::CandidType, Serialize, Deserialize, Default, Clone)]
+struct Identity {
+    id: u64,
+    principal: String,
+}
+
+impl Storable for Identity {
+    fn to_bytes(&self) -> std::borrow::Cow<[u8]> {
+        Cow::Owned(Encode!(self).unwrap())
+    }
+
+    fn from_bytes(bytes: std::borrow::Cow<[u8]>) -> Self {
+        Decode!(bytes.as_ref(), Self).unwrap()
+    }
+}
+
+impl BoundedStorable for Identity {
+    const MAX_SIZE: u32 = 1024;
+    const IS_FIXED_SIZE: bool = false;
+}
 thread_local! {
     static MEMORY_MANAGER: RefCell<MemoryManager<DefaultMemoryImpl>> = RefCell::new(
         MemoryManager::init(DefaultMemoryImpl::default())
@@ -205,6 +224,11 @@ thread_local! {
     RefCell::new(StableBTreeMap::init(
         MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(6)))
     ));
+
+    static IDENTITY_STORAGE: RefCell<StableBTreeMap<u64, Identity, Memory>> =
+    RefCell::new(StableBTreeMap::init(
+        MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(7)))
+    ));
 }
 
 #[derive(candid::CandidType, Deserialize, Serialize)]
@@ -227,11 +251,25 @@ fn get_patient(patient_id: u64) -> Result<Patient, Error> {
 }
 
 #[ic_cdk::update]
-fn register_patient(name: String, contact_details: String, medical_history: String) -> Result<Patient, Error> {
+fn add_identity(principal: String) -> Result<Identity, Error> {
     // Validate input data
-    if name.is_empty() {
+    if principal.is_empty() {
         return Err(Error::InvalidInput {
-            msg: "Name cannot be empty".to_string(),
+            msg: "Principal cannot be empty".to_string(),
+        });
+    }
+
+    // Check if the principal already exists
+    let exists = IDENTITY_STORAGE.with(|service| {
+        service
+            .borrow()
+            .iter()
+            .any(|(_, identity)| identity.principal == principal)
+    });
+
+    if exists {
+        return Err(Error::AlreadyExists {
+            msg: "Principal already exists".to_string(),
         });
     }
 
@@ -242,11 +280,83 @@ fn register_patient(name: String, contact_details: String, medical_history: Stri
         })
         .expect("cannot increment id counter");
 
-    let patient = Patient { id, name, contact_details, medical_history };
+    let identity = Identity { id, principal };
+
+    IDENTITY_STORAGE.with(|service| service.borrow_mut().insert(id, identity.clone()));
+    Ok(identity)
+}
+
+#[ic_cdk::query]
+fn get_identity(identity_id: u64) -> Result<Identity, Error> {
+    match _get_identity(&identity_id) {
+        Some(identity) => Ok(identity),
+        None => Err(Error::NotFound {
+            msg: format!("Identity with id={} not found", identity_id),
+        }),
+    }
+}
+
+#[ic_cdk::query]
+fn list_identities() -> Vec<Identity> {
+    IDENTITY_STORAGE.with(|service| {
+        service
+            .borrow()
+            .iter()
+            .map(|(_, identity)| identity.clone())
+            .collect()
+    })
+}
+
+
+#[ic_cdk::update]
+fn register_patient(username: String, identity_id: u64) -> Result<Patient, Error> {
+    // Validate input data
+    if username.is_empty() {
+        return Err(Error::InvalidInput {
+            msg: "Name cannot be empty".to_string(),
+        });
+    }
+
+    // Check if the username already exists
+    let username_exists = PATIENT_STORAGE.with(|service| {
+        service
+            .borrow()
+            .iter()
+            .any(|(_, patient)| patient.username == username)
+    });
+
+    if username_exists {
+        return Err(Error::AlreadyExists {
+            msg: "Username already exists".to_string(),
+        });
+    }
+
+    // Check if the identity_id exists
+    let identity_exists = IDENTITY_STORAGE.with(|service| {
+        service
+            .borrow()
+            .contains_key(&identity_id)
+    });
+
+    if !identity_exists {
+        return Err(Error::NotFound {
+            msg: "Identity ID does not exist".to_string(),
+        });
+    }
+
+    let id = ID_COUNTER
+        .with(|counter| {
+            let current_value = *counter.borrow().get();
+            counter.borrow_mut().set(current_value + 1)
+        })
+        .expect("cannot increment id counter");
+
+    let patient = Patient { id, username, identity_id };
 
     PATIENT_STORAGE.with(|service| service.borrow_mut().insert(id, patient.clone()));
     Ok(patient)
 }
+
 
 #[ic_cdk::query]
 fn get_appointment(appointment_id: u64) -> Result<Appointment, Error> {
@@ -331,86 +441,6 @@ fn get_medical_record(record_id: u64) -> Result<MedicalRecord, Error> {
         Some(record) => Ok(record),
         None => Err(Error::NotFound {
             msg: format!("medical record with id={} not found", record_id),
-        }),
-    }
-}
-
-#[ic_cdk::update]
-fn update_patient(patient_id: u64, name: String, contact_details: String, medical_history: String) -> Result<Patient, Error> {
-    // Validate input data
-    if name.is_empty() {
-        return Err(Error::InvalidInput {
-            msg: "Name cannot be empty".to_string(),
-        });
-    }
-
-    let updated_patient = Patient { id: patient_id, name, contact_details, medical_history };
-
-    // Update patient in storage
-    match PATIENT_STORAGE.with(|service| service.borrow_mut().insert(patient_id, updated_patient.clone())) {
-        Some(_) => Ok(updated_patient),
-        None => Err(Error::NotFound {
-            msg: format!("Patient with id={} not found", patient_id),
-        }),
-    }
-}
-
-#[ic_cdk::update]
-fn delete_patient(patient_id: u64) -> Result<(), Error> {
-    // Remove patient from storage
-    match PATIENT_STORAGE.with(|service| service.borrow_mut().remove(&patient_id)) {
-        Some(_) => Ok(()),
-        None => Err(Error::NotFound {
-            msg: format!("Patient with id={} not found", patient_id),
-        }),
-    }
-}
-
-#[ic_cdk::query]
-fn list_patients() -> Vec<Patient> {
-    PATIENT_STORAGE.with(|service| {
-        service
-            .borrow()
-            .iter()
-            .map(|(_, patient)| patient.clone())
-            .collect()
-    })
-}
-
-#[ic_cdk::update]
-fn update_appointment(appointment_id: u64, patient_id: u64, doctor_id: u64, date_time: u64, reason: String, multimedia_content: Option<MultiMediaContent>) -> Result<Appointment, Error> {
-    // Validate input data
-    if reason.is_empty() {
-        return Err(Error::InvalidInput {
-            msg: "Reason cannot be empty".to_string(),
-        });
-    }
-
-    let updated_appointment = Appointment {
-        id: appointment_id,
-        patient_id,
-        doctor_id,
-        date_time,
-        reason,
-        multimedia_content,
-    };
-
-    // Update appointment in storage
-    match APPOINTMENT_STORAGE.with(|service| service.borrow_mut().insert(appointment_id, updated_appointment.clone())) {
-        Some(_) => Ok(updated_appointment),
-        None => Err(Error::NotFound {
-            msg: format!("Appointment with id={} not found", appointment_id),
-        }),
-    }
-}
-
-#[ic_cdk::update]
-fn delete_appointment(appointment_id: u64) -> Result<(), Error> {
-    // Remove appointment from storage
-    match APPOINTMENT_STORAGE.with(|service| service.borrow_mut().remove(&appointment_id)) {
-        Some(_) => Ok(()),
-        None => Err(Error::NotFound {
-            msg: format!("Appointment with id={} not found", appointment_id),
         }),
     }
 }
@@ -770,6 +800,10 @@ fn _get_doctor(doctor_id: &u64) -> Option<Doctor> {
 
 fn _get_report(report_id: &u64) -> Option<Report> {
     REPORT_STORAGE.with(|service| service.borrow().get(report_id))
+}
+
+fn _get_identity(identity_id: &u64) -> Option<Identity> {
+    IDENTITY_STORAGE.with(|service| service.borrow().get(identity_id))
 }
 
 #[ic_cdk::update]
