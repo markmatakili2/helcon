@@ -30,8 +30,9 @@ export const login = createAsyncThunk(
               try {
             
                 dispatch(setAuthClient(true));
-             
-                localStorage.setItem('principal', principal);
+                dispatch(setPrincipal(principal))
+                sessionStorage.setItem('authenticated','true')
+                console.log('your principal_id',principal)
 
                 return { principal };
               } catch (error) {

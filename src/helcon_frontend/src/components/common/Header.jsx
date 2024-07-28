@@ -14,8 +14,6 @@ const Header = () => {
    const authClient = useSelector((state) => state.auth.authClient);
 
 
-
-
    const [menuOpen, setMenuOpen] = useState(false);
 
    const toggleMenu = () => {

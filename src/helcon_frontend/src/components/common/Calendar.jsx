@@ -27,11 +27,16 @@ const MyCalendar = () => {
 
   return (
     <div className="react-calendar-container">
-      <Calendar
+     <Calendar
         onChange={handleDateChange}
         value={date}
         tileClassName={tileClassName}
-      />
+      /> 
+       {/* <div
+        className="calendly-inline-widget"
+        data-url="https://calendly.com/info-helcon/30min"
+        style={{ minWidth: '320px', height: '630px' }}
+      ></div> */}
     </div>
   );
 };
