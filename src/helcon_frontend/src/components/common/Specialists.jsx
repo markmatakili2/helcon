@@ -6,11 +6,16 @@ import Frame from './Frame'
 import doc from '../../images/doc5.png'
 import { useDispatch } from 'react-redux';
 import { login } from '../../features/auth/authSlice';
-
+import {useNavigate,NavLink} from 'react-router-dom';
 const Specialists = () => {
-   const dispatch = useDispatch()
-   const handleLogin = async ()=>{
-      dispatch(login())
+   const navigate = useNavigate()
+   // const dispatch = useDispatch()
+   
+   const handleLogin =  () =>{
+      // dispatch(login())
+      navigate('/doctors')
+      console.log('hello world')
+      hh
   }
 
    const [availability, setAvailability] = useState(false);
@@ -38,8 +43,9 @@ const Specialists = () => {
 </p>
 
 <button className="bg-primary_1 text-white px-10 py-4 rounded-[13.03px] text-lg md:text-base shadow-lg hover:bg-primary_2 transition duration-300"
-onClick={handleLogin}>
-  Get Started
+onClick={handleLogin} 
+type="button">
+<NavLink to="/doctors"> Get Started</NavLink>
 </button>
 
 </div>

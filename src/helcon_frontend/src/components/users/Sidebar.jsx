@@ -1,21 +1,27 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FaTachometerAlt, FaCalendarAlt, FaUser, FaQuestionCircle, FaSignOutAlt } from 'react-icons/fa';
 import logo from '../../images/helcon_logo.png';
-import { NavLink, Navigate } from 'react-router-dom';
+import { NavLink, Navigate, useLocation } from 'react-router-dom';
 import { logout } from '../../features/auth/authSlice';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector, } from 'react-redux';
 
 const Sidebar = () => {
+  const location = useLocation()
+  useEffect(() => {
+  }, [location])
+
   const auth = useSelector((state) => state.auth.authClient)
+
+
   const dispatch = useDispatch
   const handleLogout = () => {
     dispatch(logout())
 
   }
 
-  if (!auth) {
-    return <Navigate to='/' replace />
-  }
+  // if (!auth) {
+  //   return <Navigate to='/' replace />
+  // }
 
   const links = [
     { name: 'Dashboard', icon: <FaTachometerAlt />, path: '/home' },
@@ -35,21 +41,56 @@ const Sidebar = () => {
       </div>
       <nav className="flex-1 pl-4 mb-20">
         <ul>
-          {links.map((link, index) => (
-            <li key={index} className="my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer">
-              <NavLink
-                to={link.path}
-                end
-                className={({ isActive }) =>
+
+          {location.pathname.startsWith('/d') ? (<> <li className="my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer">
+            <NavLink className={({ isActive }) =>
+              `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : 'text-primary'
+              }`
+            } to="/doctors" end> <span className="mr-3"><FaTachometerAlt /></span>Dashboard</NavLink>
+
+          </li>
+            <li className="my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer"><NavLink className={({ isActive }) =>
+              `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : 'text-primary'
+              }`
+            } to="/doctors/patient-records"> <span className="mr-3"><FaTachometerAlt /></span>Patient Records</NavLink></li>
+            <NavLink className={({ isActive }) =>
+              `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : 'text-primary'
+              }`
+            } to="/doctors/availability"> <span className="mr-3"><FaTachometerAlt /></span>My availablity</NavLink>
+            <li className="my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer"> <NavLink className={({ isActive }) =>
+              `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : 'text-primary'
+              }`
+            } to="/doctors/consults"> <span className="mr-3"><FaTachometerAlt /></span>My consults</NavLink></li>
+            <li className="my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer">            <NavLink className={({ isActive }) =>
+              `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : 'text-primary'
+              }`
+            } to="/doctors/chats"> <span className="mr-3"><FaTachometerAlt /></span>Chats</NavLink></li></>) : (
+            <>
+              <li className="my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer">
+                <NavLink className={({ isActive }) =>
                   `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : 'text-primary'
                   }`
-                }
-              >
-                <span className="mr-3">{link.icon}</span>
-                {link.name}
-              </NavLink>
-            </li>
-          ))}
+                } to="/home"> <span className="mr-3"><FaTachometerAlt /></span>Dashboard</NavLink>
+              </li>
+              <li className="my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer">
+                <NavLink className={({ isActive }) =>
+                  `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : 'text-primary'
+                  }`
+                } to="/home/profile"> <span className="mr-3"> <FaUser /></span>Profile</NavLink>
+              </li>
+              <li className="my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer">
+                <NavLink className={({ isActive }) =>
+                  `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : 'text-primary'
+                  }`
+                } to="/home/calendar"><span className="mr-3"><FaCalendarAlt /></span> Calendar</NavLink>
+              </li>
+            </>)}
+          <li className="my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer">
+            <NavLink className={({ isActive }) =>
+              `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : 'text-primary'
+              }`
+            } to="/home/help"><span className="mr-3"><FaQuestionCircle /></span> Help</NavLink>
+          </li>
           <button className='p-4 my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer'
             onClick={handleLogout}> <span className="mr-3"><FaSignOutAlt /></span>logout</button>
         </ul>

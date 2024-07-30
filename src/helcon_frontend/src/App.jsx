@@ -15,37 +15,41 @@ import GeneralProfile from './components/users/GeneralProfile'
 import Document from './components/users/Document'
 import SignupForm from './components/common/SignupForm'
 import MyCalendar from './components/common/Calendar';
+import DoctorDashboard from './components/users/Doctors/DoctorDasboard'
+import DefaultPage from './components/users/Doctors/DefaultPage';
+import PatientRecords from './components/users/Doctors/PatientRecords'
+import Consults from './components/users/Doctors/Consults'
 
 
 function App() {
-  const PrivateRoute = ({ element }) => {
+  // const PrivateRoute = ({ element }) => {
 
-    const isAuthenticated = useSelector((state) => state.auth.authClient);
-    const location = useLocation();
+  //   const isAuthenticated = useSelector((state) => state.auth.authClient);
+  //   const location = useLocation();
 
-    return isAuthenticated ? (
-      element
-    ) : (
-      <Navigate to="/" state={{ from: location }} replace />
-    );
-  };
-
-
+  //   return isAuthenticated ? (
+  //     element
+  //   ) : (
+  //     <Navigate to="/" state={{ from: location }} replace />
+  //   );
+  // };
 
 
 
-  const dispatch = useDispatch()
-  const { status, error } = useSelector((state) => state.doctorList)
-  useEffect(() => {
-    dispatch(fetchDoctors())
-  }, [dispatch])
-  if (status === 'loading') {
-    return <div className="">loading ....</div>
-  }
 
-  if (status === 'failed') {
-    return <div className="">{error}</div>
-  }
+
+  // const dispatch = useDispatch()
+  // const { status, error } = useSelector((state) => state.doctorList)
+  // useEffect(() => {
+  //   dispatch(fetchDoctors())
+  // }, [dispatch])
+  // if (status === 'loading') {
+  //   return <div className="">loading ....</div>
+  // }
+
+  // if (status === 'failed') {
+  //   return <div className="">{error}</div>
+  // }
 
 
   return (
@@ -56,7 +60,12 @@ function App() {
         <Route path="/services" element={<Services />} />
         <Route path="/specialists" element={<Specialists />} />
         <Route path="/new-account" element={<SignupForm />} />
-        <Route path="/home" element={<PrivateRoute element={<Dashboard />} />}>
+        <Route path="/doctors" element={<DoctorDashboard/>}>
+        <Route path=""  element={<DefaultPage/>}/>
+        <Route path="patient-records" element={<PatientRecords/>}/>
+        <Route path="consults" element={<Consults/>}/>
+        </Route>
+        {/* <Route path="/home" element={<PrivateRoute element={<Dashboard />} />}>
           <Route path='' element={<PrivateRoute element={<MainDashboard />} />} />
           <Route path="profile" element={<PrivateRoute element={<ProfilePage />} />}>
             <Route path='' element={<PrivateRoute element={<GeneralProfile />} />} />
@@ -64,7 +73,7 @@ function App() {
             <Route path="my-documents" element={<PrivateRoute element={<Document />} />} />
           </Route>
           <Route path="calendar" element={<PrivateRoute element={<MyCalendar />} />} />
-        </Route>
+        </Route> */}
       </Routes>
     </Router>
   );
