@@ -113,6 +113,7 @@ impl BoundedStorable for MedicalRecord {
 #[derive(candid::CandidType, Serialize, Deserialize, Default, Clone)]
 struct Doctor {
     id: u64,
+    docidentity_id: u64,
     name: String,
     age: u64,
     specialism: String,
@@ -185,6 +186,27 @@ impl BoundedStorable for Identity {
     const MAX_SIZE: u32 = 1024;
     const IS_FIXED_SIZE: bool = false;
 }
+
+#[derive(candid::CandidType, Serialize, Deserialize, Default, Clone)]
+struct DocIdentity {
+    id: u64,
+    principal: String,
+}
+
+impl Storable for DocIdentity {
+    fn to_bytes(&self) -> std::borrow::Cow<[u8]> {
+        Cow::Owned(Encode!(self).unwrap())
+    }
+
+    fn from_bytes(bytes: std::borrow::Cow<[u8]>) -> Self {
+        Decode!(bytes.as_ref(), Self).unwrap()
+    }
+}
+
+impl BoundedStorable for DocIdentity {
+    const MAX_SIZE: u32 = 1024;
+    const IS_FIXED_SIZE: bool = false;
+}
 thread_local! {
     static MEMORY_MANAGER: RefCell<MemoryManager<DefaultMemoryImpl>> = RefCell::new(
         MemoryManager::init(DefaultMemoryImpl::default())
@@ -229,6 +251,11 @@ thread_local! {
     RefCell::new(StableBTreeMap::init(
         MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(7)))
     ));
+
+    static DOCIDENTITY_STORAGE: RefCell<StableBTreeMap<u64, DocIdentity, Memory>> =
+    RefCell::new(StableBTreeMap::init(
+        MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(8)))
+    ));
 }
 
 #[derive(candid::CandidType, Deserialize, Serialize)]
@@ -248,6 +275,63 @@ fn get_patient(patient_id: u64) -> Result<Patient, Error> {
             msg: format!("patient with id={} not found", patient_id),
         }),
     }
+}
+
+#[ic_cdk::update]
+fn add_docidentity(principal: String) -> Result<DocIdentity, Error> {
+    // Validate input data
+    if principal.is_empty() {
+        return Err(Error::InvalidInput {
+            msg: "Principal cannot be empty".to_string(),
+        });
+    }
+
+    // Check if the principal already exists
+    let exists = DOCIDENTITY_STORAGE.with(|service| {
+        service
+            .borrow()
+            .iter()
+            .any(|(_, docidentity)| docidentity.principal == principal)
+    });
+
+    if exists {
+        return Err(Error::AlreadyExists {
+            msg: "Principal already exists".to_string(),
+        });
+    }
+
+    let id = ID_COUNTER
+        .with(|counter| {
+            let current_value = *counter.borrow().get();
+            counter.borrow_mut().set(current_value + 1)
+        })
+        .expect("cannot increment id counter");
+
+    let docidentity = DocIdentity { id, principal };
+
+    DOCIDENTITY_STORAGE.with(|service| service.borrow_mut().insert(id, docidentity.clone()));
+    Ok(docidentity)
+}
+
+#[ic_cdk::query]
+fn get_docidentity(docidentity_id: u64) -> Result<DocIdentity, Error> {
+    match DOCIDENTITY_STORAGE.with(|storage| storage.borrow().get(&docidentity_id)) {
+        Some(docidentity) => Ok(docidentity.clone()),
+        None => Err(Error::NotFound {
+            msg: format!("DocIdentity with id={} not found", docidentity_id),
+        }),
+    }
+}
+
+#[ic_cdk::query]
+fn list_docidentities() -> Vec<DocIdentity> {
+    DOCIDENTITY_STORAGE.with(|service| {
+        service
+            .borrow()
+            .iter()
+            .map(|(_, docidentity)| docidentity.clone())
+            .collect()
+    })
 }
 
 #[ic_cdk::update]
@@ -306,7 +390,6 @@ fn list_identities() -> Vec<Identity> {
             .collect()
     })
 }
-
 
 #[ic_cdk::update]
 fn register_patient(username: String, identity_id: u64) -> Result<Patient, Error> {
@@ -586,7 +669,7 @@ fn list_medical_records() -> Vec<MedicalRecord> {
 }
 
 #[ic_cdk::update]
-fn add_doctor(name: String, age: u64, specialism: String, licence_no: u64, id_no: u64, sex: String, country: String, city: String) -> Result<Doctor, Error> {
+fn add_doctor(docidentity_id: u64, name: String, age: u64, specialism: String, licence_no: u64, id_no: u64, sex: String, country: String, city: String) -> Result<Doctor, Error> {
     // Validate input data
     if name.is_empty() || specialism.is_empty() || sex.is_empty() || country.is_empty() || city.is_empty() {
         return Err(Error::InvalidInput {
@@ -603,6 +686,7 @@ fn add_doctor(name: String, age: u64, specialism: String, licence_no: u64, id_no
 
     let doctor = Doctor {
         id,
+        docidentity_id,
         name,
         age,
         specialism,
@@ -617,18 +701,8 @@ fn add_doctor(name: String, age: u64, specialism: String, licence_no: u64, id_no
     Ok(doctor)
 }
 
-#[ic_cdk::query]
-fn get_doctor(doctor_id: u64) -> Result<Doctor, Error> {
-    match _get_doctor(&doctor_id) {
-        Some(doctor) => Ok(doctor),
-        None => Err(Error::NotFound {
-            msg: format!("Doctor with id={} not found", doctor_id),
-        }),
-    }
-}
-
 #[ic_cdk::update]
-fn update_doctor(doctor_id: u64, name: String, age: u64, specialism: String, licence_no: u64, id_no: u64, sex: String, country: String, city: String) -> Result<Doctor, Error> {
+fn update_doctor(doctor_id: u64, docidentity_id: u64, name: String, age: u64, specialism: String, licence_no: u64, id_no: u64, sex: String, country: String, city: String) -> Result<Doctor, Error> {
     // Validate input data
     if name.is_empty() || specialism.is_empty() || sex.is_empty() || country.is_empty() || city.is_empty() {
         return Err(Error::InvalidInput {
@@ -638,6 +712,7 @@ fn update_doctor(doctor_id: u64, name: String, age: u64, specialism: String, lic
 
     let updated_doctor = Doctor {
         id: doctor_id,
+        docidentity_id,
         name,
         age,
         specialism,
@@ -651,6 +726,16 @@ fn update_doctor(doctor_id: u64, name: String, age: u64, specialism: String, lic
     // Update doctor in storage
     match DOCTOR_STORAGE.with(|service| service.borrow_mut().insert(doctor_id, updated_doctor.clone())) {
         Some(_) => Ok(updated_doctor),
+        None => Err(Error::NotFound {
+            msg: format!("Doctor with id={} not found", doctor_id),
+        }),
+    }
+}
+
+#[ic_cdk::query]
+fn get_doctor(doctor_id: u64) -> Result<Doctor, Error> {
+    match _get_doctor(&doctor_id) {
+        Some(doctor) => Ok(doctor),
         None => Err(Error::NotFound {
             msg: format!("Doctor with id={} not found", doctor_id),
         }),
@@ -804,6 +889,10 @@ fn _get_report(report_id: &u64) -> Option<Report> {
 
 fn _get_identity(identity_id: &u64) -> Option<Identity> {
     IDENTITY_STORAGE.with(|service| service.borrow().get(identity_id))
+}
+
+fn _get_docidentity(docidentity_id: &u64) -> Option<DocIdentity> {
+    DOCIDENTITY_STORAGE.with(|service| service.borrow().get(docidentity_id))
 }
 
 #[ic_cdk::update]
