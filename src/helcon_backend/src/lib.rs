@@ -676,7 +676,20 @@ fn add_doctor(docidentity_id: u64, name: String, age: u64, specialism: String, l
             msg: "All fields must be provided".to_string(),
         });
     }
+    
+     // Check if the docidentity_id exists
+     let identity_exists = DOCIDENTITY_STORAGE.with(|service| {
+        service
+            .borrow()
+            .contains_key(&docidentity_id)
+    });
 
+    if !identity_exists {
+        return Err(Error::NotFound {
+            msg: "Identity ID does not exist".to_string(),
+        });
+    }
+    
     let id = ID_COUNTER
         .with(|counter| {
             let current_value = *counter.borrow().get();
