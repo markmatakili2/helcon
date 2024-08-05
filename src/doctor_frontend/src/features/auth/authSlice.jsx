@@ -2,7 +2,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { AuthClient } from '@dfinity/auth-client';
 import { HttpAgent } from '@dfinity/agent';
-
+import { helcon_backend } from '../../../../declarations/helcon_backend/index';
 
 let authClient;
 
@@ -13,9 +13,48 @@ const initializeAuthClient = async () => {
   return authClient;
 };
 
+
+// docidentity_id: u64,
+// name: String,
+// age: u64,
+// specialism: String,
+// licence_no: u64,
+// id_no: u64,
+// sex: String,
+// country: String,
+// city: String
+export const registerDoctor = createAsyncThunk(
+  'auth/registerDoctor',
+  async ({ navigate, data }, { dispatch, rejectWithValue }) => {
+    try {
+      const { name, age, specialism, licence_no, id_no, sex, country, city } = data
+
+      let storedData = await JSON.parse(localStorage.getItem('data'));
+      if (storedData) {
+        const { toNumber } = storedData;
+        const response = await helcon_backend.add_doctor(toNumber, name, age, specialism, licence_no, id_no, sex, country, city);
+
+        if (response.Ok) {
+          console.log('data was succesful created', response.Ok)
+          dispatch(setDoctorData(response.Ok));
+          navigate('/doctors')
+
+          return
+        } else {
+          console.log('Registration error:', response.Err);
+          return rejectWithValue(response.Err);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 export const login = createAsyncThunk(
   'auth/login',
-  async (_, { dispatch, rejectWithValue }) => {
+  async ({ navigate }, { dispatch, rejectWithValue }) => {
     try {
       const client = await initializeAuthClient();
 
@@ -24,17 +63,45 @@ export const login = createAsyncThunk(
           try {
             const identity = client.getIdentity();
             const agent = new HttpAgent({ identity, host: "http://localhost:8080" });
-            const principal = identity.getPrincipal().toString();
-
-            if (principal) {
-              try {
+            const principalId = identity.getPrincipal().toString();
             
-                dispatch(setAuthClient(true));
-                dispatch(setPrincipal(principal))
-                sessionStorage.setItem('authenticated','true')
-                console.log('your principal_id',principal)
-
-                return { principal };
+            if (principalId) {
+              try {
+                let storedData = await JSON.parse(localStorage.getItem('data'));
+                if (storedData) {
+                  const { toNumber } = storedData;
+                  try {
+                    const response = await helcon_backend.get_doctor(toNumber);
+                    if (response.Ok) {
+                      console.log('user info is here with us', response.Ok);
+                      dispatch(setDoctorData(response.Ok));
+                      dispatch(setAuthClient(true))
+                      navigate('/doctors')
+                    } else {
+                      navigate('/new-account');
+                      console.log('you have not registerDoctored yet', response.Err);
+                    }
+                  } catch (error) {
+                    console.log('error', error);
+                  }
+                } else {
+                  const response = await helcon_backend.add_docidentity(principalId);
+                  if (response.Ok) {
+                    const { id, principal } = response.Ok;
+                    const toNumber = Number(id);
+                    let data = {
+                      toNumber, principal
+                    };
+                    localStorage.setItem('data', JSON.stringify(data));
+                    console.log('data was set for the first time');
+                    navigate('/new-account');
+                    dispatch(setAuthClient(true));
+                    dispatch(setPrincipal(principalId));
+                  } else {
+                    console.log('error existing here', response.Err);
+                    return;
+                  }
+                }
               } catch (error) {
                 console.error("Error fetching user from backend:", error.message);
                 return rejectWithValue("Error fetching user from backend");
@@ -59,7 +126,7 @@ export const login = createAsyncThunk(
 
 export const logout = createAsyncThunk(
   'auth/logout',
-  async (_, { dispatch }) => {
+  async ({navigate}, { dispatch }) => {
     try {
       const client = await initializeAuthClient();
       await client.logout();
@@ -67,7 +134,7 @@ export const logout = createAsyncThunk(
       dispatch(setAuthClient(null));
       dispatch(setActor(null));
       dispatch(setPrincipal(null));
-      localStorage.removeItem('principal');
+      navigate('/')
     } catch (error) {
       console.error('Logout failed:', error.message);
     }
@@ -77,20 +144,22 @@ export const logout = createAsyncThunk(
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
-    authClient: null,
-  
-    principal: null,
- 
+    data: null,
     status: 'idle',
-    error: null,
+    isLoading: false,
+    error: '',
+    authClient: null
+
   },
   reducers: {
     setAuthClient: (state, action) => {
       state.authClient = action.payload;
     },
-    
     setPrincipal: (state, action) => {
       state.principal = action.payload;
+    },
+    setDoctorData: (state, action) => {
+      state.data = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -110,16 +179,22 @@ const authSlice = createSlice({
       .addCase(logout.fulfilled, (state) => {
         state.status = 'idle';
         state.authClient = null;
-       
         state.principal = null;
+      })
+      .addCase(registerDoctor.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(registerDoctor.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.data = action.payload;
+      })
+      .addCase(registerDoctor.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
       });
   },
 });
 
-export const {
-  setAuthClient,
-  
-  setPrincipal,
-} = authSlice.actions;
+export const { setAuthClient, setPrincipal, setDoctorData } = authSlice.actions;
 
 export default authSlice.reducer;

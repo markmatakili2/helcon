@@ -2,9 +2,12 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { registerPatient } from '../../features/Patient/PatientSlice';
-import { registerDoctor } from '../../features/Doctors/DoctorSlice';
+// import { registerDoctor } from '../../features/Doctors/DoctorSlice';
+import { registerDoctor } from '../../features/auth/authSlice';
+import { useNavigate } from 'react-router-dom';
 
 const SignupForm = () => {
+   const navigate = useNavigate()
    const dispatch = useDispatch()
 
    //  const  name = 'kevin'
@@ -15,13 +18,13 @@ const SignupForm = () => {
    //       dispatch(registerPatient({name,medical_history,contact_details}))
    //    }
 
-     // rp()
+   // rp()
 
 
    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm();
 
    const onSubmit = async (data) => {
-         dispatch(registerDoctor(data))
+      dispatch(registerDoctor({ navigate, data }))
    };
 
    return (
@@ -75,7 +78,7 @@ const SignupForm = () => {
                <input
                   type="text"
                   className="w-full p-1 border rounded-md border-gray-400 focus:outline-none focus:border-primary_1"
-                  {...register('city', { required: 'City is required'})}
+                  {...register('city', { required: 'City is required' })}
                />
                {errors.city && <span className="text-red-500 text-sm">{errors.city.message}</span>}
             </div>
@@ -84,7 +87,7 @@ const SignupForm = () => {
                <input
                   type="number"
                   className="w-full p-1 border rounded-md border-gray-400 focus:outline-none focus:border-primary_1"
-                  {...register('licence_no', { required: 'License number is required',valueAsNumber: true })}
+                  {...register('licence_no', { required: 'License number is required', valueAsNumber: true })}
                />
                {errors.licence_no && <span className="text-red-500 text-sm">{errors.licence_no.message}</span>}
             </div>
@@ -102,7 +105,7 @@ const SignupForm = () => {
                <input
                   type="number"
                   className="w-full p-1 border rounded-md border-gray-400 focus:outline-none focus:border-primary_1"
-                  {...register('id_no', { required: 'ID number is required',valueAsNumber: true })}
+                  {...register('id_no', { required: 'ID number is required', valueAsNumber: true })}
                />
                {errors.id_no && <span className="text-red-500 text-sm">{errors.id_no.message}</span>}
             </div>

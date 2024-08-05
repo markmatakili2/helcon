@@ -21,17 +21,17 @@ import PatientRecords from './components/users/Doctors/PatientRecords'
 import Consults from './components/users/Doctors/Consults'
 
 function App() {
-  // const PrivateRoute = ({ element }) => {
+  const PrivateRoute = ({ element }) => {
 
-  //   const isAuthenticated = useSelector((state) => state.auth.authClient);
-  //   const location = useLocation();
+    const isAuthenticated = useSelector((state) => state.auth.authClient);
+    const location = useLocation();
 
-  //   return isAuthenticated ? (
-  //     element
-  //   ) : (
-  //     <Navigate to="/" state={{ from: location }} replace />
-  //   );
-  // };
+    return isAuthenticated ? (
+      element
+    ) : (
+      <Navigate to="/" state={{ from: location }} replace />
+    );
+  };
 
 
 
@@ -55,14 +55,16 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Specialists />} />
+        <Route path="/new-account" element={<SignupForm />} />
         {/* <Route path="/about-us" element={<About />} />
         <Route path="/services" element={<Services />} />
         <Route path="/specialists" element={<Specialists />} />
         <Route path="/new-account" element={<SignupForm />} /> */}
-        <Route path="/doctors" element={<DoctorDashboard/>}>
+        <Route path="/doctors" element={<PrivateRoute element={<DoctorDashboard/>} />}>
         <Route path=""  element={<DefaultPage/>}/>
         <Route path="patient-records" element={<PatientRecords/>}/>
         <Route path="consults" element={<Consults/>}/>
+       
         </Route>
         {/* <Route path="/home" element={<PrivateRoute element={<Dashboard />} />}>
           <Route path='' element={<PrivateRoute element={<MainDashboard />} />} />

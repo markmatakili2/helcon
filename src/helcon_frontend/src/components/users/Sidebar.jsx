@@ -4,8 +4,10 @@ import logo from '../../images/helcon_logo.png';
 import { NavLink, Navigate, useLocation } from 'react-router-dom';
 import { logout } from '../../features/auth/authSlice';
 import { useDispatch, useSelector, } from 'react-redux';
+import {useNavigate} from 'react-router-dom'
 
 const Sidebar = () => {
+  const navigate = useNavigate()
   const location = useLocation()
   useEffect(() => {
   }, [location])
@@ -15,7 +17,7 @@ const Sidebar = () => {
 
   const dispatch = useDispatch
   const handleLogout = () => {
-    dispatch(logout())
+    dispatch(logout({navigate}))
 
   }
 

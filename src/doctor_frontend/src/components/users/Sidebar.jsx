@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
 import { FaTachometerAlt, FaCalendarAlt, FaUser, FaQuestionCircle, FaSignOutAlt } from 'react-icons/fa';
 import logo from '../../images/helcon_logo.png';
-import { NavLink, Navigate, useLocation } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { logout } from '../../features/auth/authSlice';
 import { useDispatch, useSelector, } from 'react-redux';
 
 const Sidebar = () => {
+  const navigate = useNavigate()
   const location = useLocation()
   useEffect(() => {
   }, [location])
@@ -15,7 +16,7 @@ const Sidebar = () => {
 
   const dispatch = useDispatch
   const handleLogout = () => {
-    dispatch(logout())
+    dispatch(logout({ navigate }))
 
   }
 

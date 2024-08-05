@@ -6,17 +6,15 @@ import Frame from './Frame'
 import doc from '../../images/doc5.png'
 import { useDispatch } from 'react-redux';
 import { login } from '../../features/auth/authSlice';
-import {useNavigate,NavLink} from 'react-router-dom';
+import { useNavigate, NavLink } from 'react-router-dom';
 const Specialists = () => {
    const navigate = useNavigate()
-   // const dispatch = useDispatch()
-   
-   const handleLogin =  () =>{
-      // dispatch(login())
-      navigate('/doctors')
-      console.log('hello world')
-      hh
-  }
+   const dispatch = useDispatch()
+
+   const handleLogin = () => {
+      dispatch(login({ navigate }))
+
+   }
 
    const [availability, setAvailability] = useState(false);
 
@@ -27,28 +25,28 @@ const Specialists = () => {
       <div className='z-40 relative'>
          <Header />
 
-        <div className=" w-full  absolute right-10 md:block hidden">
-         <Frame/>
-        </div>
+         {/* <div className=" w-full  absolute right-10 md:block hidden">
+            <Frame />
+         </div> */}
 
          <div className=" mx-20 md:-pt-6 pt-6 flex flex-col">
-         <div className="flex flex-col items-start space-y-8 p-4 md:p-8 mb-6">
+            <div className="flex flex-col items-start space-y-8 p-4 md:p-8 mb-6">
 
-<h2 className="font-600 text-5xl md:text-[49px] leading-tight md:leading-[52px] text-primary_1">
-  We care <br />about your health
-</h2>
+               <h2 className="font-600 text-5xl md:text-[49px] leading-tight md:leading-[52px] text-primary_1">
+                  We care <br />about your health
+               </h2>
 
-<p className="pt-4 md:pt-6 text-lg md:text-[18.47px] text-[#A7A7A7] font-500 max-w-full md:max-w-[600px] text-balance">
-  Become one of our HealthConnect Specialists and get to help even more patients.
-</p>
+               <p className="pt-4 md:pt-6 text-lg md:text-[18.47px] text-[#A7A7A7] font-500 max-w-full md:max-w-[600px] text-balance">
+                  Become one of our HealthConnect Specialists and get to help even more patients.
+               </p>
 
-<button className="bg-primary_1 text-white px-10 py-4 rounded-[13.03px] text-lg md:text-base shadow-lg hover:bg-primary_2 transition duration-300"
-onClick={handleLogin} 
-type="button">
-<NavLink to="/doctors"> Get Started</NavLink>
-</button>
+               <button className="bg-primary_1 text-white px-10 py-4 rounded-[13.03px] text-lg md:text-base shadow-lg hover:bg-primary_2 transition duration-300"
+                  onClick={handleLogin}
+                  type="button">
+                   Get Started
+               </button>
 
-</div>
+            </div>
 
 
             <div className="md:z-50 self-center flex flex-col rounded-md shadow-lg p-2 pb-4 ">
@@ -108,7 +106,7 @@ type="button">
                            Available
                         </span>
                         <div className="overflow-hidden bg-primary_1 w-full md:w-3/5 h-64  mb-2 rounded-lg relative ">
-                        <img src={doc} alt="a doctor" className="overflow-hidden absolute   md:-top-6 md:-left-2  object-cover -left-2 -top-12" /></div>
+                           <img src={doc} alt="a doctor" className="overflow-hidden absolute   md:-top-6 md:-left-2  object-cover -left-2 -top-12" /></div>
                         <p className="text-lg font-semibold">Dr. John Doe</p>
                         <p className="text-sm text-gray-500 mb-2">Cardiologist</p>
                         <div className="flex items-center mb-4">

@@ -668,16 +668,26 @@ fn list_medical_records() -> Vec<MedicalRecord> {
 }
 
 #[ic_cdk::update]
-fn add_doctor(docidentity_id: u64, name: String, age: u64, specialism: String, licence_no: u64, id_no: u64, sex: String, country: String, city: String) -> Result<Doctor, Error> {
+fn add_doctor(
+    docidentity_id: u64,
+    name: String,
+    age: u64,
+    specialism: String,
+    licence_no: u64,
+    id_no: u64,
+    sex: String,
+    country: String,
+    city: String
+) -> Result<Doctor, Error> {
     // Validate input data
     if name.is_empty() || specialism.is_empty() || sex.is_empty() || country.is_empty() || city.is_empty() {
         return Err(Error::InvalidInput {
             msg: "All fields must be provided".to_string(),
         });
     }
-    
-     // Check if the docidentity_id exists
-     let identity_exists = DOCIDENTITY_STORAGE.with(|service| {
+
+    // Check if the docidentity_id exists in DOCIDENTITY_STORAGE
+    let identity_exists = DOCIDENTITY_STORAGE.with(|service| {
         service
             .borrow()
             .contains_key(&docidentity_id)
@@ -688,16 +698,23 @@ fn add_doctor(docidentity_id: u64, name: String, age: u64, specialism: String, l
             msg: "Identity ID does not exist".to_string(),
         });
     }
-    
-    let id = ID_COUNTER
-        .with(|counter| {
-            let current_value = *counter.borrow().get();
-            counter.borrow_mut().set(current_value + 1)
-        })
-        .expect("cannot increment id counter");
 
+    // Check if a doctor with the docidentity_id already exists in DOCTOR_STORAGE
+    let doctor_exists = DOCTOR_STORAGE.with(|service| {
+        service
+            .borrow()
+            .contains_key(&docidentity_id)
+    });
+
+    if doctor_exists {
+        return Err(Error::AlreadyExists {
+            msg: "Doctor with this Identity ID already exists".to_string(),
+        });
+    }
+
+    // Create the doctor using docidentity_id as the key
     let doctor = Doctor {
-        id,
+        id: docidentity_id, // Use docidentity_id as the id
         docidentity_id,
         name,
         age,
@@ -709,9 +726,10 @@ fn add_doctor(docidentity_id: u64, name: String, age: u64, specialism: String, l
         city,
     };
 
-    DOCTOR_STORAGE.with(|service| service.borrow_mut().insert(id, doctor.clone()));
+    DOCTOR_STORAGE.with(|service| service.borrow_mut().insert(docidentity_id, doctor.clone()));
     Ok(doctor)
 }
+
 
 #[ic_cdk::update]
 fn update_doctor(doctor_id: u64, docidentity_id: u64, name: String, age: u64, specialism: String, licence_no: u64, id_no: u64, sex: String, country: String, city: String) -> Result<Doctor, Error> {
@@ -745,11 +763,11 @@ fn update_doctor(doctor_id: u64, docidentity_id: u64, name: String, age: u64, sp
 }
 
 #[ic_cdk::query]
-fn get_doctor(doctor_id: u64) -> Result<Doctor, Error> {
-    match _get_doctor(&doctor_id) {
+fn get_doctor(docidentity_id: u64) -> Result<Doctor, Error> {
+    match _get_doctor(&docidentity_id) {
         Some(doctor) => Ok(doctor),
         None => Err(Error::NotFound {
-            msg: format!("Doctor with id={} not found", doctor_id),
+            msg: format!("Doctor with docidentity_id={} not found", docidentity_id),
         }),
     }
 }
@@ -891,8 +909,8 @@ fn _get_medical_record(record_id: &u64) -> Option<MedicalRecord> {
     MEDICAL_RECORD_STORAGE.with(|service| service.borrow().get(record_id))
 }
 
-fn _get_doctor(doctor_id: &u64) -> Option<Doctor> {
-    DOCTOR_STORAGE.with(|service| service.borrow().get(doctor_id))
+fn _get_doctor(docidentity_id: &u64) -> Option<Doctor> {
+    DOCTOR_STORAGE.with(|service| service.borrow().get(docidentity_id))
 }
 
 fn _get_report(report_id: &u64) -> Option<Report> {

@@ -22,18 +22,17 @@ import Consults from './components/users/Doctors/Consults'
 
 
 function App() {
-  // const PrivateRoute = ({ element }) => {
+  const PrivateRoute = ({ element }) => {
 
-  //   const isAuthenticated = useSelector((state) => state.auth.authClient);
-  //   const location = useLocation();
+    const isAuthenticated = useSelector((state) => state.auth.authClient);
+    const location = useLocation();
 
-  //   return isAuthenticated ? (
-  //     element
-  //   ) : (
-  //     <Navigate to="/" state={{ from: location }} replace />
-  //   );
-  // };
-
+    return isAuthenticated ? (
+      element
+    ) : (
+      <Navigate to="/" state={{ from: location }} replace />
+    );
+  };
 
 
 
@@ -59,21 +58,17 @@ function App() {
         <Route path="/about-us" element={<About />} />
         <Route path="/services" element={<Services />} />
         <Route path="/specialists" element={<Specialists />} />
-        <Route path="/new-account" element={<SignupForm />} />
-        <Route path="/doctors" element={<DoctorDashboard/>}>
-        <Route path=""  element={<DefaultPage/>}/>
-        <Route path="patient-records" element={<PatientRecords/>}/>
-        <Route path="consults" element={<Consults/>}/>
-        </Route>
-        {/* <Route path="/home" element={<PrivateRoute element={<Dashboard />} />}>
-          <Route path='' element={<PrivateRoute element={<MainDashboard />} />} />
-          <Route path="profile" element={<PrivateRoute element={<ProfilePage />} />}>
-            <Route path='' element={<PrivateRoute element={<GeneralProfile />} />} />
-            <Route path="consultation-history" element={<PrivateRoute element={<Consultation />} />} />
-            <Route path="my-documents" element={<PrivateRoute element={<Document />} />} />
+        <Route path="/new-account" element={<PrivateRoute element={<SignupForm />} />} />
+
+        <Route path="/home" element={<PrivateRoute element={<Dashboard />} />}>
+          <Route path='' element={<MainDashboard />} />
+          <Route path="profile" element={<ProfilePage />}>
+            <Route path='' element={<GeneralProfile />} />
+            <Route path="consultation-history" element={<Consultation />} />
+            <Route path="my-documents" element={<Document />} />
           </Route>
-          <Route path="calendar" element={<PrivateRoute element={<MyCalendar />} />} />
-        </Route> */}
+          <Route path="calendar" element={<MyCalendar />} />
+        </Route>
       </Routes>
     </Router>
   );

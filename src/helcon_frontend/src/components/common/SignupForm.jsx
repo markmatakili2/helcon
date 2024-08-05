@@ -1,29 +1,19 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
-import { registerPatient } from '../../features/Patient/PatientSlice';
-import { registerDoctor } from '../../features/Doctors/DoctorSlice';
+import { registerPatient } from '../../features/auth/authSlice';
+import {useNavigate} from 'react-router-dom'
 
 const SignupForm = () => {
+   const navigate = useNavigate()
    const dispatch = useDispatch()
 
-   //  const  name = 'kevin'
-   //  const medical_history='been never admitted'
-   //  const contact_details = '0722110113559'
-
-   //    function rp(){
-   //       dispatch(registerPatient({name,medical_history,contact_details}))
-   //    }
-
-     // rp()
-
-
+   
    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm();
 
    const onSubmit = async (data) => {
-         dispatch(registerDoctor(data))
+         dispatch(registerPatient({navigate,data}))
    };
-
    return (
       <div className="flex justify-center items-center min-h-screen bg-gray-100">
          <form
@@ -35,77 +25,15 @@ const SignupForm = () => {
 
 
             <div className="mb-3">
-               <label className="block text-gray-700 mb-1">Name</label>
+               <label className="block text-gray-700 mb-1">UserName</label>
                <input
                   type="text"
                   className="w-full p-1 border rounded-md border-gray-400 focus:outline-none focus:border-primary_1"
-                  {...register('name', { required: 'Name is required' })}
+                  {...register('username', { required: 'username is required' })}
                />
                {errors.name && <span className="text-red-500 text-sm">{errors.name.message}</span>}
             </div>
-            <div className="mb-3">
-               <label className="block text-gray-700 mb-1">Age</label>
-               <input
-                  type="number"
-                  className="w-full p-1 border rounded-md border-gray-400 focus:outline-none focus:border-primary_1"
-                  {...register('age', { required: 'Age is required', valueAsNumber: true })}
-               />
-               {errors.age && <span className="text-red-500 text-sm">{errors.age.message}</span>}
-            </div>
-            <div className="mb-3">
-               <label className="block text-gray-700 mb-1">Sex</label>
-               <input
-                  type="text"
-                  className="w-full p-1 border rounded-md border-gray-400 focus:outline-none focus:border-primary_1"
-                  {...register('sex', { required: 'Sex is required' })}
-               />
-               {errors.sex && <span className="text-red-500 text-sm">{errors.sex.message}</span>}
-            </div>
-            <div className="mb-3">
-               <label className="block text-gray-700 mb-1">Country</label>
-               <input
-                  type="text"
-                  className="w-full p-1 border rounded-md border-gray-400 focus:outline-none focus:border-primary_1"
-                  {...register('country', { required: 'Country is required' })}
-               />
-               {errors.country && <span className="text-red-500 text-sm">{errors.country.message}</span>}
-            </div>
-            <div className="mb-3">
-               <label className="block text-gray-700 mb-1">City</label>
-               <input
-                  type="text"
-                  className="w-full p-1 border rounded-md border-gray-400 focus:outline-none focus:border-primary_1"
-                  {...register('city', { required: 'City is required'})}
-               />
-               {errors.city && <span className="text-red-500 text-sm">{errors.city.message}</span>}
-            </div>
-            <div className="mb-3">
-               <label className="block text-gray-700 mb-1">License No</label>
-               <input
-                  type="number"
-                  className="w-full p-1 border rounded-md border-gray-400 focus:outline-none focus:border-primary_1"
-                  {...register('licence_no', { required: 'License number is required',valueAsNumber: true })}
-               />
-               {errors.licence_no && <span className="text-red-500 text-sm">{errors.licence_no.message}</span>}
-            </div>
-            <div className="mb-3">
-               <label className="block text-gray-700 mb-1">Specialism</label>
-               <input
-                  type="text"
-                  className="w-full p-1 border rounded-md border-gray-400 focus:outline-none focus:border-primary_1"
-                  {...register('specialism', { required: 'Specialism is required' })}
-               />
-               {errors.specialism && <span className="text-red-500 text-sm">{errors.specialism.message}</span>}
-            </div>
-            <div className="mb-3">
-               <label className="block text-gray-700 mb-1">ID No</label>
-               <input
-                  type="number"
-                  className="w-full p-1 border rounded-md border-gray-400 focus:outline-none focus:border-primary_1"
-                  {...register('id_no', { required: 'ID number is required',valueAsNumber: true })}
-               />
-               {errors.id_no && <span className="text-red-500 text-sm">{errors.id_no.message}</span>}
-            </div>
+            
 
 
             {/* <div className="mb-3">

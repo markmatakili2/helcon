@@ -4,12 +4,10 @@ import { MdOutlineKeyboardArrowDown, MdMenu, MdClose } from "react-icons/md";
 import { NavLink,Navigate } from "react-router-dom";
 import { login } from '../../features/auth/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
-
-
-
+import { useNavigate } from 'react-router-dom';
 
 const Header = () => {
-
+  const navigate = useNavigate()
    const dispatch = useDispatch();
    const authClient = useSelector((state) => state.auth.authClient);
 
@@ -21,16 +19,16 @@ const Header = () => {
    };
    const handleLogin = () => {
       try {
-         dispatch(login())
+         dispatch(login({navigate}))
 
       } catch (error) {
          console.error('Login failed:', error);
       }
 
    }
-   if (authClient) {
-      return <Navigate to='/home' replace />
-   }
+   // if (authClient) {
+   //    return <Navigate to='/home' replace />
+   // }
 
 
    return (
