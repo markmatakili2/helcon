@@ -37,18 +37,18 @@ function App() {
 
 
 
-  // const dispatch = useDispatch()
-  // const { status, error } = useSelector((state) => state.doctorList)
-  // useEffect(() => {
-  //   dispatch(fetchDoctors())
-  // }, [dispatch])
-  // if (status === 'loading') {
-  //   return <div className="">loading ....</div>
-  // }
+  const dispatch = useDispatch()
+  const { status, error } = useSelector((state) => state.doctorList)
+  useEffect(() => {
+    dispatch(fetchDoctors())
+  }, [dispatch])
+  if (status === 'loading') {
+    return <div className="">loading ....</div>
+  }
 
-  // if (status === 'failed') {
-  //   return <div className="">{error}</div>
-  // }
+  if (status === 'failed') {
+    return <div className="">{error}</div>
+  }
 
 
   return (

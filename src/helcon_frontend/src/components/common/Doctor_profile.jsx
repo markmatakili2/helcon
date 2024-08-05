@@ -59,7 +59,6 @@ const ProfileCard = () => {
           </button>
         </Link>
       </div>
-
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
         {doctors?.map((doctor, index) => (
           <div key={index} className="border-2 rounded-[16px] p-5 pl-[30px] border-slate-300 text-primary flex-1 min-w-[300px]">
