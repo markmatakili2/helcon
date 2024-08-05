@@ -10,11 +10,12 @@
     "pretest": "npm run prebuild --workspaces --if-present",
     "start": "npm start --workspaces --if-present",
     "test": "npm test --workspaces --if-present",
-     "generate": "./did.sh && dfx generate",
+    "generate": "./did.sh && dfx generate",
     "gen-deploy": "./did.sh && dfx generate && dfx deploy -y"
   },
   "type": "module",
   "workspaces": [
-    "src/helcon_frontend"
+    "src/helcon_frontend",
+    "src/doctor_frontend"
   ]
 }

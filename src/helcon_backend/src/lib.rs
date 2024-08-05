@@ -18,12 +18,6 @@ struct MultiMediaContent {
 
 //New structs
 
-#[derive(candid::CandidType, Serialize, Deserialize, Default, Clone)]
-struct MultiMediaContent {
-    image_url: Option<String>,
-    video_url: Option<String>,
-    audio_url: Option<String>,
-}
 
 #[derive(candid::CandidType, Serialize, Deserialize, Default, Clone)]
 struct Calendly {
