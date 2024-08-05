@@ -16,6 +16,61 @@ struct MultiMediaContent {
     audio_url: Option<String>,
 }
 
+//New structs
+
+#[derive(candid::CandidType, Serialize, Deserialize, Default, Clone)]
+struct MultiMediaContent {
+    image_url: Option<String>,
+    video_url: Option<String>,
+    audio_url: Option<String>,
+}
+
+#[derive(candid::CandidType, Serialize, Deserialize, Default, Clone)]
+struct Calendly {
+    id: u64,
+    principle_id: String,
+    calendly: String
+}
+
+impl Storable for Calendly {
+    fn to_bytes(&self) -> std::borrow::Cow<[u8]> {
+        Cow::Owned(Encode!(self).unwrap())
+    }
+
+    fn from_bytes(bytes: std::borrow::Cow<[u8]>) -> Self {
+        Decode!(bytes.as_ref(), Self).unwrap()
+    }
+}
+
+impl BoundedStorable for Calendly {
+    const MAX_SIZE: u32 = 1024;
+    const IS_FIXED_SIZE: bool = false;
+}
+
+#[derive(candid::CandidType, Serialize, Deserialize, Default, Clone)]
+struct Data {
+    id: u64,
+    patient_username: String,
+    doctor_username: String,
+    data: Vec<u8>,
+    
+}
+
+impl Storable for Data {
+    fn to_bytes(&self) -> std::borrow::Cow<[u8]> {
+        Cow::Owned(Encode!(self).unwrap())
+    }
+
+    fn from_bytes(bytes: std::borrow::Cow<[u8]>) -> Self {
+        Decode!(bytes.as_ref(), Self).unwrap()
+    }
+}
+
+impl BoundedStorable for Data {
+    const MAX_SIZE: u32 = 1024;
+    const IS_FIXED_SIZE: bool = false;
+}
+
 #[derive(candid::CandidType, Serialize, Deserialize, Default, Clone)]
 struct Patient {
     id: u64,
@@ -256,6 +311,17 @@ thread_local! {
     RefCell::new(StableBTreeMap::init(
         MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(8)))
     ));
+
+    static CALENDLY_STORAGE: RefCell<StableBTreeMap<u64, Calendly, Memory>> =
+        RefCell::new(StableBTreeMap::init(
+            MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(9)))
+    ));
+
+    static DATA_STORAGE: RefCell<StableBTreeMap<u64, Data, Memory>> =
+        RefCell::new(StableBTreeMap::init(
+            MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(10)))
+    ));
+
 }
 
 #[derive(candid::CandidType, Deserialize, Serialize)]
@@ -439,6 +505,7 @@ fn register_patient(username: String, identity_id: u64) -> Result<Patient, Error
     PATIENT_STORAGE.with(|service| service.borrow_mut().insert(id, patient.clone()));
     Ok(patient)
 }
+
 
 #[ic_cdk::query]
 fn get_appointment(appointment_id: u64) -> Result<Appointment, Error> {
@@ -964,6 +1031,82 @@ fn send_reminder_to_patient(patient_id: u64, content: String, multimedia_content
     MESSAGE_STORAGE.with(|service| service.borrow_mut().insert(id, message.clone()));
 
     Ok(message)
+}
+
+//New functions for data and calendly
+#[ic_cdk::update]
+fn add_calendly(principle_id: String, calendly: String) -> Result<Calendly, Error> {
+    // Validate input data
+   
+    let id = ID_COUNTER
+        .with(|counter| {
+            let current_value = *counter.borrow().get();
+            counter.borrow_mut().set(current_value + 1)
+        })
+        .expect("cannot increment id counter");
+
+    let calendly = Calendly {
+        id,
+        principle_id,
+        calendly,
+    };
+
+    CALENDLY_STORAGE.with(|service| service.borrow_mut().insert(id, calendly.clone()));
+    Ok(calendly)
+}
+
+#[ic_cdk::update]
+fn add_data(patient_username: String, doctor_username:String, data: Vec<u8>) -> Result<Data, Error> {
+    // Validate input data
+   
+    let id = ID_COUNTER
+        .with(|counter| {
+            let current_value = *counter.borrow().get();
+            counter.borrow_mut().set(current_value + 1)
+        })
+        .expect("cannot increment id counter");
+
+    let data = Data {
+        id,
+        patient_username,
+        doctor_username,
+        data
+    };
+
+    DATA_STORAGE.with(|service| service.borrow_mut().insert(id, data.clone()));
+    Ok(data)
+}
+
+
+#[ic_cdk::query]
+fn get_calendly(id: u64) -> Result<Calendly, Error> {
+    CALENDLY_STORAGE.with(|service| {
+        service.borrow().get(&id).map(|calendly| calendly.clone()).ok_or(Error::NotFound {
+            msg: format!("Calendly with id={} not found", id),
+        })
+    })
+}
+#[ic_cdk::query]
+fn get_data(id: u64) -> Result<Data, Error> {
+    DATA_STORAGE.with(|service| {
+        service.borrow().get(&id).map(|data| data.clone()).ok_or(Error::NotFound {
+            msg: format!("Calendly with id={} not found", id),
+        })
+    })
+}
+
+#[ic_cdk::update]
+fn delete_calendly(id: u64) -> Result<(), Error> {
+    CALENDLY_STORAGE.with(|service| {
+        let mut storage = service.borrow_mut();
+        if storage.remove(&id).is_some() {
+            Ok(())
+        } else {
+            Err(Error::NotFound {
+                msg: format!("Calendly with id={} not found", id),
+            })
+        }
+    })
 }
 
 // Export Candid interface
