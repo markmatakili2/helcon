@@ -38,7 +38,7 @@ const SignupForm = () => {
 
 
             <div className="mb-3">
-               <label className="block text-gray-700 mb-1">Name</label>
+               <label className="block text-gray-700 mb-1">First name</label>
                <input
                   type="text"
                   className="w-full p-1 border rounded-md border-gray-400 focus:outline-none focus:border-primary_1"
@@ -47,7 +47,7 @@ const SignupForm = () => {
                {errors.name && <span className="text-red-500 text-sm">{errors.name.message}</span>}
             </div>
             <div className="mb-3">
-               <label className="block text-gray-700 mb-1">Age</label>
+               <label className="block text-gray-700 mb-1">Date of birth</label>
                <input
                   type="number"
                   className="w-full p-1 border rounded-md border-gray-400 focus:outline-none focus:border-primary_1"
@@ -92,7 +92,7 @@ const SignupForm = () => {
                {errors.licence_no && <span className="text-red-500 text-sm">{errors.licence_no.message}</span>}
             </div>
             <div className="mb-3">
-               <label className="block text-gray-700 mb-1">Specialism</label>
+               <label className="block text-gray-700 mb-1">Specialization</label>
                <input
                   type="text"
                   className="w-full p-1 border rounded-md border-gray-400 focus:outline-none focus:border-primary_1"

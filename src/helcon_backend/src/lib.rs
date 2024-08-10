@@ -163,8 +163,9 @@ impl BoundedStorable for MedicalRecord {
 struct Doctor {
     id: u64,
     docidentity_id: u64,
-    name: String,
-    age: u64,
+    fname: String,
+    lname: String,
+    dob: u64,
     specialism: String,
     licence_no: u64,
     id_no: u64,
@@ -731,8 +732,9 @@ fn list_medical_records() -> Vec<MedicalRecord> {
 #[ic_cdk::update]
 fn add_doctor(
     docidentity_id: u64,
-    name: String,
-    age: u64,
+    fname: String,
+    lname: String,
+    dob: u64,
     specialism: String,
     licence_no: u64,
     id_no: u64,
@@ -741,7 +743,7 @@ fn add_doctor(
     city: String
 ) -> Result<Doctor, Error> {
     // Validate input data
-    if name.is_empty() || specialism.is_empty() || sex.is_empty() || country.is_empty() || city.is_empty() {
+    if fname.is_empty() ||lname.is_empty() || specialism.is_empty() || sex.is_empty() || country.is_empty() || city.is_empty() {
         return Err(Error::InvalidInput {
             msg: "All fields must be provided".to_string(),
         });
@@ -777,8 +779,9 @@ fn add_doctor(
     let doctor = Doctor {
         id: docidentity_id, // Use docidentity_id as the id
         docidentity_id,
-        name,
-        age,
+        fname,
+        lname,
+        dob,
         specialism,
         licence_no,
         id_no,
@@ -793,9 +796,9 @@ fn add_doctor(
 
 
 #[ic_cdk::update]
-fn update_doctor(doctor_id: u64, docidentity_id: u64, name: String, age: u64, specialism: String, licence_no: u64, id_no: u64, sex: String, country: String, city: String) -> Result<Doctor, Error> {
+fn update_doctor(doctor_id: u64, docidentity_id: u64, fname: String, lname: String, dob: u64, specialism: String, licence_no: u64, id_no: u64, sex: String, country: String, city: String) -> Result<Doctor, Error> {
     // Validate input data
-    if name.is_empty() || specialism.is_empty() || sex.is_empty() || country.is_empty() || city.is_empty() {
+    if fname.is_empty() || lname.is_empty() || specialism.is_empty() || sex.is_empty() || country.is_empty() || city.is_empty() {
         return Err(Error::InvalidInput {
             msg: "All fields must be provided".to_string(),
         });
@@ -804,8 +807,9 @@ fn update_doctor(doctor_id: u64, docidentity_id: u64, name: String, age: u64, sp
     let updated_doctor = Doctor {
         id: doctor_id,
         docidentity_id,
-        name,
-        age,
+        fname,
+        lname,
+        dob,
         specialism,
         licence_no,
         id_no,
