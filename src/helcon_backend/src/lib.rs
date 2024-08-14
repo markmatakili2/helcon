@@ -1,6 +1,6 @@
 #[macro_use]
 extern crate serde;
-use candid::{Decode, Encode};
+use candid::{Decode, Encode, Principal};
 use ic_stable_structures::memory_manager::{MemoryId, MemoryManager, VirtualMemory};
 use ic_stable_structures::{BoundedStorable, Cell, DefaultMemoryImpl, StableBTreeMap, Storable};
 use std::{borrow::Cow, cell::RefCell};
@@ -159,9 +159,10 @@ impl BoundedStorable for MedicalRecord {
 #[derive(candid::CandidType, Serialize, Deserialize, Default, Clone)]
 struct Doctor {
     id: u64,
-    docidentity_id: u64,
-    name: String,
-    age: u64,
+    principal_str: String,
+    fname: String,
+    lname: String,
+    dob: String,
     specialism: String,
     licence_no: u64,
     id_no: u64,
@@ -392,13 +393,13 @@ fn list_docidentities() -> Vec<DocIdentity> {
 }
 
 #[ic_cdk::query]
-fn does_docidentity_exist(input_principal: String) -> bool {
+fn does_docidentity_exist(principal: String) -> bool {
     // Get the list of identities
     let identities = list_docidentities();
 
     // Iterate through the identities and check if the input_principal exists
     for identity in identities {
-        if identity.principal == input_principal {
+        if identity.principal == principal {
             return true; // Identity exists
         }
     }
@@ -794,9 +795,10 @@ fn list_medical_records() -> Vec<MedicalRecord> {
 
 #[ic_cdk::update]
 fn add_doctor(
-    docidentity_id: u64,
-    name: String,
-    age: u64,
+    principal_str: String,
+    fname: String,
+    lname: String,
+    dob: String,
     specialism: String,
     licence_no: u64,
     id_no: u64,
@@ -805,7 +807,9 @@ fn add_doctor(
     city: String,
 ) -> Result<Doctor, Error> {
     // Validate input data
-    if name.is_empty()
+    if fname.is_empty()
+        || lname.is_empty()
+        || dob.is_empty()
         || specialism.is_empty()
         || sex.is_empty()
         || country.is_empty()
@@ -816,19 +820,25 @@ fn add_doctor(
         });
     }
 
-    // Check if the docidentity_id exists in DOCIDENTITY_STORAGE
-    let identity_exists =
-        DOCIDENTITY_STORAGE.with(|service| service.borrow().contains_key(&docidentity_id));
+    // Convert the principal_str to a u64 or appropriate key type used in storage
+    let identity_id = principal_str
+        .parse::<u64>()
+        .map_err(|_| Error::InvalidInput {
+            msg: "Invalid Identity ID format".to_string(),
+        })?;
 
-    if !identity_exists {
+    // Check if the identity ID exists in DOCIDENTITY_STORAGE
+    let principal_exists =
+        DOCIDENTITY_STORAGE.with(|service| service.borrow().contains_key(&identity_id));
+
+    if !principal_exists {
         return Err(Error::NotFound {
             msg: "Identity ID does not exist".to_string(),
         });
     }
 
-    // Check if a doctor with the docidentity_id already exists in DOCTOR_STORAGE
-    let doctor_exists =
-        DOCTOR_STORAGE.with(|service| service.borrow().contains_key(&docidentity_id));
+    // Check if a doctor with the identity ID already exists in DOCTOR_STORAGE
+    let doctor_exists = DOCTOR_STORAGE.with(|service| service.borrow().contains_key(&identity_id));
 
     if doctor_exists {
         return Err(Error::AlreadyExists {
@@ -836,12 +846,13 @@ fn add_doctor(
         });
     }
 
-    // Create the doctor using docidentity_id as the key
+    // Create the doctor using the identity ID as the key
     let doctor = Doctor {
-        id: docidentity_id, // Use docidentity_id as the id
-        docidentity_id,
-        name,
-        age,
+        id: identity_id,                        // Use identity_id as the id
+        principal_str: identity_id.to_string(), // Assuming the Doctor struct has a `docidentity_id` field
+        fname,
+        lname,
+        dob,
         specialism,
         licence_no,
         id_no,
@@ -850,16 +861,18 @@ fn add_doctor(
         city,
     };
 
-    DOCTOR_STORAGE.with(|service| service.borrow_mut().insert(docidentity_id, doctor.clone()));
+    // Insert the doctor into the DOCTOR_STORAGE
+    DOCTOR_STORAGE.with(|service| service.borrow_mut().insert(identity_id, doctor.clone()));
+
     Ok(doctor)
 }
 
 #[ic_cdk::update]
 fn update_doctor(
-    doctor_id: u64,
-    docidentity_id: u64,
-    name: String,
-    age: u64,
+    principal_str: String,
+    fname: String,
+    lname: String,
+    dob: String,
     specialism: String,
     licence_no: u64,
     id_no: u64,
@@ -868,7 +881,9 @@ fn update_doctor(
     city: String,
 ) -> Result<Doctor, Error> {
     // Validate input data
-    if name.is_empty()
+    if fname.is_empty()
+        || lname.is_empty()
+        || dob.is_empty()
         || specialism.is_empty()
         || sex.is_empty()
         || country.is_empty()
@@ -879,11 +894,29 @@ fn update_doctor(
         });
     }
 
+    // Convert the principal_str to a u64 or appropriate key type used in storage
+    let identity_id = principal_str
+        .parse::<u64>()
+        .map_err(|_| Error::InvalidInput {
+            msg: "Invalid Identity ID format".to_string(),
+        })?;
+
+    // Check if the doctor with the identity ID exists in DOCTOR_STORAGE
+    let doctor_exists = DOCTOR_STORAGE.with(|service| service.borrow().contains_key(&identity_id));
+
+    if !doctor_exists {
+        return Err(Error::NotFound {
+            msg: "Doctor with this Identity ID does not exist".to_string(),
+        });
+    }
+
+    // Create the updated doctor object
     let updated_doctor = Doctor {
-        id: doctor_id,
-        docidentity_id,
-        name,
-        age,
+        id: identity_id,
+        principal_str: identity_id.to_string(),
+        fname,
+        lname,
+        dob,
         specialism,
         licence_no,
         id_no,
@@ -892,17 +925,14 @@ fn update_doctor(
         city,
     };
 
-    // Update doctor in storage
-    match DOCTOR_STORAGE.with(|service| {
+    // Update the doctor in the DOCTOR_STORAGE
+    DOCTOR_STORAGE.with(|service| {
         service
             .borrow_mut()
-            .insert(doctor_id, updated_doctor.clone())
-    }) {
-        Some(_) => Ok(updated_doctor),
-        None => Err(Error::NotFound {
-            msg: format!("Doctor with id={} not found", doctor_id),
-        }),
-    }
+            .insert(identity_id, updated_doctor.clone())
+    });
+
+    Ok(updated_doctor)
 }
 
 #[ic_cdk::query]

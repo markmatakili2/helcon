@@ -16,15 +16,16 @@ type Data = record {
 type DocIdentity = record { id : nat64; "principal" : text };
 type Doctor = record {
   id : nat64;
-  age : nat64;
+  dob : text;
   sex : text;
+  fname : text;
   country : text;
   city : text;
-  name : text;
   licence_no : nat64;
-  docidentity_id : nat64;
   specialism : text;
+  lname : text;
   id_no : nat64;
+  principal_str : text;
 };
 type Error = variant {
   InvalidInput : record { msg : text };
@@ -78,9 +79,18 @@ service : {
   add_calendly : (text, text) -> (Result);
   add_data : (text, text, vec nat8) -> (Result_1);
   add_docidentity : (text) -> (Result_2);
-  add_doctor : (nat64, text, nat64, text, nat64, nat64, text, text, text) -> (
-      Result_3,
-    );
+  add_doctor : (
+      text,
+      text,
+      text,
+      text,
+      text,
+      nat64,
+      nat64,
+      text,
+      text,
+      text,
+    ) -> (Result_3);
   add_identity : (text) -> (Result_4);
   add_report : (nat64, text, text, text, text, text, opt MultiMediaContent) -> (
       Result_5,
@@ -117,10 +127,10 @@ service : {
   send_message : (nat64, nat64, text, opt MultiMediaContent) -> (Result_9);
   send_reminder_to_patient : (nat64, text, opt MultiMediaContent) -> (Result_9);
   update_doctor : (
-      nat64,
-      nat64,
       text,
-      nat64,
+      text,
+      text,
+      text,
       text,
       nat64,
       nat64,
