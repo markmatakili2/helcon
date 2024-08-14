@@ -8,14 +8,6 @@ use std::{borrow::Cow, cell::RefCell};
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 type IdCell = Cell<u64, Memory>;
 
-// Define MultimediaContent struct for multimedia communication
-// #[derive(candid::CandidType, Serialize, Deserialize, Default, Clone)]
-// struct MultiMediaContent {
-//     image_url: Option<String>,
-//     video_url: Option<String>,
-//     audio_url: Option<String>,
-// }
-
 //New structs
 
 #[derive(candid::CandidType, Serialize, Deserialize, Default, Clone)]
@@ -29,7 +21,7 @@ struct MultiMediaContent {
 struct Calendly {
     id: u64,
     principle_id: String,
-    calendly: String
+    calendly: String,
 }
 
 impl Storable for Calendly {
@@ -53,7 +45,6 @@ struct Data {
     patient_username: String,
     doctor_username: String,
     data: Vec<u8>,
-    
 }
 
 impl Storable for Data {
@@ -98,7 +89,7 @@ struct Appointment {
     id: u64,
     patient_id: u64,
     doctor_id: u64,
-    date_time: u64, 
+    date_time: u64,
     reason: String,
     multimedia_content: Option<MultiMediaContent>,
 }
@@ -291,7 +282,7 @@ thread_local! {
         RefCell::new(StableBTreeMap::init(
             MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(4)))
     ));
-    
+
     static DOCTOR_STORAGE: RefCell<StableBTreeMap<u64, Doctor, Memory>> =
     RefCell::new(StableBTreeMap::init(
         MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(5)))
@@ -400,6 +391,21 @@ fn list_docidentities() -> Vec<DocIdentity> {
     })
 }
 
+#[ic_cdk::query]
+fn does_docidentity_exist(input_principal: String) -> bool {
+    // Get the list of identities
+    let identities = list_docidentities();
+
+    // Iterate through the identities and check if the input_principal exists
+    for identity in identities {
+        if identity.principal == input_principal {
+            return true; // Identity exists
+        }
+    }
+
+    false // Identity does not exist
+}
+
 #[ic_cdk::update]
 fn add_identity(principal: String) -> Result<Identity, Error> {
     // Validate input data
@@ -457,6 +463,21 @@ fn list_identities() -> Vec<Identity> {
     })
 }
 
+#[ic_cdk::query]
+fn does_identity_exist(input_principal: String) -> bool {
+    // Get the list of identities
+    let identities = list_identities();
+
+    // Iterate through the identities and check if the input_principal exists
+    for identity in identities {
+        if identity.principal == input_principal {
+            return true; // Identity exists
+        }
+    }
+
+    false // Identity does not exist
+}
+
 #[ic_cdk::update]
 fn register_patient(username: String, identity_id: u64) -> Result<Patient, Error> {
     // Validate input data
@@ -481,11 +502,8 @@ fn register_patient(username: String, identity_id: u64) -> Result<Patient, Error
     }
 
     // Check if the identity_id exists
-    let identity_exists = IDENTITY_STORAGE.with(|service| {
-        service
-            .borrow()
-            .contains_key(&identity_id)
-    });
+    let identity_exists =
+        IDENTITY_STORAGE.with(|service| service.borrow().contains_key(&identity_id));
 
     if !identity_exists {
         return Err(Error::NotFound {
@@ -500,12 +518,15 @@ fn register_patient(username: String, identity_id: u64) -> Result<Patient, Error
         })
         .expect("cannot increment id counter");
 
-    let patient = Patient { id, username, identity_id };
+    let patient = Patient {
+        id,
+        username,
+        identity_id,
+    };
 
     PATIENT_STORAGE.with(|service| service.borrow_mut().insert(id, patient.clone()));
     Ok(patient)
 }
-
 
 #[ic_cdk::query]
 fn get_appointment(appointment_id: u64) -> Result<Appointment, Error> {
@@ -518,7 +539,13 @@ fn get_appointment(appointment_id: u64) -> Result<Appointment, Error> {
 }
 
 #[ic_cdk::update]
-fn schedule_appointment(patient_id: u64, doctor_id: u64, date_time: u64, reason: String, multimedia_content: Option<MultiMediaContent>) -> Result<Appointment, Error> {
+fn schedule_appointment(
+    patient_id: u64,
+    doctor_id: u64,
+    date_time: u64,
+    reason: String,
+    multimedia_content: Option<MultiMediaContent>,
+) -> Result<Appointment, Error> {
     // Validate input data
     if reason.is_empty() {
         return Err(Error::InvalidInput {
@@ -557,7 +584,12 @@ fn get_message(message_id: u64) -> Result<Message, Error> {
 }
 
 #[ic_cdk::update]
-fn send_message(sender_id: u64, receiver_id: u64, content: String, multimedia_content: Option<MultiMediaContent>) -> Result<Message, Error> {
+fn send_message(
+    sender_id: u64,
+    receiver_id: u64,
+    content: String,
+    multimedia_content: Option<MultiMediaContent>,
+) -> Result<Message, Error> {
     // Validate input data
     if content.is_empty() {
         return Err(Error::InvalidInput {
@@ -608,7 +640,13 @@ fn list_appointments() -> Vec<Appointment> {
 // Similar implementation for messages and medical records
 
 #[ic_cdk::update]
-fn update_message(message_id: u64, sender_id: u64, receiver_id: u64, content: String, multimedia_content: Option<MultiMediaContent>) -> Result<Message, Error> {
+fn update_message(
+    message_id: u64,
+    sender_id: u64,
+    receiver_id: u64,
+    content: String,
+    multimedia_content: Option<MultiMediaContent>,
+) -> Result<Message, Error> {
     // Validate input data
     if content.is_empty() {
         return Err(Error::InvalidInput {
@@ -625,7 +663,11 @@ fn update_message(message_id: u64, sender_id: u64, receiver_id: u64, content: St
     };
 
     // Update message in storage
-    match MESSAGE_STORAGE.with(|service| service.borrow_mut().insert(message_id, updated_message.clone())) {
+    match MESSAGE_STORAGE.with(|service| {
+        service
+            .borrow_mut()
+            .insert(message_id, updated_message.clone())
+    }) {
         Some(_) => Ok(updated_message),
         None => Err(Error::NotFound {
             msg: format!("Message with id={} not found", message_id),
@@ -656,7 +698,12 @@ fn list_messages() -> Vec<Message> {
 }
 
 #[ic_cdk::update]
-fn create_medical_record(record_id: u64, patient_id: u64, lab_results: String, treatment_history: String) -> Result<MedicalRecord, Error> {
+fn create_medical_record(
+    record_id: u64,
+    patient_id: u64,
+    lab_results: String,
+    treatment_history: String,
+) -> Result<MedicalRecord, Error> {
     // Input validation
     if lab_results.trim().is_empty() || treatment_history.trim().is_empty() {
         return Err(Error::InvalidInput {
@@ -672,7 +719,9 @@ fn create_medical_record(record_id: u64, patient_id: u64, lab_results: String, t
     };
 
     // Insert the new medical record into storage
-    match MEDICAL_RECORD_STORAGE.with(|service| service.borrow_mut().insert(record_id, new_record.clone())) {
+    match MEDICAL_RECORD_STORAGE
+        .with(|service| service.borrow_mut().insert(record_id, new_record.clone()))
+    {
         Some(_) => Err(Error::AlreadyExists {
             msg: format!("Medical record with id={} already exists", record_id),
         }),
@@ -681,7 +730,12 @@ fn create_medical_record(record_id: u64, patient_id: u64, lab_results: String, t
 }
 
 #[ic_cdk::update]
-fn update_medical_record(record_id: u64, patient_id: u64, lab_results: String, treatment_history: String) -> Result<MedicalRecord, Error> {
+fn update_medical_record(
+    record_id: u64,
+    patient_id: u64,
+    lab_results: String,
+    treatment_history: String,
+) -> Result<MedicalRecord, Error> {
     // Input validation
     if lab_results.trim().is_empty() || treatment_history.trim().is_empty() {
         return Err(Error::InvalidInput {
@@ -697,7 +751,11 @@ fn update_medical_record(record_id: u64, patient_id: u64, lab_results: String, t
     };
 
     // Update medical record in storage
-    match MEDICAL_RECORD_STORAGE.with(|service| service.borrow_mut().insert(record_id, updated_record.clone())) {
+    match MEDICAL_RECORD_STORAGE.with(|service| {
+        service
+            .borrow_mut()
+            .insert(record_id, updated_record.clone())
+    }) {
         Some(_) => Ok(updated_record),
         None => Err(Error::NotFound {
             msg: format!("Medical record with id={} not found", record_id),
@@ -744,21 +802,23 @@ fn add_doctor(
     id_no: u64,
     sex: String,
     country: String,
-    city: String
+    city: String,
 ) -> Result<Doctor, Error> {
     // Validate input data
-    if name.is_empty() || specialism.is_empty() || sex.is_empty() || country.is_empty() || city.is_empty() {
+    if name.is_empty()
+        || specialism.is_empty()
+        || sex.is_empty()
+        || country.is_empty()
+        || city.is_empty()
+    {
         return Err(Error::InvalidInput {
             msg: "All fields must be provided".to_string(),
         });
     }
 
     // Check if the docidentity_id exists in DOCIDENTITY_STORAGE
-    let identity_exists = DOCIDENTITY_STORAGE.with(|service| {
-        service
-            .borrow()
-            .contains_key(&docidentity_id)
-    });
+    let identity_exists =
+        DOCIDENTITY_STORAGE.with(|service| service.borrow().contains_key(&docidentity_id));
 
     if !identity_exists {
         return Err(Error::NotFound {
@@ -767,11 +827,8 @@ fn add_doctor(
     }
 
     // Check if a doctor with the docidentity_id already exists in DOCTOR_STORAGE
-    let doctor_exists = DOCTOR_STORAGE.with(|service| {
-        service
-            .borrow()
-            .contains_key(&docidentity_id)
-    });
+    let doctor_exists =
+        DOCTOR_STORAGE.with(|service| service.borrow().contains_key(&docidentity_id));
 
     if doctor_exists {
         return Err(Error::AlreadyExists {
@@ -797,11 +854,26 @@ fn add_doctor(
     Ok(doctor)
 }
 
-
 #[ic_cdk::update]
-fn update_doctor(doctor_id: u64, docidentity_id: u64, name: String, age: u64, specialism: String, licence_no: u64, id_no: u64, sex: String, country: String, city: String) -> Result<Doctor, Error> {
+fn update_doctor(
+    doctor_id: u64,
+    docidentity_id: u64,
+    name: String,
+    age: u64,
+    specialism: String,
+    licence_no: u64,
+    id_no: u64,
+    sex: String,
+    country: String,
+    city: String,
+) -> Result<Doctor, Error> {
     // Validate input data
-    if name.is_empty() || specialism.is_empty() || sex.is_empty() || country.is_empty() || city.is_empty() {
+    if name.is_empty()
+        || specialism.is_empty()
+        || sex.is_empty()
+        || country.is_empty()
+        || city.is_empty()
+    {
         return Err(Error::InvalidInput {
             msg: "All fields must be provided".to_string(),
         });
@@ -821,7 +893,11 @@ fn update_doctor(doctor_id: u64, docidentity_id: u64, name: String, age: u64, sp
     };
 
     // Update doctor in storage
-    match DOCTOR_STORAGE.with(|service| service.borrow_mut().insert(doctor_id, updated_doctor.clone())) {
+    match DOCTOR_STORAGE.with(|service| {
+        service
+            .borrow_mut()
+            .insert(doctor_id, updated_doctor.clone())
+    }) {
         Some(_) => Ok(updated_doctor),
         None => Err(Error::NotFound {
             msg: format!("Doctor with id={} not found", doctor_id),
@@ -862,9 +938,22 @@ fn list_doctors() -> Vec<Doctor> {
 }
 
 #[ic_cdk::update]
-fn add_report(patient_id: u64, username: String, symptoms: String, diagnostic: String, prescription: String, recommendations: String, multimedia_content: Option<MultiMediaContent>) -> Result<Report, Error> {
+fn add_report(
+    patient_id: u64,
+    username: String,
+    symptoms: String,
+    diagnostic: String,
+    prescription: String,
+    recommendations: String,
+    multimedia_content: Option<MultiMediaContent>,
+) -> Result<Report, Error> {
     // Validate input data
-    if username.is_empty() || symptoms.is_empty() || diagnostic.is_empty() || prescription.is_empty() || recommendations.is_empty() {
+    if username.is_empty()
+        || symptoms.is_empty()
+        || diagnostic.is_empty()
+        || prescription.is_empty()
+        || recommendations.is_empty()
+    {
         return Err(Error::InvalidInput {
             msg: "All fields must be provided".to_string(),
         });
@@ -910,9 +999,23 @@ fn get_report(report_id: u64) -> Result<Report, Error> {
 }
 
 #[ic_cdk::update]
-fn update_report(report_id: u64, patient_id: u64, username: String, symptoms: String, diagnostic: String, prescription: String, recommendations: String, multimedia_content: Option<MultiMediaContent>) -> Result<Report, Error> {
+fn update_report(
+    report_id: u64,
+    patient_id: u64,
+    username: String,
+    symptoms: String,
+    diagnostic: String,
+    prescription: String,
+    recommendations: String,
+    multimedia_content: Option<MultiMediaContent>,
+) -> Result<Report, Error> {
     // Validate input data
-    if username.is_empty() || symptoms.is_empty() || diagnostic.is_empty() || prescription.is_empty() || recommendations.is_empty() {
+    if username.is_empty()
+        || symptoms.is_empty()
+        || diagnostic.is_empty()
+        || prescription.is_empty()
+        || recommendations.is_empty()
+    {
         return Err(Error::InvalidInput {
             msg: "All fields must be provided".to_string(),
         });
@@ -930,7 +1033,11 @@ fn update_report(report_id: u64, patient_id: u64, username: String, symptoms: St
     };
 
     // Update report in storage
-    match REPORT_STORAGE.with(|service| service.borrow_mut().insert(report_id, updated_report.clone())) {
+    match REPORT_STORAGE.with(|service| {
+        service
+            .borrow_mut()
+            .insert(report_id, updated_report.clone())
+    }) {
         Some(_) => Ok(updated_report),
         None => Err(Error::NotFound {
             msg: format!("Report with id={} not found", report_id),
@@ -993,7 +1100,11 @@ fn _get_docidentity(docidentity_id: &u64) -> Option<DocIdentity> {
 }
 
 #[ic_cdk::update]
-fn send_reminder_to_patient(patient_id: u64, content: String, multimedia_content: Option<MultiMediaContent>) -> Result<Message, Error> {
+fn send_reminder_to_patient(
+    patient_id: u64,
+    content: String,
+    multimedia_content: Option<MultiMediaContent>,
+) -> Result<Message, Error> {
     // Validate input data
     if content.is_empty() {
         return Err(Error::InvalidInput {
@@ -1037,7 +1148,7 @@ fn send_reminder_to_patient(patient_id: u64, content: String, multimedia_content
 #[ic_cdk::update]
 fn add_calendly(principle_id: String, calendly: String) -> Result<Calendly, Error> {
     // Validate input data
-   
+
     let id = ID_COUNTER
         .with(|counter| {
             let current_value = *counter.borrow().get();
@@ -1056,9 +1167,13 @@ fn add_calendly(principle_id: String, calendly: String) -> Result<Calendly, Erro
 }
 
 #[ic_cdk::update]
-fn add_data(patient_username: String, doctor_username:String, data: Vec<u8>) -> Result<Data, Error> {
+fn add_data(
+    patient_username: String,
+    doctor_username: String,
+    data: Vec<u8>,
+) -> Result<Data, Error> {
     // Validate input data
-   
+
     let id = ID_COUNTER
         .with(|counter| {
             let current_value = *counter.borrow().get();
@@ -1070,28 +1185,35 @@ fn add_data(patient_username: String, doctor_username:String, data: Vec<u8>) -> 
         id,
         patient_username,
         doctor_username,
-        data
+        data,
     };
 
     DATA_STORAGE.with(|service| service.borrow_mut().insert(id, data.clone()));
     Ok(data)
 }
 
-
 #[ic_cdk::query]
 fn get_calendly(id: u64) -> Result<Calendly, Error> {
     CALENDLY_STORAGE.with(|service| {
-        service.borrow().get(&id).map(|calendly| calendly.clone()).ok_or(Error::NotFound {
-            msg: format!("Calendly with id={} not found", id),
-        })
+        service
+            .borrow()
+            .get(&id)
+            .map(|calendly| calendly.clone())
+            .ok_or(Error::NotFound {
+                msg: format!("Calendly with id={} not found", id),
+            })
     })
 }
 #[ic_cdk::query]
 fn get_data(id: u64) -> Result<Data, Error> {
     DATA_STORAGE.with(|service| {
-        service.borrow().get(&id).map(|data| data.clone()).ok_or(Error::NotFound {
-            msg: format!("Calendly with id={} not found", id),
-        })
+        service
+            .borrow()
+            .get(&id)
+            .map(|data| data.clone())
+            .ok_or(Error::NotFound {
+                msg: format!("Calendly with id={} not found", id),
+            })
     })
 }
 
@@ -1111,4 +1233,3 @@ fn delete_calendly(id: u64) -> Result<(), Error> {
 
 // Export Candid interface
 ic_cdk::export_candid!();
-
