@@ -807,7 +807,8 @@ fn add_doctor(
     city: String,
 ) -> Result<Doctor, Error> {
     // Validate input data
-    if fname.is_empty()
+    if principal_str.is_empty()
+        || fname.is_empty()
         || lname.is_empty()
         || dob.is_empty()
         || specialism.is_empty()
@@ -816,40 +817,34 @@ fn add_doctor(
         || city.is_empty()
     {
         return Err(Error::InvalidInput {
-            msg: "All fields must be provided".to_string(),
+            msg: "All fields must be filled".to_string(),
         });
     }
 
-    // Convert the principal_str to a u64 or appropriate key type used in storage
-    let identity_id = principal_str
-        .parse::<u64>()
-        .map_err(|_| Error::InvalidInput {
-            msg: "Invalid Identity ID format".to_string(),
-        })?;
+    // Check if the principal already exists
+    let exists = DOCTOR_STORAGE.with(|service| {
+        service
+            .borrow()
+            .iter()
+            .any(|(_, doctor)| doctor.principal_str == principal_str)
+    });
 
-    // Check if the identity ID exists in DOCIDENTITY_STORAGE
-    let principal_exists =
-        DOCIDENTITY_STORAGE.with(|service| service.borrow().contains_key(&identity_id));
-
-    if !principal_exists {
-        return Err(Error::NotFound {
-            msg: "Identity ID does not exist".to_string(),
-        });
-    }
-
-    // Check if a doctor with the identity ID already exists in DOCTOR_STORAGE
-    let doctor_exists = DOCTOR_STORAGE.with(|service| service.borrow().contains_key(&identity_id));
-
-    if doctor_exists {
+    if exists {
         return Err(Error::AlreadyExists {
-            msg: "Doctor with this Identity ID already exists".to_string(),
+            msg: "Principal already exists".to_string(),
         });
     }
 
-    // Create the doctor using the identity ID as the key
+    let id = ID_COUNTER
+        .with(|counter| {
+            let current_value = *counter.borrow().get();
+            counter.borrow_mut().set(current_value + 1)
+        })
+        .expect("cannot increment id counter");
+
     let doctor = Doctor {
-        id: identity_id,                        // Use identity_id as the id
-        principal_str: identity_id.to_string(), // Assuming the Doctor struct has a `docidentity_id` field
+        id,
+        principal_str,
         fname,
         lname,
         dob,
@@ -861,9 +856,7 @@ fn add_doctor(
         city,
     };
 
-    // Insert the doctor into the DOCTOR_STORAGE
-    DOCTOR_STORAGE.with(|service| service.borrow_mut().insert(identity_id, doctor.clone()));
-
+    DOCTOR_STORAGE.with(|service| service.borrow_mut().insert(id, doctor.clone()));
     Ok(doctor)
 }
 
