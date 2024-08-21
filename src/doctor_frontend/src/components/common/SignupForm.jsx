@@ -1,32 +1,28 @@
 import React from 'react';
-import { useForm } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
-import { registerPatient } from '../../features/Patient/PatientSlice';
-// import { registerDoctor } from '../../features/Doctors/DoctorSlice';
-import { registerDoctor } from '../../features/auth/authSlice';
+import { useForm, } from 'react-hook-form';
+import { useDispatch,useSelector } from 'react-redux';
+import { registerUser } from '../../features/auth/account';
 import { useNavigate } from 'react-router-dom';
 
 const SignupForm = () => {
+  // const {principal} = useSelector((state)=>state.account.identityData.data)
    const navigate = useNavigate()
    const dispatch = useDispatch()
-
-   //  const  name = 'kevin'
-   //  const medical_history='been never admitted'
-   //  const contact_details = '0722110113559'
-
-   //    function rp(){
-   //       dispatch(registerPatient({name,medical_history,contact_details}))
-   //    }
-
-   // rp()
-
 
    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm();
 
    const onSubmit = async (data) => {
-      dispatch(registerDoctor({ navigate, data }))
+      const userData = {principal_str:'butita',...data}
+console.log(userData)
+      const response = await dispatch(registerUser({data:userData}))
+      const { requestStatus } = response.meta
+      if (requestStatus === 'fulfilled') {
+         navigate('/doctors')
+      } else {
+         console.log('some error occured adding the identity', requestStatus)
+      }
+      
    };
-
    return (
       <div className="flex justify-center items-center min-h-screen bg-gray-100">
          <form
@@ -38,32 +34,41 @@ const SignupForm = () => {
 
 
             <div className="mb-3">
-               <label className="block text-gray-700 mb-1">Name</label>
+               <label className="block text-gray-700 mb-1">First name</label>
                <input
                   type="text"
                   className="w-full p-1 border rounded-md border-gray-400 focus:outline-none focus:border-primary_1"
-                  {...register('name', { required: 'Name is required' })}
+                  {...register('fname', { required: 'Name is required' })}
                />
-               {errors.name && <span className="text-red-500 text-sm">{errors.name.message}</span>}
+               {errors.fname && <span className="text-red-500 text-sm">{errors.fname.message}</span>}
             </div>
             <div className="mb-3">
-               <label className="block text-gray-700 mb-1">Age</label>
-               <input
-                  type="number"
-                  className="w-full p-1 border rounded-md border-gray-400 focus:outline-none focus:border-primary_1"
-                  {...register('age', { required: 'Age is required', valueAsNumber: true })}
-               />
-               {errors.age && <span className="text-red-500 text-sm">{errors.age.message}</span>}
-            </div>
-            <div className="mb-3">
-               <label className="block text-gray-700 mb-1">Sex</label>
+               <label className="block text-gray-700 mb-1"> Last name</label>
                <input
                   type="text"
                   className="w-full p-1 border rounded-md border-gray-400 focus:outline-none focus:border-primary_1"
-                  {...register('sex', { required: 'Sex is required' })}
+                  {...register('lname', { required: 'Name is required' })}
                />
-               {errors.sex && <span className="text-red-500 text-sm">{errors.sex.message}</span>}
+               {errors.lname && <span className="text-red-500 text-sm">{errors.lname.message}</span>}
             </div>
+            <div className="mb-3">
+               <label className="block text-gray-700 mb-1">D.O.B</label>
+               <input
+                  type="date"
+                  className="w-full p-1 border rounded-md border-gray-400 focus:outline-none focus:border-primary_1"
+                  {...register('dob', { required: 'Age is required', })}
+               />
+               {errors.dob && <span className="text-red-500 text-sm">{errors.dob.message}</span>}
+            </div>
+            <div className="mb-3">
+  <label className="block text-gray-700 mb-1">Gender</label>
+  <select {...register("gender")} className='w-full p-1 border rounded-md border-gray-400 focus:outline-none focus:border-primary_1"'>
+        <option value="female" className="w-2/5">female</option>
+        <option value="male" className="w-2/5">male</option>
+        
+      </select>
+</div>
+
             <div className="mb-3">
                <label className="block text-gray-700 mb-1">Country</label>
                <input

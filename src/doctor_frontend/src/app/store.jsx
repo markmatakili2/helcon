@@ -4,6 +4,7 @@ import authSlice from '../features/auth/authSlice';
 import PatientSlice from '../features/Patient/PatientSlice';
 import DoctorSlice from '../features/Doctors/DoctorSlice';
 import doctorListSlice from '../features/Doctors/doctorListSlice';
+import accountSlice from '../features/auth/account'
 
 export const store = configureStore({
   reducer: {
@@ -12,14 +13,8 @@ export const store = configureStore({
     patients: PatientSlice,
     doctors: DoctorSlice,
     doctorList: doctorListSlice,
+    account:accountSlice
   },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: ['patients/registerPatient/fulfilled'],
-        ignoredPaths: ['patients.patient.Ok.id'],
-      },
-    }),
 });
 
 export default store;

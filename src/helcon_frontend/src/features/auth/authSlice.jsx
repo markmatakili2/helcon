@@ -63,7 +63,7 @@ export const login = createAsyncThunk(
                   };
                   dispatch(setAuthClient(true));
                   localStorage.setItem('id', JSON.stringify(data))
-                  dispatch(setPrincipal(principal))
+                  dispatch(setPrincipals(principal))
                   dispatch(setAuthClient(true));
                   navigate('/new-account')
                   console.log('your principal_id', principal)
@@ -115,7 +115,7 @@ export const logout = createAsyncThunk(
 
       dispatch(setAuthClient(null));
       dispatch(setActor(null));
-      dispatch(setPrincipal(null));
+      dispatch(setPrincipals(null));
 
       navigate('/')
     } catch (error) {
@@ -138,7 +138,7 @@ const authSlice = createSlice({
       state.authClient = action.payload;
     },
 
-    setPrincipal: (state, action) => {
+    setPrincipals: (state, action) => {
       state.principal = action.payload;
     },
     setUser: (state, action) => {
@@ -181,8 +181,7 @@ const authSlice = createSlice({
 
 export const {
   setAuthClient,
-
-  setPrincipal,
+  setPrincipals,
   setUser,
 } = authSlice.actions;
 

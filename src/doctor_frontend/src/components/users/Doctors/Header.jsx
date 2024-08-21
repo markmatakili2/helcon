@@ -3,9 +3,12 @@ import { useLocation } from 'react-router-dom';
 import { FaBell, } from 'react-icons/fa';
 import { NavLink } from 'react-router-dom';
 import { FaUserCircle } from "react-icons/fa";
+import {useSelector} from 'react-redux'
 
 const DoctorHeader = () => {
+   const {data}  = useSelector((state)=>state.account.userData)
    const location = useLocation()
+
 
    useEffect(() => { }, [location])
 
@@ -13,7 +16,7 @@ const DoctorHeader = () => {
       <div className="p-4 flex flex-col space-y-4 w-full">
          <div className="flex justify-between items-center mb-5">
             <div>
-               <p>Hi, Kevin</p>
+               <p>Hi, {data?.fname}</p>
                <h1 className="text-2xl font-bold text-black">Profile</h1>
             </div>
             <div className="flex items-center space-x-4">

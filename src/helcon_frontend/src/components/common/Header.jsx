@@ -1,35 +1,56 @@
 import React, { useState, useEffect } from 'react';
 import logo from '../../images/helcon_logo.png';
 import { MdOutlineKeyboardArrowDown, MdMenu, MdClose } from "react-icons/md";
-import { NavLink,Navigate } from "react-router-dom";
+import { NavLink, Navigate } from "react-router-dom";
 import { login } from '../../features/auth/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import {useNavigate} from 'react-router-dom'
-
-
-
+import { useNavigate } from 'react-router-dom'
+import { getPrincipal, addIdentity, getUserData } from '../../features/auth/account'
 
 const Header = () => {
-  const navigate = useNavigate()
-   const dispatch = useDispatch();
-   const authClient = useSelector((state) => state.auth.authClient);
 
+   const navigate = useNavigate()
+   const dispatch = useDispatch();
+   // const principal = JSON.parse(localStorage.getItem('principal'))
+   const { principal } = useSelector((state) => state.account.principalData)
+   const { message } = useSelector((state) => state.account.identityData)
+   
+
+   
 
    const [menuOpen, setMenuOpen] = useState(false);
 
    const toggleMenu = () => {
       setMenuOpen(!menuOpen);
    };
-   const handleLogin = () => {
+   const handleLogin = async () => {
+
       try {
-         dispatch(login({navigate}))
 
-      } catch (error) {
-         console.error('Login failed:', error);
+         dispatch(getPrincipal())
       }
-
+      catch (error) {
+         console.log('error')
+      }
    }
-  
+
+   // useEffect(() => {
+   //    if (principal) {
+   //      console.log('Principal detected', principal);
+   //      dispatch(addIdentity({ principal: principal }));
+   //    } else {
+   //      console.log('Principal not yet available');
+   //    }
+   //  }, [principal, dispatch]); // Added dependencies
+    
+   //  useEffect(() => {
+   //    if (message === 'success') {
+   //      navigate('/new-account');
+   //    } else {
+   //      console.log('For now we got a problem');
+   //    }
+   //  }, [message, navigate]); // Added dependencies
+    
 
    return (
       <div className="w-full h-20 flex items-center border-b-[1px] border-[#E3E3E3] mb-10 px-5 relative justify-between">

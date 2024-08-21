@@ -1,31 +1,29 @@
-// import React, { useEffect, useState } from 'react';
-// import { Navigate, useLocation } from 'react-router-dom';
-// import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { getUserData } from '../../features/auth/account'; // Adjust the path as needed
 
-// // Define PrivateRoute component
-// const PrivateRoute = ({ element: Element }) => {
-//   const isAuthenticated = useSelector((state) => state.auth.authClient);
-//   const [shouldRedirect, setShouldRedirect] = useState(false);
-//   const location = useLocation();
+const PrivateRoute = ({ element: Component }) => {
+  const dispatch = useDispatch();
+  const location = useLocation();
+  const { isRegistered, loading } = useSelector((state) => state.account.userData);
+  const storedId = JSON.parse(localStorage.getItem('identifier'));
 
+  useEffect(() => {
+    if (storedId && !isRegistered && !loading) {
+      dispatch(getUserData({ id: storedId.toNum }));
+    }
+  }, [storedId, isRegistered, loading, dispatch]);
 
-//   useEffect(() => {
+  if (loading) {
+    return <div>Loading...</div>; // Optionally show a spinner or placeholder
+  }
 
-//     // If not authenticated, set redirect state
-//     if (!isAuthenticated) {
-//       setShouldRedirect(true);
-//     } else {
-//       setShouldRedirect(false);
-//     }
-//   }, [isAuthenticated]); // Dependency array listens for changes in isAuthenticated
+  if (!isRegistered) {
+    return <Navigate to="/" state={{ from: location }} replace />;
+  }
 
-//   // If shouldRedirect is true, redirect to homepage
-//   if (shouldRedirect) {
-//     return <Navigate to="/" state={{ from: location }} replace />;
-//   }
+  return <Component />;
+};
 
-//   // If authenticated, render the requested element
-//   return <Element />;
-// };
-
-// export default PrivateRoute;
+export default PrivateRoute;

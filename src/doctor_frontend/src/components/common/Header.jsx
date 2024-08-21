@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import logo from '../../images/helcon_logo.png';
 import { MdOutlineKeyboardArrowDown, MdMenu, MdClose } from "react-icons/md";
-import { NavLink,Navigate } from "react-router-dom";
-import { login } from '../../features/auth/authSlice';
+import { NavLink, Navigate } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { getPrincipal, addIdentity } from '../../features/auth/account';
 
 const Header = () => {
-  const navigate = useNavigate()
+   const navigate = useNavigate()
    const dispatch = useDispatch();
-   const authClient = useSelector((state) => state.auth.authClient);
 
 
    const [menuOpen, setMenuOpen] = useState(false);
@@ -17,18 +16,29 @@ const Header = () => {
    const toggleMenu = () => {
       setMenuOpen(!menuOpen);
    };
-   const handleLogin = () => {
+   const handleLogin = async () => {
+      const principal = JSON.parse(localStorage.getItem('principal'))
       try {
-         dispatch(login({navigate}))
+         ///const principalResult = await dispatch(getPrincipal())
+         //const {requestStatus} = principalResult.meta
+         //   if(requestStatus === 'fulfilled'){
+         //    dispatch(addIdentity)
+         //   }
+         const idendtityStatus = await dispatch(addIdentity({ principal: 'butita'}))
 
-      } catch (error) {
-         console.error('Login failed:', error);
+         const { requestStatus } = idendtityStatus.meta
+         if (requestStatus === 'fulfilled') {
+            navigate('/new-account')
+         } else {
+            console.log('some error occured adding the identity', requestStatus)
+         }
+      }
+      catch (error) {
+         console.log('error', error)
       }
 
+
    }
-   // if (authClient) {
-   //    return <Navigate to='/home' replace />
-   // }
 
 
    return (

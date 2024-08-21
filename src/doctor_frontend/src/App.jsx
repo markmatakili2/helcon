@@ -1,53 +1,29 @@
-import { useDispatch, useSelector } from 'react-redux'
-import { useEffect } from 'react'
-import { fetchDoctors } from './features/Doctors/doctorListSlice';
-import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
-import HomePage from './components/common/Homepage';
-import About from './components/common/About';
-import Services from './components/common/Services';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Specialists from './components/common/Specialists';
-// import PrivateRoute from './components/routes/PrivateRoutes';
-import Dashboard from './components/users/Dashboard';
-import ProfilePage from './components/users/Profile';
-import MainDashboard from './components/users/MainDashboard';
-import Consultation from './components/users/Consultation';
-import GeneralProfile from './components/users/GeneralProfile'
-import Document from './components/users/Document'
-import SignupForm from './components/common/SignupForm'
-import MyCalendar from './components/common/Calendar';
-import DoctorDashboard from './components/users/Doctors/DoctorDasboard'
+import SignupForm from './components/common/SignupForm';
+import DoctorDashboard from './components/users/Doctors/DoctorDasboard';
 import DefaultPage from './components/users/Doctors/DefaultPage';
-import PatientRecords from './components/users/Doctors/PatientRecords'
-import Consults from './components/users/Doctors/Consults'
+import PatientRecords from './components/users/Doctors/PatientRecords';
+import Consults from './components/users/Doctors/Consults';
+import { useFetchUserData } from './components/common/custom'
+import GeneralProfile from './components/users/GeneralProfile'
 
 function App() {
   const PrivateRoute = ({ element }) => {
+    useFetchUserData()
+    const { isRegistered, loading } = useSelector((state) => state.account.userData);
+    return isRegistered ? (element) : (
+      <Navigate to='/' replace />
+    )
 
-    const isAuthenticated = useSelector((state) => state.auth.authClient);
-    const location = useLocation();
-
-    return isAuthenticated ? (
-      element
-    ) : (
-      <Navigate to="/" state={{ from: location }} replace />
-    );
-  };
+  }
 
 
 
-
-
-  // const dispatch = useDispatch()
-  // const { status, error } = useSelector((state) => state.doctorList)
-  // useEffect(() => {
-  //   dispatch(fetchDoctors())
-  // }, [dispatch])
-  // if (status === 'loading') {
-  //   return <div className="">loading ....</div>
-  // }
-
-  // if (status === 'failed') {
-  //   return <div className="">{error}</div>
+  // if (loading) {
+  //   return <div>Loading...</div>;
   // }
 
 
@@ -56,25 +32,15 @@ function App() {
       <Routes>
         <Route path="/" element={<Specialists />} />
         <Route path="/new-account" element={<SignupForm />} />
-        {/* <Route path="/about-us" element={<About />} />
-        <Route path="/services" element={<Services />} />
-        <Route path="/specialists" element={<Specialists />} />
-        <Route path="/new-account" element={<SignupForm />} /> */}
-        <Route path="/doctors" element={<PrivateRoute element={<DoctorDashboard/>} />}>
-        <Route path=""  element={<DefaultPage/>}/>
-        <Route path="patient-records" element={<PatientRecords/>}/>
-        <Route path="consults" element={<Consults/>}/>
-       
+        <Route
+          path="/doctors"
+          element={<PrivateRoute element={<DoctorDashboard />} />}
+        >
+          <Route path="" element={<DefaultPage />} />
+          <Route path="patient-records" element={<PatientRecords />} />
+          <Route path="consults" element={<Consults />} />
+          <Route path='my-account' element={<GeneralProfile />} />
         </Route>
-        {/* <Route path="/home" element={<PrivateRoute element={<Dashboard />} />}>
-          <Route path='' element={<PrivateRoute element={<MainDashboard />} />} />
-          <Route path="profile" element={<PrivateRoute element={<ProfilePage />} />}>
-            <Route path='' element={<PrivateRoute element={<GeneralProfile />} />} />
-            <Route path="consultation-history" element={<PrivateRoute element={<Consultation />} />} />
-            <Route path="my-documents" element={<PrivateRoute element={<Document />} />} />
-          </Route>
-          <Route path="calendar" element={<PrivateRoute element={<MyCalendar />} />} />
-        </Route> */}
       </Routes>
     </Router>
   );

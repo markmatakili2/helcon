@@ -9,13 +9,15 @@ import { MdEventBusy } from 'react-icons/md';
 import { HiMagnifyingGlass } from "react-icons/hi2";
 import { CiLocationOn } from "react-icons/ci";
 import { FaUserCircle } from "react-icons/fa";
+import { useSelector } from 'react-redux'
 
 const MainDashboard = () => {
+  const { data } = useSelector((state) => state.account.userData)
   return (
     <div className="min-h-screen p-4 flex flex-col space-y-4 w-full">
       <div className="flex justify-between items-center mb-8 mt-4">
         <div>
-          <p className="text-gray-600">Hi, Kevin</p>
+          <p className="text-gray-600">Hi, {data?.username}</p>
           <h1 className="text-2xl font-bold text-black">Welcome Back</h1>
         </div>
         <div className={` md:w-[610px] rounded-[16px] bg-white py-3 px-5 flex flex-col md:flex-row justify-between shadow-md items-center text-[#7A7D84]  relative z-20`}>
@@ -37,9 +39,9 @@ const MainDashboard = () => {
             {/* Add more languages as needed */}
           </select>
           <FaBell className="text-xl text-gray-700" />
-        
-          <FaUserCircle className='text-2xl ml-4'/>
-          
+
+          <FaUserCircle className='text-2xl ml-4' />
+
           <p className='-mr-10'>Kevlin</p>
         </div>
       </div>
@@ -64,7 +66,7 @@ const MainDashboard = () => {
             </button>
           </div>
           <div className="md:w-4/5 lg:w-auto md:ml-20 lg:ml-0  md:p-4 lg:p-auto">
-          <MyCalendar />
+            <MyCalendar />
           </div>
           <div className="flex flex-col items-center mt-6">
             <MdEventBusy size={50} color="#ccc" />
