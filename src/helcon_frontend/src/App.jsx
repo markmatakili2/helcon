@@ -13,23 +13,9 @@ import GeneralProfile from './components/users/GeneralProfile';
 import Document from './components/users/Document';
 import SignupForm from './components/common/SignupForm';
 import MyCalendar from './components/common/Calendar';
+import ProtectedRoute from './components/routes/PrivateRoutes';
 
 function App() {
-  const dispatch = useDispatch();
-
-  const { isRegistered, loading } = useSelector((state) => state.account.userData);
-
-  useEffect(() => {
-    const checkUserStatus = async () => {
-      const storedId = localStorage.getItem('identifier');
-      if (storedId) {
-        const parsedId = JSON.parse(storedId);
-        await dispatch(getUserData({ id: parsedId.toNum }));
-      }
-    };
-
-    checkUserStatus();
-  }, [dispatch]);
 
 
   return (
@@ -40,7 +26,7 @@ function App() {
         <Route path="/services" element={<Services />} />
         <Route path="/specialists" element={<Specialists />} />
         <Route path="/new-account" element={<SignupForm />} />
-        <Route path="/home" element={isRegistered ? <Dashboard /> : <Navigate to="/" />}>
+        <Route path="/home" element={<ProtectedRoute element={<HomePage />} />}>
           <Route index element={<MainDashboard />} />
           <Route path="profile" element={<ProfilePage />} >
             <Route index element={<GeneralProfile />} />

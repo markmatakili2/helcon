@@ -9,9 +9,6 @@ const DoctorHeader = () => {
    const {data}  = useSelector((state)=>state.account.userData)
    const location = useLocation()
 
-
-   useEffect(() => { }, [location])
-
    return (
       <div className="p-4 flex flex-col space-y-4 w-full">
          <div className="flex justify-between items-center mb-5">

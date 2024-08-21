@@ -85,19 +85,10 @@ export const registerUser = createAsyncThunk(
    async ({ data }, { rejectWithValue, dispatch }) => {
       console.log(data)
 
-      const { principal_str, fname, lname, dob, specialism, licence_no, id_no, sex, country, city } = data;
-      // principal_str: String,
-      // fname: String,
-      // lname: String,
-      // dob: String,
-      // specialism: String,
-      // licence_no: u64,
-      // id_no: u64,
-      // sex: String,
-      // country: String,
-      // city: String,
+
       try {
-         const response = await helcon_backend.add_doctor('72', 'samil', 'oliver', '10/10/2022', 'surgeon', 25656, 565657, 'male', 'Kenya', 'mombasa')
+         const { fname, lname, dob, specialism, licence_no, id_no, gender, country, city } = data;
+         const response = await helcon_backend.add_doctor('76', fname, lname, dob, specialism, licence_no, id_no, gender, country, city)
          if (response.Ok) {
             const userInfo = extractUserInfo(response);
             dispatch(setQueryId({ id: userInfo.id }));

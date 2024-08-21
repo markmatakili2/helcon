@@ -7,26 +7,10 @@ import DoctorDashboard from './components/users/Doctors/DoctorDasboard';
 import DefaultPage from './components/users/Doctors/DefaultPage';
 import PatientRecords from './components/users/Doctors/PatientRecords';
 import Consults from './components/users/Doctors/Consults';
-import { useFetchUserData } from './components/common/custom'
 import GeneralProfile from './components/users/GeneralProfile'
+import ProtectedRoute from './components/routes/PrivateRoutes';
 
 function App() {
-  const PrivateRoute = ({ element }) => {
-    useFetchUserData()
-    const { isRegistered, loading } = useSelector((state) => state.account.userData);
-    return isRegistered ? (element) : (
-      <Navigate to='/' replace />
-    )
-
-  }
-
-
-
-  // if (loading) {
-  //   return <div>Loading...</div>;
-  // }
-
-
   return (
     <Router>
       <Routes>
@@ -34,7 +18,7 @@ function App() {
         <Route path="/new-account" element={<SignupForm />} />
         <Route
           path="/doctors"
-          element={<PrivateRoute element={<DoctorDashboard />} />}
+          element={<ProtectedRoute element={<DoctorDashboard />} />}
         >
           <Route path="" element={<DefaultPage />} />
           <Route path="patient-records" element={<PatientRecords />} />

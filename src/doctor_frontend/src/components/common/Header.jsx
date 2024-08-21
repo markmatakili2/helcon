@@ -24,7 +24,7 @@ const Header = () => {
          //   if(requestStatus === 'fulfilled'){
          //    dispatch(addIdentity)
          //   }
-         const idendtityStatus = await dispatch(addIdentity({ principal: 'butita'}))
+         const idendtityStatus = await dispatch(addIdentity({ principal: 'jj'}))
 
          const { requestStatus } = idendtityStatus.meta
          if (requestStatus === 'fulfilled') {

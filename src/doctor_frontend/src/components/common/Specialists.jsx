@@ -1,33 +1,45 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Header from './Header';
 import Footer from './Footer';
 import image from '../../images/image_2.png'
 import Frame from './Frame'
 import doc from '../../images/doc5.png'
-import { useDispatch } from 'react-redux';
-import { login } from '../../features/auth/authSlice';
-import { useNavigate, NavLink } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, } from 'react-router-dom';
+import { getUserData } from '../../features/auth/account'
 const Specialists = () => {
+   const { isRegistered, data, loading } = useSelector((state) => state.account.userData)
    const navigate = useNavigate()
    const dispatch = useDispatch()
+   useEffect(() => {
+      const identifier = localStorage.getItem('identifier')
+      if (identifier) {
+         const queryId = JSON.parse(identifier)
+         dispatch(getUserData({ id: queryId.id }))
+      }
+   }, [dispatch])
+   useEffect(() => {
+      if (isRegistered && data) {
+         navigate('/doctors')
+      }
+   }, [navigate, isRegistered, data])
 
-   const handleLogin = () => {
-      dispatch(login({ navigate }))
-
-   }
 
    const [availability, setAvailability] = useState(false);
 
    const handleToggle = () => {
       setAvailability(!availability);
    };
+
+
+   if (loading) {
+      return <div className="w-full h-full mt-10 flex justify-center items-center">
+         <div className="">loading ...</div>
+      </div>
+   }
    return (
       <div className='z-40 relative'>
          <Header />
-
-         {/* <div className=" w-full  absolute right-10 md:block hidden">
-            <Frame />
-         </div> */}
 
          <div className=" mx-20 md:-pt-6 pt-6 flex flex-col">
             <div className="flex flex-col items-start space-y-8 p-4 md:p-8 mb-6">
@@ -41,9 +53,8 @@ const Specialists = () => {
                </p>
 
                <button className="bg-primary_1 text-white px-10 py-4 rounded-[13.03px] text-lg md:text-base shadow-lg hover:bg-primary_2 transition duration-300"
-                  onClick={handleLogin}
                   type="button">
-                   Get Started
+                  Get Started
                </button>
 
             </div>
@@ -137,21 +148,7 @@ const Specialists = () => {
 
 
 
-
-
-
-
          </div>
-
-
-
-
-
-
-
-
-
-
 
 
          <Footer />

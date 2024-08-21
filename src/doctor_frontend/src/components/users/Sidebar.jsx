@@ -62,6 +62,12 @@ const Sidebar = () => {
               `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : 'text-primary'
               }`
             } to="/doctors/consults"> <span className="mr-3"><FaTachometerAlt /></span>My consults</NavLink></li>
+            <li className="my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer">
+                <NavLink className={({ isActive }) =>
+                  `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : 'text-primary'
+                  }`
+                } to="/doctors/my-account"> <span className="mr-3"> <FaUser /></span>Profile</NavLink>
+              </li>
             <li className="my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer">            <NavLink className={({ isActive }) =>
               `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : 'text-primary'
               }`

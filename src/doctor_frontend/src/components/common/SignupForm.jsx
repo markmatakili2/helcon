@@ -1,19 +1,19 @@
 import React from 'react';
 import { useForm, } from 'react-hook-form';
-import { useDispatch,useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { registerUser } from '../../features/auth/account';
 import { useNavigate } from 'react-router-dom';
 
 const SignupForm = () => {
-  // const {principal} = useSelector((state)=>state.account.identityData.data)
+   const { loading } = useSelector((state) => state.account.userData)
    const navigate = useNavigate()
    const dispatch = useDispatch()
 
    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm();
 
    const onSubmit = async (data) => {
-      const userData = {principal_str:'butita',...data}
-console.log(userData)
+      const userData = { principal_str: 'butita', ...data }
+      
       const response = await dispatch(registerUser({data:userData}))
       const { requestStatus } = response.meta
       if (requestStatus === 'fulfilled') {
@@ -21,7 +21,7 @@ console.log(userData)
       } else {
          console.log('some error occured adding the identity', requestStatus)
       }
-      
+
    };
    return (
       <div className="flex justify-center items-center min-h-screen bg-gray-100">
@@ -61,13 +61,13 @@ console.log(userData)
                {errors.dob && <span className="text-red-500 text-sm">{errors.dob.message}</span>}
             </div>
             <div className="mb-3">
-  <label className="block text-gray-700 mb-1">Gender</label>
-  <select {...register("gender")} className='w-full p-1 border rounded-md border-gray-400 focus:outline-none focus:border-primary_1"'>
-        <option value="female" className="w-2/5">female</option>
-        <option value="male" className="w-2/5">male</option>
-        
-      </select>
-</div>
+               <label className="block text-gray-700 mb-1">Gender</label>
+               <select {...register("gender")} className='w-full p-1 border rounded-md border-gray-400 focus:outline-none focus:border-primary_1"'>
+                  <option value="female" className="w-2/5">female</option>
+                  <option value="male" className="w-2/5">male</option>
+
+               </select>
+            </div>
 
             <div className="mb-3">
                <label className="block text-gray-700 mb-1">Country</label>
@@ -138,32 +138,9 @@ console.log(userData)
             <button
                type="submit"
                className="w-full py-2 px-4 bg-primary_1 text-white rounded-md flex justify-center items-center"
-               disabled={isSubmitting}
+               disabled={loading}
             >
-               {isSubmitting ? (
-                  <svg
-                     className="animate-spin h-5 w-5 text-white"
-                     xmlns="http://www.w3.org/2000/svg"
-                     fill="none"
-                     viewBox="0 0 24 24"
-                  >
-                     <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                     ></circle>
-                     <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                     ></path>
-                  </svg>
-               ) : (
-                  'Create Account'
-               )}
+              {loading ? 'please wait ...':'create account'}
             </button>
          </form>
       </div>
