@@ -687,6 +687,28 @@ fn delete_message(message_id: u64) -> Result<(), Error> {
     }
 }
 
+#[ic_cdk::update]
+fn delete_identity(id: u64) -> Result<(), Error> {
+    // Remove message from storage
+    match IDENTITY_STORAGE.with(|service| service.borrow_mut().remove(&id)) {
+        Some(_) => Ok(()),
+        None => Err(Error::NotFound {
+            msg: format!("Message with id={} not found", id),
+        }),
+    }
+}
+
+#[ic_cdk::update]
+fn delete_docidentity(id: u64) -> Result<(), Error> {
+    // Remove message from storage
+    match DOCIDENTITY_STORAGE.with(|service| service.borrow_mut().remove(&id)) {
+        Some(_) => Ok(()),
+        None => Err(Error::NotFound {
+            msg: format!("Message with id={} not found", id),
+        }),
+    }
+}
+
 #[ic_cdk::query]
 fn list_messages() -> Vec<Message> {
     MESSAGE_STORAGE.with(|service| {

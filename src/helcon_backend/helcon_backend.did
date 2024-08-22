@@ -97,7 +97,9 @@ service : {
     );
   create_medical_record : (nat64, nat64, text, text) -> (Result_6);
   delete_calendly : (nat64) -> (Result_7);
+  delete_docidentity : (nat64) -> (Result_7);
   delete_doctor : (nat64) -> (Result_7);
+  delete_identity : (nat64) -> (Result_7);
   delete_medical_record : (nat64) -> (Result_7);
   delete_message : (nat64) -> (Result_7);
   delete_report : (nat64) -> (Result_7);
