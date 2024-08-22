@@ -6,7 +6,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { getPrincipal, addIdentity } from '../../features/auth/account';
 
+
 const Header = () => {
+   
    const navigate = useNavigate()
    const dispatch = useDispatch();
 
@@ -17,28 +19,21 @@ const Header = () => {
       setMenuOpen(!menuOpen);
    };
    const handleLogin = async () => {
-      const principal = JSON.parse(localStorage.getItem('principal'))
-      try {
-         ///const principalResult = await dispatch(getPrincipal())
-         //const {requestStatus} = principalResult.meta
-         //   if(requestStatus === 'fulfilled'){
-         //    dispatch(addIdentity)
-         //   }
-         const idendtityStatus = await dispatch(addIdentity({ principal: 'jj'}))
-
-         const { requestStatus } = idendtityStatus.meta
-         if (requestStatus === 'fulfilled') {
+      const result = await dispatch(getPrincipal())
+      if (getPrincipal.fulfilled.match(result)) {
+         const identityResult = await dispatch(addIdentity({ principal: result.payload }))
+         if (addIdentity.fulfilled.match(identityResult)) {
             navigate('/new-account')
          } else {
-            console.log('some error occured adding the identity', requestStatus)
+            console.log(identityResult)
          }
-      }
-      catch (error) {
-         console.log('error', error)
-      }
 
+      } else {
+         console.log('some error occured')
+      }
 
    }
+  
 
 
    return (

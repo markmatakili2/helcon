@@ -7,7 +7,9 @@ import doc from '../../images/doc5.png'
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, } from 'react-router-dom';
 import { getUserData } from '../../features/auth/account'
+import Loading from './loading';
 const Specialists = () => {
+   const { principalData, identityData } = useSelector((state) => state.account)
    const { isRegistered, data, loading } = useSelector((state) => state.account.userData)
    const navigate = useNavigate()
    const dispatch = useDispatch()
@@ -19,7 +21,7 @@ const Specialists = () => {
       }
    }, [dispatch])
    useEffect(() => {
-      if (isRegistered && data) {
+      if (!loading && isRegistered && data) {
          navigate('/doctors')
       }
    }, [navigate, isRegistered, data])
@@ -32,10 +34,12 @@ const Specialists = () => {
    };
 
 
-   if (loading) {
-      return <div className="w-full h-full mt-10 flex justify-center items-center">
-         <div className="">loading ...</div>
-      </div>
+   if (loading && !isRegistered) {
+      return <Loading />
+   }
+
+   if (principalData.loading || identityData.loading) {
+      return <Loading />
    }
    return (
       <div className='z-40 relative'>

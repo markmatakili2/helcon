@@ -26,15 +26,15 @@ function App() {
         <Route path="/services" element={<Services />} />
         <Route path="/specialists" element={<Specialists />} />
         <Route path="/new-account" element={<SignupForm />} />
-        <Route path="/home" element={<ProtectedRoute element={<HomePage />} />}>
-          <Route index element={<MainDashboard />} />
+         <Route path="/home" element={ <ProtectedRoute element={<Dashboard  />}/>}>
+          <Route path="" element={<MainDashboard />} />
           <Route path="profile" element={<ProfilePage />} >
             <Route index element={<GeneralProfile />} />
             <Route path="consultation-history" element={<Consultation />} />
             <Route path="my-documents" element={<Document />} />
           </Route>
           <Route path="calendar" element={<MyCalendar />} />
-        </Route>
+        </Route> 
       </Routes>
     </Router>
   );

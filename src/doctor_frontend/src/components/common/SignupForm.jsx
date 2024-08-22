@@ -5,14 +5,19 @@ import { registerUser } from '../../features/auth/account';
 import { useNavigate } from 'react-router-dom';
 
 const SignupForm = () => {
+   const  {data} = useSelector((state)=>state.account.identityData)
+   console.log(data)
    const { loading } = useSelector((state) => state.account.userData)
    const navigate = useNavigate()
    const dispatch = useDispatch()
 
    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm();
+   const id = localStorage.getItem('id')
+   console.log(id)
 
    const onSubmit = async (data) => {
-      const userData = { principal_str: 'butita', ...data }
+
+      const userData = { principal_id:id, ...data }
       
       const response = await dispatch(registerUser({data:userData}))
       const { requestStatus } = response.meta

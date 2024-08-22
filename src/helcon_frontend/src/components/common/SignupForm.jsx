@@ -5,24 +5,28 @@ import { registerUser } from '../../features/auth/account';
 import { useNavigate } from 'react-router-dom';
 
 const SignupForm = () => {
-   const [errorMessage, setErrorMessage] = useState('');
+   const { data } = useSelector((state) => state.account.identityData)
+   console.log(data)
+   const {message,loading} = useSelector((state) => state.account.userData)
    const navigate = useNavigate();
    const dispatch = useDispatch();
-   const { message } = useSelector((state) => state.account.userData);
-   const { toNumber } = useSelector((state) => state.account.identityData.data)
    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm();
+   const userId = localStorage.getItem('userId')
+   console.log(userId)
 
-   useEffect(() => {
-      if (message === 'success') {
-         navigate('/home');
-      } else {
-         // Handle other cases if needed
-         console.log('Some other errors:', message);
-      }
-   }, [message, navigate]);
+
 
    const onSubmit = async (data) => {
-      dispatch(registerUser({ username: data.username, id: toNumber }));
+      const userData = { id:userId, ...data }
+      
+      const response = await dispatch(registerUser({data:userData}))
+     
+      const { requestStatus } = response.meta
+      if (requestStatus === 'fulfilled') {
+         navigate('/home')
+      } else {
+         console.log('some error occured adding the identity', requestStatus)
+      }
    };
 
    return (
@@ -44,16 +48,18 @@ const SignupForm = () => {
                {errors.username && <span className="text-red-500 text-sm">{errors.username.message}</span>}
             </div>
 
-            <div className="">
-               <span className="text-red-500 text-sm">{errorMessage}</span>
+             {message && (
+               <div className="">
+               <span className="text-red-500 text-sm">{message}</span>
             </div>
+             )} 
 
             <button
                type="submit"
                className="w-full py-2 px-4 bg-primary_1 text-white rounded-md flex justify-center items-center"
-               disabled={isSubmitting}
+               disabled={loading}
             >
-               {isSubmitting ? 'Please wait ...' : 'Create account'}
+               {loading ? 'Please wait ...' : 'Create account'}
             </button>
          </form>
       </div>

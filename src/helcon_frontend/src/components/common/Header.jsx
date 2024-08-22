@@ -5,19 +5,12 @@ import { NavLink, Navigate } from "react-router-dom";
 import { login } from '../../features/auth/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom'
-import { getPrincipal, addIdentity, getUserData } from '../../features/auth/account'
+import { getPrincipal, addIdentity,} from '../../features/auth/account'
 
 const Header = () => {
 
    const navigate = useNavigate()
    const dispatch = useDispatch();
-   // const principal = JSON.parse(localStorage.getItem('principal'))
-   const { principal } = useSelector((state) => state.account.principalData)
-   const { message } = useSelector((state) => state.account.identityData)
-   
-
-   
-
    const [menuOpen, setMenuOpen] = useState(false);
 
    const toggleMenu = () => {
@@ -25,32 +18,22 @@ const Header = () => {
    };
    const handleLogin = async () => {
 
-      try {
+      const result = await dispatch(getPrincipal())
+      if (getPrincipal.fulfilled.match(result)) {
+         const identityResult = await dispatch(addIdentity({ principal: result.payload }))
+         if (addIdentity.fulfilled.match(identityResult)) {
+            navigate('/new-account')
+         } else {
+            console.log(identityResult)
+         }
 
-         dispatch(getPrincipal())
+      } else {
+         console.log('some error occured')
       }
-      catch (error) {
-         console.log('error')
-      }
+
    }
+   
 
-   // useEffect(() => {
-   //    if (principal) {
-   //      console.log('Principal detected', principal);
-   //      dispatch(addIdentity({ principal: principal }));
-   //    } else {
-   //      console.log('Principal not yet available');
-   //    }
-   //  }, [principal, dispatch]); // Added dependencies
-    
-   //  useEffect(() => {
-   //    if (message === 'success') {
-   //      navigate('/new-account');
-   //    } else {
-   //      console.log('For now we got a problem');
-   //    }
-   //  }, [message, navigate]); // Added dependencies
-    
 
    return (
       <div className="w-full h-20 flex items-center border-b-[1px] border-[#E3E3E3] mb-10 px-5 relative justify-between">

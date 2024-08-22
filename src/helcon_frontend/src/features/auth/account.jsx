@@ -13,38 +13,41 @@ const initializeAuthClient = async () => {
 export const getPrincipal = createAsyncThunk(
    'auth/getPrincipal',
    async (_, { dispatch, rejectWithValue }) => {
-      try {
-         const client = await initializeAuthClient();
-
-         await client.login({
-            onSuccess: async () => {
-               try {
-                  const identity = client.getIdentity();
-                  const agent = new HttpAgent({ identity, host: "http://localhost:8080" });
-                  const principal = identity.getPrincipal().toString();
-
-                  if (principal) {
-                      let y = 'hffgf-fgrt92'
-                     dispatch(setPrincipal(y))
-                     return principal
-
-                  }
-               } catch (error) {
-                  console.error("Error during login onSuccess callback:", error.message);
-                  return rejectWithValue(error.message);
+     try {
+       const client = await initializeAuthClient();
+ 
+       // Wrap the login in a Promise
+       return new Promise((resolve, reject) => {
+         client.login({
+           onSuccess: async () => {
+             try {
+               const identity = client.getIdentity();
+               const principal = identity.getPrincipal().toString();
+ 
+               if (principal) {
+                 dispatch(setPrincipal(principal));
+                 resolve(principal); // Resolve with the principal
+               } else {
+                 reject(new Error('Principal is undefined'));
                }
-            },
-            onError: (error) => {
-               console.error("Login failed:", error.message);
-               return rejectWithValue(error.message);
-            }
+             } catch (error) {
+               console.error("Error during login onSuccess callback:", error.message);
+               reject(new Error(error.message));
+             }
+           },
+           onError: (error) => {
+             console.error("Login failed:", error.message);
+             reject(new Error(error.message));
+           }
          });
-      } catch (error) {
-         console.error("Login caught error:", error.message);
-         return rejectWithValue(error.message);
-      }
+       });
+     } catch (error) {
+       console.error("Login caught error:", error.message);
+       return rejectWithValue(error.message);
+     }
    }
-);
+ );
+ 
 export const addIdentity = createAsyncThunk(
    'auth/addIdentity',
    async ({ principal }, { rejectWithValue }) => {
@@ -53,9 +56,9 @@ export const addIdentity = createAsyncThunk(
          const response = await helcon_backend.add_identity(principal);
          if (response.Ok) {
             const { id, principal } = response.Ok
-            let toNumber = Number(id)
+            let identityId= Number(id)
             return {
-               toNumber, principal
+               identityId, principal
             }
          } else {
             return rejectWithValue(response.Err);
@@ -69,9 +72,11 @@ export const addIdentity = createAsyncThunk(
 
 export const registerUser = createAsyncThunk(
    'auth/registerUser',
-   async ({ id, username }, { rejectWithValue, dispatch }) => {
+   async ({data}, { rejectWithValue, dispatch }) => {
+      console.log(data)
       try {
-         const response = await helcon_backend.register_patient(username, id);
+            const {id, username } = data
+         const response = await helcon_backend.register_patient(username, Number(id));
          if (response.Ok) {
 
             const { id, username, identity_id } = await response.Ok
@@ -133,7 +138,6 @@ const accountSlice = createSlice({
          loading: false,
          message: '',
          data: null,
-         message: '',
          isRegistered:false
 
       }
@@ -172,6 +176,7 @@ const accountSlice = createSlice({
             state.identityData.data = action.payload
             state.identityData.loading = false
             state.identityData.message = 'success'
+            localStorage.setItem('userId',action.payload.identityId)
          })
          .addCase(addIdentity.rejected, (state, action) => {
             state.identityData.message = action.payload
@@ -179,18 +184,19 @@ const accountSlice = createSlice({
          })
          .addCase(registerUser.pending, (state) => {
             state.userData.loading = true
-            state.userData.message = 'fetching'
-
+           
          })
          .addCase(registerUser.fulfilled, (state, action) => {
             state.userData.data = action.payload
             state.userData.loading = false
             state.userData.message = 'success'
+            state.userData.isRegistered = true
 
          })
          .addCase(registerUser.rejected, (state, action) => {
             state.userData.message = action.payload
             state.userData.loading = false
+            state.userData.isRegistered = false
 
          })
          .addCase(getUserData.pending, (state) => {
@@ -202,8 +208,8 @@ const accountSlice = createSlice({
          .addCase(getUserData.fulfilled, (state, action) => {
             state.userData.loading = false
             state.userData.message = 'success'
-            state.userData.isRegistered = true
             state.userData.data = action.payload
+            state.userData.isRegistered = true
          })
          .addCase(getUserData.rejected, (state, action) => {
             state.userData.loading = false
