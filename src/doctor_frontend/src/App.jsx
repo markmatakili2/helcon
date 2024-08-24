@@ -9,6 +9,7 @@ import PatientRecords from './components/users/Doctors/PatientRecords';
 import Consults from './components/users/Doctors/Consults';
 import GeneralProfile from './components/users/GeneralProfile'
 import ProtectedRoute from './components/routes/PrivateRoutes';
+import DoctorAvailability from './components/users/Doctors/DoctorAvailability'
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Specialists />} />
         <Route path="/new-account" element={<SignupForm />} />
+        <Route path="/calendar"  element={< DoctorAvailability/>}/>
         <Route
           path="/doctors"
           element={<ProtectedRoute element={<DoctorDashboard />} />}

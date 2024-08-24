@@ -101,12 +101,12 @@ const DoctorHeader = () => {
                   <option value="may23">May 23</option>
                </select>)}
 
-               {location.pathname.includes('consults') && (
+               
                   <button className=" py-2 bg-primary_1 text-white rounded mr-2 px-3"
                   >
-                     New ppointment
+                     Add Report
                   </button>
-               )}
+               
 
             </div>
          </div>
