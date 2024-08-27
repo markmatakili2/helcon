@@ -89,9 +89,9 @@ struct Appointment {
     id: u64,
     patient_id: u64,
     doctor_id: u64,
-    date_time: u64,
-    reason: String,
-    multimedia_content: Option<MultiMediaContent>,
+    appointment_date: u64,
+    status: String,
+    time: String,
 }
 
 impl Storable for Appointment {
@@ -109,6 +109,30 @@ impl BoundedStorable for Appointment {
     const IS_FIXED_SIZE: bool = false;
 }
 
+#[derive(candid::CandidType, Serialize, Deserialize, Default, Clone)]
+struct Availability {
+    id:u64,
+    doctor_id: u64,
+    day_of_week: u8,  
+    start_time: String, 
+    end_time: String, 
+    is_available: bool,
+}
+
+impl Storable for Availability {
+    fn to_bytes(&self) -> Cow<[u8]> {
+        Cow::Owned(Encode!(self).unwrap())
+    }
+
+    fn from_bytes(bytes: Cow<[u8]>) -> Self {
+        Decode!(bytes.as_ref(), Self).unwrap()
+    }
+}
+
+impl BoundedStorable for Availability {
+    const MAX_SIZE: u32 = 1024;
+    const IS_FIXED_SIZE: bool = false;
+}
 #[derive(candid::CandidType, Serialize, Deserialize, Default, Clone)]
 struct Message {
     id: u64,
@@ -313,6 +337,11 @@ thread_local! {
         RefCell::new(StableBTreeMap::init(
             MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(10)))
     ));
+
+    static AVAILABILITY_STORAGE: RefCell<StableBTreeMap<u64, Availability, Memory>> =
+    RefCell::new(StableBTreeMap::init(
+        MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(11)))
+));
 
 }
 
@@ -540,17 +569,17 @@ fn get_appointment(appointment_id: u64) -> Result<Appointment, Error> {
 }
 
 #[ic_cdk::update]
-fn schedule_appointment(
+fn add_appointment(
     patient_id: u64,
     doctor_id: u64,
-    date_time: u64,
-    reason: String,
-    multimedia_content: Option<MultiMediaContent>,
+    appointment_date: u64,
+    time:String,
+    status: String,
 ) -> Result<Appointment, Error> {
     // Validate input data
-    if reason.is_empty() {
+    if status.is_empty() {
         return Err(Error::InvalidInput {
-            msg: "Reason cannot be empty".to_string(),
+            msg: "status cannot be empty".to_string(),
         });
     }
 
@@ -565,9 +594,9 @@ fn schedule_appointment(
         id,
         patient_id,
         doctor_id,
-        date_time,
-        reason,
-        multimedia_content,
+        appointment_date,
+        time,
+        status,
     };
 
     APPOINTMENT_STORAGE.with(|service| service.borrow_mut().insert(id, appointment.clone()));
@@ -683,28 +712,6 @@ fn delete_message(message_id: u64) -> Result<(), Error> {
         Some(_) => Ok(()),
         None => Err(Error::NotFound {
             msg: format!("Message with id={} not found", message_id),
-        }),
-    }
-}
-
-#[ic_cdk::update]
-fn delete_identity(id: u64) -> Result<(), Error> {
-    // Remove message from storage
-    match IDENTITY_STORAGE.with(|service| service.borrow_mut().remove(&id)) {
-        Some(_) => Ok(()),
-        None => Err(Error::NotFound {
-            msg: format!("Message with id={} not found", id),
-        }),
-    }
-}
-
-#[ic_cdk::update]
-fn delete_docidentity(id: u64) -> Result<(), Error> {
-    // Remove message from storage
-    match DOCIDENTITY_STORAGE.with(|service| service.borrow_mut().remove(&id)) {
-        Some(_) => Ok(()),
-        None => Err(Error::NotFound {
-            msg: format!("Message with id={} not found", id),
         }),
     }
 }
@@ -1112,6 +1119,128 @@ fn list_reports() -> Vec<Report> {
     })
 }
 
+#[ic_cdk::update]
+fn add_availability(
+    doctor_id: u64,
+    day_of_week: u8,
+    start_time: String,
+    end_time: String,
+    is_available: bool,
+) -> Result<Availability, Error> {
+    // Validate input data
+    if day_of_week > 6 {
+        return Err(Error::InvalidInput {
+            msg: "Invalid day of the week".to_string(),
+        });
+    }
+    if start_time.is_empty() || end_time.is_empty() {
+        return Err(Error::InvalidInput {
+            msg: "Start time or end time cannot be empty".to_string(),
+        });
+    }
+
+    // Check if the doctor exists
+    if _get_doctor(&doctor_id).is_none() {
+        return Err(Error::NotFound {
+            msg: format!("Doctor with id={} not found", doctor_id),
+        });
+    }
+
+    let id = ID_COUNTER
+        .with(|counter| {
+            let current_value = *counter.borrow().get();
+            counter.borrow_mut().set(current_value + 1)
+        })
+        .expect("cannot increment id counter");
+
+    let availability = Availability {
+        id,
+        doctor_id,
+        day_of_week,
+        start_time,
+        end_time,
+        is_available,
+    };
+
+    AVAILABILITY_STORAGE.with(|service| service.borrow_mut().insert(id, availability.clone()));
+    Ok(availability)
+}
+
+#[ic_cdk::query]
+fn get_availability(availability_id: u64) -> Result<Availability, Error> {
+    match _get_availability(&availability_id) {
+        Some(availability) => Ok(availability),
+        None => Err(Error::NotFound {
+            msg: format!("Availability with id={} not found", availability_id),
+        }),
+    }
+}
+
+#[ic_cdk::update]
+fn update_availability(
+    availability_id: u64,
+    doctor_id: u64,
+    day_of_week: u8,
+    start_time: String,
+    end_time: String,
+    is_available: bool,
+) -> Result<Availability, Error> {
+    // Validate input data
+    if day_of_week > 6 {
+        return Err(Error::InvalidInput {
+            msg: "Invalid day of the week".to_string(),
+        });
+    }
+    if start_time.is_empty() || end_time.is_empty() {
+        return Err(Error::InvalidInput {
+            msg: "Start time or end time cannot be empty".to_string(),
+        });
+    }
+
+    let updated_availability = Availability {
+        id: availability_id,
+        doctor_id,
+        day_of_week,
+        start_time,
+        end_time,
+        is_available,
+    };
+
+    // Update availability in storage
+    match AVAILABILITY_STORAGE.with(|service| {
+        service
+            .borrow_mut()
+            .insert(availability_id, updated_availability.clone())
+    }) {
+        Some(_) => Ok(updated_availability),
+        None => Err(Error::NotFound {
+            msg: format!("Availability with id={} not found", availability_id),
+        }),
+    }
+}
+
+#[ic_cdk::update]
+fn delete_availability(availability_id: u64) -> Result<(), Error> {
+    // Remove availability from storage
+    match AVAILABILITY_STORAGE.with(|service| service.borrow_mut().remove(&availability_id)) {
+        Some(_) => Ok(()),
+        None => Err(Error::NotFound {
+            msg: format!("Availability with id={} not found", availability_id),
+        }),
+    }
+}
+
+#[ic_cdk::query]
+fn list_availabilities() -> Vec<Availability> {
+    AVAILABILITY_STORAGE.with(|service| {
+        service
+            .borrow()
+            .iter()
+            .map(|(_, availability)| availability.clone())
+            .collect()
+    })
+}
+
 fn _get_patient(patient_id: &u64) -> Option<Patient> {
     PATIENT_STORAGE.with(|service| service.borrow().get(patient_id))
 }
@@ -1143,6 +1272,10 @@ fn _get_identity(identity_id: &u64) -> Option<Identity> {
 fn _get_docidentity(docidentity_id: &u64) -> Option<DocIdentity> {
     DOCIDENTITY_STORAGE.with(|service| service.borrow().get(docidentity_id))
 }
+
+fn _get_availability(availability_id: &u64) -> Option<Availability> {
+    AVAILABILITY_STORAGE.with(|service| service.borrow().get(availability_id))
+} 
 
 #[ic_cdk::update]
 fn send_reminder_to_patient(
