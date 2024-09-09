@@ -65,8 +65,12 @@ const Header = () => {
             <li className="font-medium text-[#404040] text-[18px] leading-[22px]">
                <NavLink to="" className={({ isActive }) => isActive ? 'text-primary_1' : 'text-[#404040]'}>FAQ</NavLink>
             </li>
+            <div className="w-full md:hidden flex items-center pl-20">
+            <button className="bg-primary_1 h-10 w-4/5 sm:w-36 lg:w-40 rounded-[6px] text-white py-2 px-4"
+               onClick={handleLogin}>Get Started</button>
+         </div>
          </ul>
-         <div className="hidden md:flex items-center">
+         <div className="hidden md:flex items-center ">
             <button className="bg-primary_1 h-10 w-32 sm:w-36 lg:w-40 rounded-[6px] text-white py-2 px-4"
                onClick={handleLogin}>Get Started</button>
          </div>
