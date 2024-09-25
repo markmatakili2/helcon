@@ -84,7 +84,7 @@ pub struct Appointment {
     pub patient_id: u64,
     pub doctor_id: u64,
     pub appointment_date: u64,
-    pub status: String,
+    pub phone_no: String,
     pub time: String,
 }
 

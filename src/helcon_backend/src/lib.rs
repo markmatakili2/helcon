@@ -294,6 +294,17 @@ fn register_patient(username: String, identity_id: u64) -> Result<Patient, Error
     Ok(patient)
 }
 
+#[ic_cdk::update]
+fn delete_patient(patient_id: u64) -> Result<(), Error> {
+    // Remove patient from storage
+    match PATIENT_STORAGE.with(|service| service.borrow_mut().remove(&patient_id)) {
+        Some(_) => Ok(()),
+        None => Err(Error::NotFound {
+            msg: format!("Patient with id={} not found", patient_id),
+        }),
+    }
+}
+
 #[ic_cdk::query]
 fn get_appointment(appointment_id: u64) -> Result<Appointment, Error> {
     match _get_appointment(&appointment_id) {
@@ -310,12 +321,12 @@ fn add_appointment(
     doctor_id: u64,
     appointment_date: u64,
     time: String,
-    status: String,
+    phone_no: String,
 ) -> Result<Appointment, Error> {
     // Validate input data
-    if status.is_empty() {
+    if phone_no.is_empty() {
         return Err(Error::InvalidInput {
-            msg: "status cannot be empty".to_string(),
+            msg: "phone_no cannot be empty".to_string(),
         });
     }
 
@@ -332,11 +343,35 @@ fn add_appointment(
         doctor_id,
         appointment_date,
         time,
-        status,
+        phone_no,
     };
 
     APPOINTMENT_STORAGE.with(|service| service.borrow_mut().insert(id, appointment.clone()));
     Ok(appointment)
+}
+
+#[ic_cdk::query]
+fn filter_appointments_by_doctor_id(doctor_id: u64) -> Vec<Appointment> {
+    APPOINTMENT_STORAGE.with(|service| {
+        service
+            .borrow()
+            .iter()
+            .filter(|(_, appointment)| appointment.doctor_id == doctor_id)
+            .map(|(_, appointment)| appointment.clone())
+            .collect()
+    })
+}
+
+#[ic_cdk::query]
+fn filter_appointments_by_patient_id(patient_id: u64) -> Vec<Appointment> {
+    APPOINTMENT_STORAGE.with(|service| {
+        service
+            .borrow()
+            .iter()
+            .filter(|(_, appointment)| appointment.patient_id == patient_id)
+            .map(|(_, appointment)| appointment.clone())
+            .collect()
+    })
 }
 
 #[ic_cdk::query]
