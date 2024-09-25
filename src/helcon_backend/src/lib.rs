@@ -350,6 +350,45 @@ fn add_appointment(
     Ok(appointment)
 }
 
+#[ic_cdk::update]
+fn update_appointment(
+    appointment_id: u64,
+    patient_id: u64,
+    doctor_id: u64,
+    appointment_date: u64,
+    time: String,
+    phone_no: String,
+) -> Result<Appointment, Error> {
+    // Validate input data
+    if phone_no.is_empty() || time.is_empty() {
+        return Err(Error::InvalidInput {
+            msg: "Phone number and time cannot be empty".to_string(),
+        });
+    }
+
+    // Check if the appointment exists
+    let updated_appointment = Appointment {
+        id: appointment_id,
+        patient_id,
+        doctor_id,
+        appointment_date,
+        time,
+        phone_no,
+    };
+
+    // Update the appointment in storage
+    match APPOINTMENT_STORAGE.with(|service| {
+        service
+            .borrow_mut()
+            .insert(appointment_id, updated_appointment.clone())
+    }) {
+        Some(_) => Ok(updated_appointment),
+        None => Err(Error::NotFound {
+            msg: format!("Appointment with id={} not found", appointment_id),
+        }),
+    }
+}
+
 #[ic_cdk::query]
 fn filter_appointments_by_doctor_id(doctor_id: u64) -> Vec<Appointment> {
     APPOINTMENT_STORAGE.with(|service| {

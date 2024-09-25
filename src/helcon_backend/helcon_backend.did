@@ -143,6 +143,7 @@ service : {
   send_reminder_to_patient : (nat64, text, opt MultiMediaContent) -> (
       Result_10,
     );
+  update_appointment : (nat64, nat64, nat64, nat64, text, text) -> (Result);
   update_availability : (nat64, nat64, nat8, text, text, bool) -> (Result_1);
   update_doctor : (
       text,
