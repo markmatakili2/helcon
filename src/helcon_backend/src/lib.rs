@@ -1,283 +1,19 @@
 #[macro_use]
 extern crate serde;
-use candid::{Decode, Encode, Principal};
+
 use ic_stable_structures::memory_manager::{MemoryId, MemoryManager, VirtualMemory};
 use ic_stable_structures::{BoundedStorable, Cell, DefaultMemoryImpl, StableBTreeMap, Storable};
 use std::{borrow::Cow, cell::RefCell};
 
+mod models;
+use models::{
+    Appointment, Availability, Calendly, Data, DocIdentity, Doctor, Identity, MedicalRecord,
+    Message, MultiMediaContent, Patient, Report,
+};
+
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 type IdCell = Cell<u64, Memory>;
 
-//New structs
-
-#[derive(candid::CandidType, Serialize, Deserialize, Default, Clone)]
-struct MultiMediaContent {
-    image_url: Option<String>,
-    video_url: Option<String>,
-    audio_url: Option<String>,
-}
-
-#[derive(candid::CandidType, Serialize, Deserialize, Default, Clone)]
-struct Calendly {
-    id: u64,
-    principle_id: String,
-    calendly: String,
-}
-
-impl Storable for Calendly {
-    fn to_bytes(&self) -> std::borrow::Cow<[u8]> {
-        Cow::Owned(Encode!(self).unwrap())
-    }
-
-    fn from_bytes(bytes: std::borrow::Cow<[u8]>) -> Self {
-        Decode!(bytes.as_ref(), Self).unwrap()
-    }
-}
-
-impl BoundedStorable for Calendly {
-    const MAX_SIZE: u32 = 1024;
-    const IS_FIXED_SIZE: bool = false;
-}
-
-#[derive(candid::CandidType, Serialize, Deserialize, Default, Clone)]
-struct Data {
-    id: u64,
-    patient_username: String,
-    doctor_username: String,
-    data: Vec<u8>,
-}
-
-impl Storable for Data {
-    fn to_bytes(&self) -> std::borrow::Cow<[u8]> {
-        Cow::Owned(Encode!(self).unwrap())
-    }
-
-    fn from_bytes(bytes: std::borrow::Cow<[u8]>) -> Self {
-        Decode!(bytes.as_ref(), Self).unwrap()
-    }
-}
-
-impl BoundedStorable for Data {
-    const MAX_SIZE: u32 = 1024;
-    const IS_FIXED_SIZE: bool = false;
-}
-
-#[derive(candid::CandidType, Serialize, Deserialize, Default, Clone)]
-struct Patient {
-    id: u64,
-    username: String,
-    identity_id: u64,
-}
-
-impl Storable for Patient {
-    fn to_bytes(&self) -> std::borrow::Cow<[u8]> {
-        Cow::Owned(Encode!(self).unwrap())
-    }
-
-    fn from_bytes(bytes: std::borrow::Cow<[u8]>) -> Self {
-        Decode!(bytes.as_ref(), Self).unwrap()
-    }
-}
-
-impl BoundedStorable for Patient {
-    const MAX_SIZE: u32 = 1024;
-    const IS_FIXED_SIZE: bool = false;
-}
-
-#[derive(candid::CandidType, Serialize, Deserialize, Default, Clone)]
-struct Appointment {
-    id: u64,
-    patient_id: u64,
-    doctor_id: u64,
-    appointment_date: u64,
-    status: String,
-    time: String,
-}
-
-impl Storable for Appointment {
-    fn to_bytes(&self) -> std::borrow::Cow<[u8]> {
-        Cow::Owned(Encode!(self).unwrap())
-    }
-
-    fn from_bytes(bytes: std::borrow::Cow<[u8]>) -> Self {
-        Decode!(bytes.as_ref(), Self).unwrap()
-    }
-}
-
-impl BoundedStorable for Appointment {
-    const MAX_SIZE: u32 = 1024;
-    const IS_FIXED_SIZE: bool = false;
-}
-
-#[derive(candid::CandidType, Serialize, Deserialize, Default, Clone)]
-struct Availability {
-    id:u64,
-    doctor_id: u64,
-    day_of_week: u8,  
-    start_time: String, 
-    end_time: String, 
-    is_available: bool,
-}
-
-impl Storable for Availability {
-    fn to_bytes(&self) -> Cow<[u8]> {
-        Cow::Owned(Encode!(self).unwrap())
-    }
-
-    fn from_bytes(bytes: Cow<[u8]>) -> Self {
-        Decode!(bytes.as_ref(), Self).unwrap()
-    }
-}
-
-impl BoundedStorable for Availability {
-    const MAX_SIZE: u32 = 1024;
-    const IS_FIXED_SIZE: bool = false;
-}
-#[derive(candid::CandidType, Serialize, Deserialize, Default, Clone)]
-struct Message {
-    id: u64,
-    sender_id: u64,
-    receiver_id: u64,
-    content: String,
-    multimedia_content: Option<MultiMediaContent>,
-}
-
-impl Storable for Message {
-    fn to_bytes(&self) -> std::borrow::Cow<[u8]> {
-        Cow::Owned(Encode!(self).unwrap())
-    }
-
-    fn from_bytes(bytes: std::borrow::Cow<[u8]>) -> Self {
-        Decode!(bytes.as_ref(), Self).unwrap()
-    }
-}
-
-impl BoundedStorable for Message {
-    const MAX_SIZE: u32 = 1024;
-    const IS_FIXED_SIZE: bool = false;
-}
-
-#[derive(candid::CandidType, Serialize, Deserialize, Default, Clone)]
-struct MedicalRecord {
-    id: u64,
-    patient_id: u64,
-    lab_results: String,
-    treatment_history: String,
-}
-
-impl Storable for MedicalRecord {
-    fn to_bytes(&self) -> std::borrow::Cow<[u8]> {
-        Cow::Owned(Encode!(self).unwrap())
-    }
-
-    fn from_bytes(bytes: std::borrow::Cow<[u8]>) -> Self {
-        Decode!(bytes.as_ref(), Self).unwrap()
-    }
-}
-
-impl BoundedStorable for MedicalRecord {
-    const MAX_SIZE: u32 = 1024;
-    const IS_FIXED_SIZE: bool = false;
-}
-
-#[derive(candid::CandidType, Serialize, Deserialize, Default, Clone)]
-struct Doctor {
-    id: u64,
-    principal_str: String,
-    fname: String,
-    lname: String,
-    dob: String,
-    specialism: String,
-    licence_no: u64,
-    id_no: u64,
-    sex: String,
-    country: String,
-    city: String,
-}
-
-impl Storable for Doctor {
-    fn to_bytes(&self) -> std::borrow::Cow<[u8]> {
-        Cow::Owned(Encode!(self).unwrap())
-    }
-
-    fn from_bytes(bytes: std::borrow::Cow<[u8]>) -> Self {
-        Decode!(bytes.as_ref(), Self).unwrap()
-    }
-}
-
-impl BoundedStorable for Doctor {
-    const MAX_SIZE: u32 = 1024;
-    const IS_FIXED_SIZE: bool = false;
-}
-
-#[derive(candid::CandidType, Serialize, Deserialize, Default, Clone)]
-struct Report {
-    id: u64,
-    patient_id: u64,
-    username: String,
-    symptoms: String,
-    diagnostic: String,
-    prescription: String,
-    recommendations: String,
-    multimedia_content: Option<MultiMediaContent>,
-}
-
-impl Storable for Report {
-    fn to_bytes(&self) -> std::borrow::Cow<[u8]> {
-        Cow::Owned(Encode!(self).unwrap())
-    }
-
-    fn from_bytes(bytes: std::borrow::Cow<[u8]>) -> Self {
-        Decode!(bytes.as_ref(), Self).unwrap()
-    }
-}
-
-impl BoundedStorable for Report {
-    const MAX_SIZE: u32 = 1024;
-    const IS_FIXED_SIZE: bool = false;
-}
-
-#[derive(candid::CandidType, Serialize, Deserialize, Default, Clone)]
-struct Identity {
-    id: u64,
-    principal: String,
-}
-
-impl Storable for Identity {
-    fn to_bytes(&self) -> std::borrow::Cow<[u8]> {
-        Cow::Owned(Encode!(self).unwrap())
-    }
-
-    fn from_bytes(bytes: std::borrow::Cow<[u8]>) -> Self {
-        Decode!(bytes.as_ref(), Self).unwrap()
-    }
-}
-
-impl BoundedStorable for Identity {
-    const MAX_SIZE: u32 = 1024;
-    const IS_FIXED_SIZE: bool = false;
-}
-
-#[derive(candid::CandidType, Serialize, Deserialize, Default, Clone)]
-struct DocIdentity {
-    id: u64,
-    principal: String,
-}
-
-impl Storable for DocIdentity {
-    fn to_bytes(&self) -> std::borrow::Cow<[u8]> {
-        Cow::Owned(Encode!(self).unwrap())
-    }
-
-    fn from_bytes(bytes: std::borrow::Cow<[u8]>) -> Self {
-        Decode!(bytes.as_ref(), Self).unwrap()
-    }
-}
-
-impl BoundedStorable for DocIdentity {
-    const MAX_SIZE: u32 = 1024;
-    const IS_FIXED_SIZE: bool = false;
-}
 thread_local! {
     static MEMORY_MANAGER: RefCell<MemoryManager<DefaultMemoryImpl>> = RefCell::new(
         MemoryManager::init(DefaultMemoryImpl::default())
@@ -573,7 +309,7 @@ fn add_appointment(
     patient_id: u64,
     doctor_id: u64,
     appointment_date: u64,
-    time:String,
+    time: String,
     status: String,
 ) -> Result<Appointment, Error> {
     // Validate input data
@@ -1275,7 +1011,7 @@ fn _get_docidentity(docidentity_id: &u64) -> Option<DocIdentity> {
 
 fn _get_availability(availability_id: &u64) -> Option<Availability> {
     AVAILABILITY_STORAGE.with(|service| service.borrow().get(availability_id))
-} 
+}
 
 #[ic_cdk::update]
 fn send_reminder_to_patient(
