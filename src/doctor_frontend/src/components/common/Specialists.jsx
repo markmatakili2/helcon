@@ -10,6 +10,7 @@ import { getUserData } from '../../features/auth/account'
 import Loading from './loading';
 const Specialists = () => {
    const { principalData, identityData } = useSelector((state) => state.account)
+     
    const { isRegistered, data, loading } = useSelector((state) => state.account.userData)
    const navigate = useNavigate()
    const dispatch = useDispatch()

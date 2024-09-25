@@ -54,14 +54,14 @@ const Header = () => {
                <NavLink to="/" className={({ isActive }) => isActive ? 'text-primary_1' : 'text-[#404040]'}>Home</NavLink>
             </li>
             <li className="font-medium text-[#404040] text-[18px] leading-[22px] flex relative">
-               <NavLink to="/services" className={({ isActive }) => isActive ? 'text-primary_1' : 'text-[#404040]'}>Services</NavLink>
+               <NavLink to="/" className={({ isActive }) => isActive ? 'text-primary_1' : 'text-[#404040]'}>Services</NavLink>
                <MdOutlineKeyboardArrowDown className="text-primary text-2xl" />
             </li>
             <li className="font-medium text-[#404040] text-[18px] leading-[22px]">
-               <NavLink to="/specialists" className={({ isActive }) => isActive ? 'text-primary_1' : 'text-[#404040]'}>Specialists</NavLink>
+               <NavLink to="/" className={({ isActive }) => isActive ? 'text-primary_1' : 'text-[#404040]'}>Specialists</NavLink>
             </li>
             <li className="font-medium text-[#404040] text-[18px] leading-[22px]">
-               <NavLink to="/about-us" className={({ isActive }) => isActive ? 'text-primary_1' : 'text-[#404040]'}>About us</NavLink>
+               <NavLink to="/" className={({ isActive }) => isActive ? 'text-primary_1' : 'text-[#404040]'}>About us</NavLink>
             </li>
             <li className="font-medium text-[#404040] text-[18px] leading-[22px]">
                <NavLink to="" className={({ isActive }) => isActive ? 'text-primary_1' : 'text-[#404040]'}>FAQ</NavLink>

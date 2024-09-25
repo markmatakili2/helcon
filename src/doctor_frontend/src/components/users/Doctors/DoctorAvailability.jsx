@@ -3,24 +3,27 @@ import React, { useState } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import { useDispatch } from "react-redux";
+import { updateDoctorAvailability } from "../../../features/Doctors/DoctorAvailability"; // Redux action
 
 const localizer = momentLocalizer(moment);
 
 const DoctorAvailability = () => {
   const [events, setEvents] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState(null);
+  const dispatch = useDispatch(); // Access Redux dispatch
 
   const handleSelectSlot = (slotInfo) => {
-   const date = new Date()
-   const now = new Date(date.getFullYear(),date.getMonth(),date.getDate())
-   if(slotInfo.start < now){
-     alert('Please select from today onwards')
-   }
-   setSelectedSlot(slotInfo);
+    const date = new Date();
+    const now = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    if (slotInfo.start < now) {
+      alert('Please select from today onwards');
+      return;
+    }
+    setSelectedSlot(slotInfo);
+  };
 
-   };
-
-  const handleAddAvailability = () => {
+  const handleAddAvailability = async () => {
     if (selectedSlot) {
       const newEvent = {
         start: selectedSlot.start,
@@ -28,10 +31,41 @@ const DoctorAvailability = () => {
         title: "Available",
       };
       setEvents([...events, newEvent]);
+
+      // Prepare data for Redux/Backend
+      const startDayOfWeek = moment(selectedSlot.start).isoWeekday();
+      const startTime = moment(selectedSlot.start).format('HH:mm');
+      const endTime = moment(selectedSlot.end).format('HH:mm');
+
+      const identifier = localStorage.getItem('identifier');
+      if (identifier) {
+        const queryId = JSON.parse(identifier);
+
+        try {
+          
+          const result = await dispatch(updateDoctorAvailability({
+            doctor_id: Number(queryId.id),
+            day_of_week: startDayOfWeek,
+            start_time: startTime,
+            end_time: endTime,
+            is_available: true
+          })).unwrap();
+
+         
+          console.log("Availability updated successfully:", result);
+
+        } catch (error) {
+          // Handle any errors
+          console.error("Failed to update availability:", error);
+        }
+      } else {
+        alert("the doctor id is not there")
+      }
+
       setSelectedSlot(null);
-   console.log(newEvent)
     }
   };
+
 
   return (
     <div className="container mx-auto my-4 p-4">
@@ -46,11 +80,9 @@ const DoctorAvailability = () => {
         style={{ height: 500 }}
         className="shadow-lg"
         min={new Date(1970, 1, 1, 9, 0, 0)} // 9:00 AM
-        max={new Date(1970, 1, 1, 18, 0, 0)}
+        max={new Date(1970, 1, 1, 18, 0, 0)} // 5:00 PM
         step={120}
         timeslots={1}
-        
-         // 5:00 PM
       />
       {selectedSlot && (
         <div className="mt-4 p-4 border rounded-lg shadow-md bg-white">

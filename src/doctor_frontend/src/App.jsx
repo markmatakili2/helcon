@@ -17,13 +17,14 @@ function App() {
       <Routes>
         <Route path="/" element={<Specialists />} />
         <Route path="/new-account" element={<SignupForm />} />
-        <Route path="/calendar"  element={< DoctorAvailability/>}/>
+       
         <Route
           path="/doctors"
           element={<ProtectedRoute element={<DoctorDashboard />} />}
         >
           <Route path="" element={<DefaultPage />} />
           <Route path="patient-records" element={<PatientRecords />} />
+          <Route path="availability"  element={< DoctorAvailability/>}/>
           <Route path="consults" element={<Consults />} />
           <Route path='my-account' element={<GeneralProfile />} />
         </Route>

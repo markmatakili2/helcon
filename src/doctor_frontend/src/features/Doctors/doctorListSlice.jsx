@@ -9,12 +9,7 @@ export const fetchDoctors = createAsyncThunk(
       try {
          const response = await helcon_backend.list_doctors()
        
-         
-
-
-
-
-
+      
          return response;
       } catch (err) {
          return rejectWithValue(err.message);
