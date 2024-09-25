@@ -1,6 +1,7 @@
 import Sidebar from '../../users/Sidebar'
 import { Outlet } from "react-router-dom"
 import DoctorHeader from './Header'
+
 const DoctorDashboard = ()=>{
    return (
    <div className="flex relative w-full min-h-screen">

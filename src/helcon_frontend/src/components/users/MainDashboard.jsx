@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import image from '../../images/doc4.png';
 import { FaBell } from 'react-icons/fa';
 import Banner from '../common/Banner';
@@ -9,10 +9,22 @@ import { MdEventBusy } from 'react-icons/md';
 import { HiMagnifyingGlass } from "react-icons/hi2";
 import { CiLocationOn } from "react-icons/ci";
 import { FaUserCircle } from "react-icons/fa";
-import { useSelector } from 'react-redux'
+import { useSelector } from 'react-redux';
+import Modal from './Modal';  
+import BookingCard from "./Booking"
 
 const MainDashboard = () => {
-  const { data } = useSelector((state) => state.account.userData)
+  const { data } = useSelector((state) => state.account.userData);
+  const [isModalOpen, setModalOpen] = useState(false); // State to manage modal visibility
+
+  const handleOpenModal = () => {
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+  };
+
   return (
     <div className="min-h-screen p-4 flex flex-col space-y-4 w-full">
       <div className="flex justify-between items-center mb-8 mt-4">
@@ -36,15 +48,14 @@ const MainDashboard = () => {
         <div className="flex items-center space-x-4">
           <select className="p-2 rounded-md border border-gray-300">
             <option>En</option>
-            {/* Add more languages as needed */}
           </select>
           <FaBell className="text-xl text-gray-700" />
-
           <FaUserCircle className='text-2xl ml-4' />
-
-          <p className='-mr-10'>Kevlin</p>
+          <p className='-mr-10'>Kevin</p>
         </div>
       </div>
+
+  
       <div className="grid grid-cols-1 md:grid-cols-1 w-full gap-3 lg:grid-cols-3">
         <div className="lg:col-span-2 w-full ">
           <Banner />
@@ -75,8 +86,13 @@ const MainDashboard = () => {
         </div>
       </div>
       <div className="w-full">
-        <ProfileCard />
+        <ProfileCard handleOpenModal={handleOpenModal}/>
       </div>
+
+      {/* Modal integration */}
+      <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+      <BookingCard  handleCloseModal={ handleCloseModal}/>
+      </Modal>
     </div>
   );
 };

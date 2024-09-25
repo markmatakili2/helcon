@@ -8,7 +8,7 @@ import image from '../../images/doctors.png';
 import { FaUserCircle } from "react-icons/fa";
 
 
-const ProfileCard = () => {
+const ProfileCard = ({handleOpenModal}) => {
   const navigate = useNavigate()
   const location = useLocation()
   useEffect(() => { }, [location])
@@ -24,30 +24,7 @@ const ProfileCard = () => {
     //  setAvailableDoctors(threeDoctors)
 
   }
-  const markCalendar = () => {
-    if (auth) {
-      const getNewestObjectWithLink = (array) => {
-        if (array.length === 0) return null; // Check if the array is empty
-
-        const newestObject = array[array.length - 1]; // Get the last object in the array
-
-        // Check if the link property starts with 'http://' or 'https://'
-        if (newestObject.city.startsWith('http://') || newestObject.city.startsWith('https://')) {
-          return newestObject.city;
-        } else {
-          return null; // Return null if the newest object does not have a link that looks like a URL
-        }
-      };
-      const newestObjectWithLink = getNewestObjectWithLink(doctors);
-
-      window.location.href = newestObjectWithLink || 'https://calendly.com/info-helcon/30min'
-    }
-    else {
-      alert('log in first to book an appointment')
-    }
-  }
-
-
+  
   return (
     <div className={`flex flex-col ${location.pathname === '/' ? 'mx-4 md:mx-[60px]  px-2' : ' '}`}>
       <div className="flex justify-between items-center py-2 mb-4">
@@ -67,10 +44,16 @@ const ProfileCard = () => {
               <div className="ml-4">
                 <div className="font-bold text-lg normal-case ">{doctor.name}</div>
                 <div className="text-primary-300 normal-case ">
-                  {doctor.country} <span className="mx-2">|</span> {Number(doctor.age)} years experience
+                  {doctor.country} <span className="mx-2">|</span> 20 years experience
                 </div>
                 <div className=" normal-case mt-1 px-2 py-1 bg-blue-100 text-blue-600 rounded inline-block">
                   {doctor.specialism}
+                </div>
+                <div className="text-primary-300 normal-case text-[00A600]">
+                 Next available slot:10:00 AM - 01:00 PM, MON
+                </div>
+                <div className="text-primary-300 normal-case text-[#C82506]" onClick={handleOpenModal}>
+                  see all timings
                 </div>
               </div>
             </div>
@@ -91,10 +74,10 @@ const ProfileCard = () => {
                 </div>
               </div>
             </div> */}
-            <button className="mt-4 w-full py-2 bg-primary_1 text-white rounded"
+            {/* <button className="mt-4 w-full py-2 bg-primary_1 text-white rounded"
               onClick={markCalendar}>
               Book Appointment
-            </button>
+            </button> */}
           </div>
         ))}
       </div>

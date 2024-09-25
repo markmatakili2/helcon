@@ -1,7 +1,22 @@
+import {useEffect} from "react"
 import { Outlet } from "react-router-dom"
 import Sidebar from "./Sidebar"
-
+import { useDispatch, useSelector } from 'react-redux';
+import {fetchDoctors} from "../../features/Doctors/doctorListSlice"
 const Dashboard = ()=>{
+  const { doctors, status, error } = useSelector((state) => state.doctorList);
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    const loadDoctors = async () => {
+       await dispatch(fetchDoctors());
+    };
+    loadDoctors();
+    console.log(doctors)
+ }, [dispatch]);
+
+
+
 
    return (
       <div className="flex relative w-full min-h-screen">
