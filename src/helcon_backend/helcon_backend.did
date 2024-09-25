@@ -115,6 +115,7 @@ service : {
   delete_report : (nat64) -> (Result_9);
   does_docidentity_exist : (text) -> (bool) query;
   does_identity_exist : (text) -> (bool) query;
+  filter_availability_by_doctor_id : (nat64) -> (vec Availability) query;
   get_appointment : (nat64) -> (Result) query;
   get_availability : (nat64) -> (Result_1) query;
   get_calendly : (nat64) -> (Result_2) query;

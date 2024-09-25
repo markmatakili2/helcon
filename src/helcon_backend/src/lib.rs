@@ -1241,6 +1241,18 @@ fn list_availabilities() -> Vec<Availability> {
     })
 }
 
+#[ic_cdk::query]
+fn filter_availability_by_doctor_id(doctor_id: u64) -> Vec<Availability> {
+    AVAILABILITY_STORAGE.with(|service| {
+        service
+            .borrow()
+            .iter()
+            .filter(|(_, availability)| availability.doctor_id == doctor_id)
+            .map(|(_, availability)| availability.clone())
+            .collect()
+    })
+}
+
 fn _get_patient(patient_id: &u64) -> Option<Patient> {
     PATIENT_STORAGE.with(|service| service.borrow().get(patient_id))
 }
