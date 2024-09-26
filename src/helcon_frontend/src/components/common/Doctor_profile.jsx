@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector,useDispatch } from 'react-redux';
 import { FaClock, FaDollarSign, FaGreaterThan } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { FaLocationDot } from 'react-icons/fa6';
 import { useLocation, useNavigate } from 'react-router-dom';
 import image from '../../images/doctors.png';
 import { FaUserCircle } from "react-icons/fa";
+import {fetchAvailabilityByDoctorId} from "../../features/Doctors/Availability"
 
 
 const ProfileCard = ({handleOpenModal}) => {
   const navigate = useNavigate()
   const location = useLocation()
+  const dispatch = useDispatch()
   useEffect(() => { }, [location])
   const profile = useSelector((state) => state.profile.profile);
   const auth = useSelector((state) => state.auth.authClient)
@@ -24,6 +26,14 @@ const ProfileCard = ({handleOpenModal}) => {
     //  setAvailableDoctors(threeDoctors)
 
   }
+  const handleOpenModalAndFetchDoctor = (doctorId) => {
+    
+    handleOpenModal()
+    console.log("hello world",doctorId)
+    dispatch(fetchAvailabilityByDoctorId(doctorId));
+
+    
+  };
   
   return (
     <div className={`flex flex-col ${location.pathname === '/' ? 'mx-4 md:mx-[60px]  px-2' : ' '}`}>
@@ -52,7 +62,7 @@ const ProfileCard = ({handleOpenModal}) => {
                 <div className="text-primary-300 normal-case text-[00A600]">
                  Next available slot:10:00 AM - 01:00 PM, MON
                 </div>
-                <div className="text-primary-300 normal-case text-[#C82506]" onClick={handleOpenModal}>
+                <div className="text-primary-300 normal-case text-[#C82506]" onClick={()=>handleOpenModalAndFetchDoctor(doctor.id)}>
                   see all timings
                 </div>
               </div>

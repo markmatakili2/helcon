@@ -1,14 +1,29 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { helcon_backend } from '../../../../declarations/helcon_backend';
 
+const extractUserInfo = (response) => {
+  const { id,
+    doctor_id, ...rest } = response;
+  return {
+    ...rest,
+    id: Number(id),
+    doctor_id: Number(doctor_id)
+
+
+  };
+}
 export const fetchAvailabilityByDoctorId = createAsyncThunk(
   'availability/fetchByDoctorId',
   async (doctorId, { rejectWithValue }) => {
+    console.log("testing", doctorId)
     try {
-      const response = await helcon_backend.filter_availability_by_doctor_id(doctorId);
-      return response; 
+      const response = await helcon_backend.filter_availability_by_doctor_id(doctorId)
+      const result = response.map((d) => extractUserInfo(d))
+      console.log(result)
+      return result;
     } catch (error) {
-      return rejectWithValue(error.message || 'Failed to fetch availability'); 
+      console.log("error", error)
+      return rejectWithValue(error.message || 'Failed to fetch availability');
     }
   }
 );
@@ -17,7 +32,7 @@ const availabilitySlice = createSlice({
   name: 'availability',
   initialState: {
     availabilityData: [],
-    status: 'idle', 
+    status: 'idle',
     error: null,
   },
   reducers: {},
@@ -25,15 +40,17 @@ const availabilitySlice = createSlice({
     builder
       .addCase(fetchAvailabilityByDoctorId.pending, (state) => {
         state.status = 'loading';
-        state.error = null; 
+        state.error = null;
       })
       .addCase(fetchAvailabilityByDoctorId.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.availabilityData = action.payload; 
+        state.availabilityData = action.payload;
+        
+
       })
       .addCase(fetchAvailabilityByDoctorId.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.payload; 
+        state.error = action.payload;
       });
   },
 });

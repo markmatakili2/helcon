@@ -33,8 +33,14 @@ const DoctorAvailability = () => {
       setEvents([...events, newEvent]);
 
       // Prepare data for Redux/Backend
-      const startDayOfWeek = moment(selectedSlot.start).isoWeekday();
-      const startTime = moment(selectedSlot.start).format('HH:mm');
+      const startDayOfWeek = moment(selectedSlot.start).isoWeekday(); // Day of week
+      const startDate = moment(selectedSlot.start).format('YYYY'); // Year
+      const monthName = moment(selectedSlot.start).format('MMMM'); // Full month name
+      const startTime = moment(selectedSlot.start).format('HH:mm'); // Time
+
+      // Concatenate start time with month and year
+      const startTimeWithMonthYear = `${startTime} on ${monthName} ${startDate}`; // Example: "14:00 on September 2024"
+
       const endTime = moment(selectedSlot.end).format('HH:mm');
 
       const identifier = localStorage.getItem('identifier');
@@ -42,16 +48,14 @@ const DoctorAvailability = () => {
         const queryId = JSON.parse(identifier);
 
         try {
-          
           const result = await dispatch(updateDoctorAvailability({
             doctor_id: Number(queryId.id),
-            day_of_week: startDayOfWeek,
-            start_time: startTime,
+            day_of_week: startDayOfWeek, // Original day of week preserved
+            start_time: startTimeWithMonthYear, // Updated start time with month and year
             end_time: endTime,
             is_available: true
           })).unwrap();
 
-         
           console.log("Availability updated successfully:", result);
 
         } catch (error) {
@@ -59,13 +63,12 @@ const DoctorAvailability = () => {
           console.error("Failed to update availability:", error);
         }
       } else {
-        alert("the doctor id is not there")
+        alert("the doctor id is not there");
       }
 
       setSelectedSlot(null);
     }
   };
-
 
   return (
     <div className="container mx-auto my-4 p-4">
@@ -79,10 +82,10 @@ const DoctorAvailability = () => {
         endAccessor="end"
         style={{ height: 500 }}
         className="shadow-lg"
-        min={new Date(1970, 1, 1, 9, 0, 0)} // 9:00 AM
-        max={new Date(1970, 1, 1, 18, 0, 0)} // 5:00 PM
-        step={120}
-        timeslots={1}
+        min={new Date(1970, 1, 1, 8, 0, 0)} // 8:00 AM
+        max={new Date(1970, 1, 1, 18, 0, 0)} // 6:00 PM
+        step={30} // 30-minute intervals
+        timeslots={1} // 1 timeslot per step
       />
       {selectedSlot && (
         <div className="mt-4 p-4 border rounded-lg shadow-md bg-white">
