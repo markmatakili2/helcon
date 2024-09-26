@@ -1,17 +1,38 @@
-// src/components/DoctorAvailability.js
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { updateDoctorAvailability } from "../../../features/Doctors/DoctorAvailability"; // Redux action
 
 const localizer = momentLocalizer(moment);
 
 const DoctorAvailability = () => {
+  const { availabilities } = useSelector((state) => state.availability);
   const [events, setEvents] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState(null);
-  const dispatch = useDispatch(); // Access Redux dispatch
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const formattedEvents = availabilities
+      .filter(availability => {
+        // Create a date object for each availability's start_time
+        const startDate = moment(availability.start_time, 'HH:mm on MMMM YYYY');
+        return startDate.isValid(); // Ensure the date is valid
+      })
+      .map(availability => {
+        const startDate = moment(availability.start_time, 'HH:mm on MMMM YYYY').toDate();
+        const endDate = moment(availability.end_time, 'HH:mm on MMMM YYYY').toDate();
+
+        return {
+          start: startDate,
+          end: endDate,
+          title: "Available",
+        };
+      });
+
+    setEvents(formattedEvents);
+  }, [availabilities]); // Update events whenever availabilities change
 
   const handleSelectSlot = (slotInfo) => {
     const date = new Date();
@@ -33,33 +54,28 @@ const DoctorAvailability = () => {
       setEvents([...events, newEvent]);
 
       // Prepare data for Redux/Backend
-      const startDayOfWeek = moment(selectedSlot.start).isoWeekday(); // Day of week
-      const startDate = moment(selectedSlot.start).format('YYYY'); // Year
-      const monthName = moment(selectedSlot.start).format('MMMM'); // Full month name
-      const startTime = moment(selectedSlot.start).format('HH:mm'); // Time
+      const startDayOfWeek = moment(selectedSlot.start).isoWeekday();
+      const startDate = moment(selectedSlot.start).format('YYYY');
+      const monthName = moment(selectedSlot.start).format('MMMM');
+      const startTime = moment(selectedSlot.start).format('HH:mm');
 
-      // Concatenate start time with month and year
-      const startTimeWithMonthYear = `${startTime} on ${monthName} ${startDate}`; // Example: "14:00 on September 2024"
-
+      const startTimeWithMonthYear = `${startTime} on ${monthName} ${startDate}`;
       const endTime = moment(selectedSlot.end).format('HH:mm');
 
       const identifier = localStorage.getItem('identifier');
       if (identifier) {
         const queryId = JSON.parse(identifier);
-
         try {
           const result = await dispatch(updateDoctorAvailability({
             doctor_id: Number(queryId.id),
-            day_of_week: startDayOfWeek, // Original day of week preserved
-            start_time: startTimeWithMonthYear, // Updated start time with month and year
+            day_of_week: startDayOfWeek,
+            start_time: startTimeWithMonthYear,
             end_time: endTime,
             is_available: true
           })).unwrap();
 
           console.log("Availability updated successfully:", result);
-
         } catch (error) {
-          // Handle any errors
           console.error("Failed to update availability:", error);
         }
       } else {
@@ -68,6 +84,7 @@ const DoctorAvailability = () => {
 
       setSelectedSlot(null);
     }
+     alert("Availability added successfully!");
   };
 
   return (
@@ -82,10 +99,10 @@ const DoctorAvailability = () => {
         endAccessor="end"
         style={{ height: 500 }}
         className="shadow-lg"
-        min={new Date(1970, 1, 1, 8, 0, 0)} // 8:00 AM
-        max={new Date(1970, 1, 1, 18, 0, 0)} // 6:00 PM
-        step={30} // 30-minute intervals
-        timeslots={1} // 1 timeslot per step
+        min={new Date(1970, 1, 1, 8, 0, 0)}
+        max={new Date(1970, 1, 1, 18, 0, 0)}
+        step={30}
+        timeslots={1}
       />
       {selectedSlot && (
         <div className="mt-4 p-4 border rounded-lg shadow-md bg-white">

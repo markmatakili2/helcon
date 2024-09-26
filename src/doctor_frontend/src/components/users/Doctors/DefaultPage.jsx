@@ -1,6 +1,19 @@
-import React from 'react';
+import React,{useEffect} from 'react';
+
+import {fetchAvailability } from "../../../features/Doctors/DoctorAvailability"
+import { useSelector,useDispatch } from 'react-redux';
+
 
 const DefaultPage = () => {
+  const dispatch = useDispatch()
+  const { id } = useSelector((state) => state.account.userData.data);
+  
+  useEffect(()=>{
+     if(id){
+       dispatch(fetchAvailability(id))
+     }
+  },[dispatch])
+
   return (
     <div className="p-4  lg:flex lg:space-x-6">
     

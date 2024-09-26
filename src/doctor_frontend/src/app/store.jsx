@@ -6,6 +6,7 @@ import DoctorSlice from '../features/Doctors/DoctorSlice';
 import doctorListSlice from '../features/Doctors/doctorListSlice';
 import accountSlice from '../features/auth/account'
 import doctorAvailabilitySlice from '../features/Doctors/DoctorAvailability'
+import appointmentsSlice  from "../features/Doctors/Appointments"
 
 export const store = configureStore({
   reducer: {
@@ -15,7 +16,8 @@ export const store = configureStore({
     doctors: DoctorSlice,
     doctorList: doctorListSlice,
     account:accountSlice,
-    avalibility:doctorAvailabilitySlice,
+    availability:doctorAvailabilitySlice,
+    appointment:appointmentsSlice,
   },
 });
 

@@ -46,6 +46,12 @@ const BookingCard = ({ handleCloseModal }) => {
     setShowForm(true); // Show the booking form
   };
 
+  //  patient_id: u64,
+  //   doctor_id: u64,
+  //   appointment_date: u64,
+  //   time: String,
+  //   phone_no: String,
+
   const handleBookingSubmit = (e) => {
     e.preventDefault();
     alert('Booking submitted!');
