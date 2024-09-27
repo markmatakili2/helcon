@@ -83,9 +83,12 @@ pub struct Appointment {
     pub id: u64,
     pub patient_id: u64,
     pub doctor_id: u64,
-    pub appointment_date: u64,
     pub phone_no: String,
-    pub time: String,
+    pub slot: String,
+    pub reason: String,
+    pub symtoms: String, 
+    pub status: String, 
+    pub appointment_type: String,
 }
 
 impl Storable for Appointment {

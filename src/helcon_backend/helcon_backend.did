@@ -1,10 +1,13 @@
 type Appointment = record {
   id : nat64;
+  status : text;
   patient_id : nat64;
-  appointment_date : nat64;
-  time : text;
+  symtoms : text;
+  appointment_type : text;
+  slot : text;
   doctor_id : nat64;
   phone_no : text;
+  reason : text;
 };
 type Availability = record {
   id : nat64;
@@ -85,7 +88,9 @@ type Result_7 = variant { Ok : Report; Err : Error };
 type Result_8 = variant { Ok : MedicalRecord; Err : Error };
 type Result_9 = variant { Ok; Err : Error };
 service : {
-  add_appointment : (nat64, nat64, nat64, text, text) -> (Result);
+  add_appointment : (nat64, nat64, text, text, text, text, text, text) -> (
+      Result,
+    );
   add_availability : (nat64, nat8, text, text, bool) -> (Result_1);
   add_calendly : (text, text) -> (Result_2);
   add_data : (text, text, vec nat8) -> (Result_3);
@@ -138,13 +143,24 @@ service : {
   list_identities : () -> (vec Identity) query;
   list_medical_records : () -> (vec MedicalRecord) query;
   list_messages : () -> (vec Message) query;
+  list_patients : () -> (vec Patient) query;
   list_reports : () -> (vec Report) query;
   register_patient : (text, nat64) -> (Result_11);
   send_message : (nat64, nat64, text, opt MultiMediaContent) -> (Result_10);
   send_reminder_to_patient : (nat64, text, opt MultiMediaContent) -> (
       Result_10,
     );
-  update_appointment : (nat64, nat64, nat64, nat64, text, text) -> (Result);
+  update_appointment : (
+      nat64,
+      nat64,
+      nat64,
+      text,
+      text,
+      text,
+      text,
+      text,
+      text,
+    ) -> (Result);
   update_availability : (nat64, nat64, nat8, text, text, bool) -> (Result_1);
   update_doctor : (
       text,

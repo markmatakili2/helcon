@@ -329,14 +329,31 @@ fn get_appointment(appointment_id: u64) -> Result<Appointment, Error> {
 fn add_appointment(
     patient_id: u64,
     doctor_id: u64,
-    appointment_date: u64,
-    time: String,
     phone_no: String,
+    slot: String,
+    reason: String,
+    symtoms: String, 
+    status: String, 
+    appointment_type: String,
 ) -> Result<Appointment, Error> {
     // Validate input data
     if phone_no.is_empty() {
         return Err(Error::InvalidInput {
             msg: "phone_no cannot be empty".to_string(),
+        });
+    }
+    
+    // Check if the doctor exists
+    if _get_doctor(&doctor_id).is_none() {
+        return Err(Error::NotFound {
+            msg: format!("Doctor with id={} not found", doctor_id),
+        });
+    }
+
+    // Check if the patient exists
+    if _get_patient(&patient_id).is_none() {
+        return Err(Error::NotFound {
+            msg: format!("Patient with id={} not found", patient_id),
         });
     }
 
@@ -351,9 +368,12 @@ fn add_appointment(
         id,
         patient_id,
         doctor_id,
-        appointment_date,
-        time,
         phone_no,
+        slot,
+        reason,
+        symtoms, 
+        status, 
+        appointment_type,
     };
 
     APPOINTMENT_STORAGE.with(|service| service.borrow_mut().insert(id, appointment.clone()));
@@ -365,12 +385,15 @@ fn update_appointment(
     appointment_id: u64,
     patient_id: u64,
     doctor_id: u64,
-    appointment_date: u64,
-    time: String,
     phone_no: String,
+    slot: String,
+    reason: String,
+    symtoms: String, 
+    status: String, 
+    appointment_type: String,
 ) -> Result<Appointment, Error> {
     // Validate input data
-    if phone_no.is_empty() || time.is_empty() {
+    if phone_no.is_empty() {
         return Err(Error::InvalidInput {
             msg: "Phone number and time cannot be empty".to_string(),
         });
@@ -381,9 +404,12 @@ fn update_appointment(
         id: appointment_id,
         patient_id,
         doctor_id,
-        appointment_date,
-        time,
         phone_no,
+        slot,
+        reason,
+        symtoms, 
+        status, 
+        appointment_type,
     };
 
     // Update the appointment in storage
@@ -1107,6 +1133,17 @@ fn _get_docidentity(docidentity_id: &u64) -> Option<DocIdentity> {
 
 fn _get_availability(availability_id: &u64) -> Option<Availability> {
     AVAILABILITY_STORAGE.with(|service| service.borrow().get(availability_id))
+}
+
+#[ic_cdk::query]
+fn list_patients() -> Vec<Patient> {
+    PATIENT_STORAGE.with(|service| {
+        service
+            .borrow()
+            .iter()
+            .map(|(_, patient)| patient.clone())
+            .collect()
+    })
 }
 
 #[ic_cdk::update]
