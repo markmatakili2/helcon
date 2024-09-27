@@ -110,6 +110,7 @@ service : {
   delete_availability : (nat64) -> (Result_9);
   delete_calendly : (nat64) -> (Result_9);
   delete_doctor : (nat64) -> (Result_9);
+  delete_identity : (nat64) -> (Result_9);
   delete_medical_record : (nat64) -> (Result_9);
   delete_message : (nat64) -> (Result_9);
   delete_patient : (nat64) -> (Result_9);

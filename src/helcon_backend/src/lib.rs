@@ -228,6 +228,16 @@ fn list_identities() -> Vec<Identity> {
             .collect()
     })
 }
+#[ic_cdk::update]
+fn delete_identity(identity_id: u64) -> Result<(), Error> {
+    // Remove report from storage
+    match IDENTITY_STORAGE.with(|service| service.borrow_mut().remove(&identity_id)) {
+        Some(_) => Ok(()),
+        None => Err(Error::NotFound {
+            msg: format!("Report with id={} not found", identity_id),
+        }),
+    }
+}
 
 #[ic_cdk::query]
 fn does_identity_exist(input_principal: String) -> bool {
