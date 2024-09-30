@@ -88,6 +88,7 @@ enum Error {
     Unauthorized { msg: String },
     AppointmentConflict { msg: String },
     AlreadyExists { msg: String },
+    SlotAlreadyBooked { msg: String },
 }
 
 #[ic_cdk::query]
@@ -342,17 +343,16 @@ fn add_appointment(
     phone_no: String,
     slot: String,
     reason: String,
-    symtoms: String, 
-    status: String, 
+    symtoms: String,
     appointment_type: String,
 ) -> Result<Appointment, Error> {
     // Validate input data
     if phone_no.is_empty() {
         return Err(Error::InvalidInput {
-            msg: "phone_no cannot be empty".to_string(),
+            msg: "Phone number cannot be empty".to_string(),
         });
     }
-    
+
     // Check if the doctor exists
     if _get_doctor(&doctor_id).is_none() {
         return Err(Error::NotFound {
@@ -367,12 +367,21 @@ fn add_appointment(
         });
     }
 
+    // Check if the slot is already booked for the specific doctor
+    let existing_appointments = filter_appointments_by_doctor_id(doctor_id);
+    if existing_appointments.iter().any(|appt| appt.slot == slot && appt.status == "booked") {
+        return Err(Error::SlotAlreadyBooked {
+            msg: format!("Slot {} is already booked for doctor id={}", slot, doctor_id),
+        });
+    }
+
+    // Increment ID counter using the provided logic
     let id = ID_COUNTER
         .with(|counter| {
-            let current_value = *counter.borrow().get();
-            counter.borrow_mut().set(current_value + 1)
+            let current_value = *counter.borrow().get(); // Safely get the current value
+            counter.borrow_mut().set(current_value + 1)  // Increment the counter by 1
         })
-        .expect("cannot increment id counter");
+        .expect("cannot increment id counter"); // Handle potential errors with an expectation
 
     let appointment = Appointment {
         id,
@@ -381,12 +390,14 @@ fn add_appointment(
         phone_no,
         slot,
         reason,
-        symtoms, 
-        status, 
+        symtoms,
+        status: "booked".to_string(), // Default status is "booked"
         appointment_type,
     };
 
+    // Store the appointment
     APPOINTMENT_STORAGE.with(|service| service.borrow_mut().insert(id, appointment.clone()));
+
     Ok(appointment)
 }
 
@@ -398,14 +409,14 @@ fn update_appointment(
     phone_no: String,
     slot: String,
     reason: String,
-    symtoms: String, 
-    status: String, 
+    symtoms: String,
+    status: String,
     appointment_type: String,
 ) -> Result<Appointment, Error> {
     // Validate input data
     if phone_no.is_empty() {
         return Err(Error::InvalidInput {
-            msg: "Phone number and time cannot be empty".to_string(),
+            msg: "Phone number cannot be empty".to_string(),
         });
     }
 
@@ -417,8 +428,8 @@ fn update_appointment(
         phone_no,
         slot,
         reason,
-        symtoms, 
-        status, 
+        symtoms,
+        status,
         appointment_type,
     };
 
@@ -434,6 +445,35 @@ fn update_appointment(
         }),
     }
 }
+
+#[ic_cdk::update]
+fn cancel_appointment(appointment_id: u64) -> Result<(), Error> {
+    match APPOINTMENT_STORAGE.with(|service| service.borrow_mut().remove(&appointment_id)) {
+        Some(_) => Ok(()),
+        None => Err(Error::NotFound {
+            msg: format!("Appointment with id={} not found", appointment_id),
+        }),
+    }
+}
+
+#[ic_cdk::update]
+fn complete_appointment(appointment_id: u64) -> Result<Appointment, Error> {
+    let mut appointment = match _get_appointment(&appointment_id) {
+        Some(appt) => appt,
+        None => return Err(Error::NotFound {
+            msg: format!("Appointment with id={} not found", appointment_id),
+        }),
+    };
+
+    // Mark appointment as completed
+    appointment.status = "completed".to_string();
+
+    // Update the appointment in storage
+    APPOINTMENT_STORAGE.with(|service| service.borrow_mut().insert(appointment_id, appointment.clone()));
+
+    Ok(appointment)
+}
+
 
 #[ic_cdk::query]
 fn filter_appointments_by_doctor_id(doctor_id: u64) -> Vec<Appointment> {

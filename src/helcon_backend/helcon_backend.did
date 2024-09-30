@@ -42,6 +42,7 @@ type Error = variant {
   InvalidInput : record { msg : text };
   AppointmentConflict : record { msg : text };
   NotFound : record { msg : text };
+  SlotAlreadyBooked : record { msg : text };
   Unauthorized : record { msg : text };
   AlreadyExists : record { msg : text };
 };
@@ -85,12 +86,10 @@ type Result_4 = variant { Ok : DocIdentity; Err : Error };
 type Result_5 = variant { Ok : Doctor; Err : Error };
 type Result_6 = variant { Ok : Identity; Err : Error };
 type Result_7 = variant { Ok : Report; Err : Error };
-type Result_8 = variant { Ok : MedicalRecord; Err : Error };
-type Result_9 = variant { Ok; Err : Error };
+type Result_8 = variant { Ok; Err : Error };
+type Result_9 = variant { Ok : MedicalRecord; Err : Error };
 service : {
-  add_appointment : (nat64, nat64, text, text, text, text, text, text) -> (
-      Result,
-    );
+  add_appointment : (nat64, nat64, text, text, text, text, text) -> (Result);
   add_availability : (nat64, nat8, text, text, bool) -> (Result_1);
   add_calendly : (text, text) -> (Result_2);
   add_data : (text, text, vec nat8) -> (Result_3);
@@ -111,16 +110,18 @@ service : {
   add_report : (nat64, text, text, text, text, text, opt MultiMediaContent) -> (
       Result_7,
     );
-  create_medical_record : (nat64, nat64, text, text) -> (Result_8);
-  delete_availability : (nat64) -> (Result_9);
-  delete_calendly : (nat64) -> (Result_9);
-  delete_docidentity : (nat64) -> (Result_9);
-  delete_doctor : (nat64) -> (Result_9);
-  delete_identity : (nat64) -> (Result_9);
-  delete_medical_record : (nat64) -> (Result_9);
-  delete_message : (nat64) -> (Result_9);
-  delete_patient : (nat64) -> (Result_9);
-  delete_report : (nat64) -> (Result_9);
+  cancel_appointment : (nat64) -> (Result_8);
+  complete_appointment : (nat64) -> (Result);
+  create_medical_record : (nat64, nat64, text, text) -> (Result_9);
+  delete_availability : (nat64) -> (Result_8);
+  delete_calendly : (nat64) -> (Result_8);
+  delete_docidentity : (nat64) -> (Result_8);
+  delete_doctor : (nat64) -> (Result_8);
+  delete_identity : (nat64) -> (Result_8);
+  delete_medical_record : (nat64) -> (Result_8);
+  delete_message : (nat64) -> (Result_8);
+  delete_patient : (nat64) -> (Result_8);
+  delete_report : (nat64) -> (Result_8);
   does_docidentity_exist : (text) -> (bool) query;
   does_identity_exist : (text) -> (bool) query;
   filter_appointments_by_doctor_id : (nat64) -> (vec Appointment) query;
@@ -133,7 +134,7 @@ service : {
   get_docidentity : (nat64) -> (Result_6) query;
   get_doctor : (nat64) -> (Result_5) query;
   get_identity : (nat64) -> (Result_6) query;
-  get_medical_record : (nat64) -> (Result_8) query;
+  get_medical_record : (nat64) -> (Result_9) query;
   get_message : (nat64) -> (Result_10) query;
   get_patient : (nat64) -> (Result_11) query;
   get_report : (nat64) -> (Result_7) query;
@@ -175,7 +176,7 @@ service : {
       text,
       text,
     ) -> (Result_5);
-  update_medical_record : (nat64, nat64, text, text) -> (Result_8);
+  update_medical_record : (nat64, nat64, text, text) -> (Result_9);
   update_message : (nat64, nat64, nat64, text, opt MultiMediaContent) -> (
       Result_10,
     );
