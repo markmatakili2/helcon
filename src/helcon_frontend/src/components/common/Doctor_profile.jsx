@@ -39,7 +39,7 @@ const ProfileCard = ({handleOpenModal}) => {
     <div className={`flex flex-col ${location.pathname === '/' ? 'mx-4 md:mx-[60px]  px-2' : ' '}`}>
       <div className="flex justify-between items-center py-2 mb-4">
         <h2 className='text-2xl font-bold text-primary'>Recommended Doctors</h2>
-        <Link to="/view-all" className='font-semibold flex items-center text-xl relative px-6'>
+        <Link to="" className='font-semibold flex items-center text-xl relative px-6'>
           <button className='flex items-center relative bg-primary_1 text-white px-4 py-2 rounded-lg'
           >
             View All <FaGreaterThan className='ml-2 text-sm' />
@@ -52,9 +52,9 @@ const ProfileCard = ({handleOpenModal}) => {
             <div className="flex">
               {/* <img src={image} alt="Doctor" className="w-16 h-16 rounded-full bg-primary" /> */}<FaUserCircle className='text-4xl mt-1' />
               <div className="ml-4">
-                <div className="font-bold text-lg normal-case ">{doctor.name}</div>
+               
                 <div className="text-primary-300 normal-case ">
-                  {doctor.country} <span className="mx-2">|</span> 20 years experience
+                  {doctor.fname} {doctor.lname}<span className="mx-2">| {doctor.city}, {doctor.country}</span> 
                 </div>
                 <div className=" normal-case mt-1 px-2 py-1 bg-blue-100 text-blue-600 rounded inline-block">
                   {doctor.specialism}
