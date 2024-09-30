@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-  import {createAppointment} from "../../features/Patient/AppointmentSlice"
+import { createAppointment } from "../../features/Patient/AppointmentSlice";
 import Loading from "../common/Loading";
 
-const BookingCard = ({ handleCloseModal,  }) => {
+const BookingCard = ({ handleCloseModal }) => {
   const dispatch = useDispatch();
   const { availabilityData, status } = useSelector((state) => state.availability);
-  const {toNum} = useSelector((state)=> state.account.userData.data)
+  const { toNum } = useSelector((state) => state.account.userData.data);
   const [selectedDay, setSelectedDay] = useState(new Date());
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [showForm, setShowForm] = useState(false);
@@ -24,7 +24,7 @@ const BookingCard = ({ handleCloseModal,  }) => {
     availabilityData.forEach(slot => {
       const [time, monthYear] = slot.start_time.split(' on '); // Split to get time and date
       const [hours, minutes] = time.split(':');
-      
+
       // Create a date object for local time
       const slotTime = new Date(selectedDay);
       slotTime.setHours(parseInt(hours), parseInt(minutes), 0, 0); // Set time
@@ -66,7 +66,6 @@ const BookingCard = ({ handleCloseModal,  }) => {
   const handleBookingSubmit = (e) => {
     e.preventDefault();
 
-   
     const appointmentData = {
       patient_id: toNum,
       doctor_id: selectedTimeSlot.doctor_id,
@@ -83,7 +82,6 @@ const BookingCard = ({ handleCloseModal,  }) => {
   
     setShowForm(false);
     handleCloseModal();
-   
   };
 
   return (
@@ -141,7 +139,7 @@ const BookingCard = ({ handleCloseModal,  }) => {
           ) : (
             <div>
               <h2 className="text-xl font-bold mb-4">Appointment</h2>
-              <p className="text-gray-700 mb-2">You selected: {selectedTimeSlot.formattedTime}</p>
+              <p className="text-gray-700 mb-2">You selected: {selectedTimeSlot.formattedTime} on {selectedTimeSlot.date}</p>
               <form onSubmit={handleBookingSubmit}>
                 <div className="mb-3">
                   <label className="block text-gray-700">Name</label>

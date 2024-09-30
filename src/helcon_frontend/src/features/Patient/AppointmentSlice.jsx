@@ -52,6 +52,7 @@ export const createAppointment = createAsyncThunk(
 export const fetchPatientAppointments = createAsyncThunk(
   'appointments/fetchPatientAppointments',
   async (patientId, { rejectWithValue }) => {
+    console.log(patientId)
     try {
       const response = await helcon_backend.filter_appointments_by_patient_id(patientId);
         const result = response.map((appointment)=>extractUserInfo(appointment))

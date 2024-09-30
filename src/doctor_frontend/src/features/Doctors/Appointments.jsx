@@ -1,21 +1,26 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { helcon_backend } from '../../../../declarations/helcon_backend'; 
-export const createAppointment = createAsyncThunk(
-  'appointments/createAppointment',
-  async (appointmentData) => {
-  
-    const response = await helcon_backend.add_appointment()
-    return response; 
-  }
-);
+import { helcon_backend } from '../../../../declarations/helcon_backend';
+
+const extractUserInfo = (response) => {
+  const { id,
+    doctor_id, patient_id, ...rest } = response.Ok || response;
+  return {
+    ...rest,
+    id: Number(id),
+    doctor_id: Number(doctor_id)
+
+
+  };
+}
 
 
 export const fetchPatientAppointments = createAsyncThunk(
   'appointments/fetchPatientAppointments',
-  async (patientId) => {
+  async (doctorId) => {
 
-    const response = await helcon_backend.filter_appointments_by_patient_id(patientId)
-    return response; 
+    const response = await helcon_backend.filter_appointments_by_doctor_id(doctorId)
+    const result = response.map((appointment) => extractUserInfo(appointment))
+    return result
   }
 );
 
@@ -32,18 +37,7 @@ const appointmentsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(createAppointment.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(createAppointment.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        // Optionally add the new appointment to the existing list
-        state.appointments.push(action.payload);
-      })
-      .addCase(createAppointment.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.error.message;
-      })
+
       .addCase(fetchPatientAppointments.pending, (state) => {
         state.status = 'loading';
       })

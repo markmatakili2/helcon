@@ -1,83 +1,81 @@
-import React,{useEffect} from 'react';
-
-import {fetchAvailability } from "../../../features/Doctors/DoctorAvailability"
-import { useSelector,useDispatch } from 'react-redux';
-
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchAvailability } from "../../../features/Doctors/DoctorAvailability";
+import { fetchPatientAppointments } from "../../../features/Doctors/Appointments";
 
 const DefaultPage = () => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const { id } = useSelector((state) => state.account.userData.data);
+
+  // Fetch appointments from Redux state
+  const {appointments} = useSelector((state) => state.appointment);
   
-  useEffect(()=>{
-     if(id){
-       dispatch(fetchAvailability(id))
-     }
-  },[dispatch])
+  // Filtered appointments based on status
+  const pendingAppointments = appointments.filter(app => app.status === 'pending');
+  const completedAppointments = appointments.filter(app => app.status === 'completed');
+
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchAvailability(id));
+      dispatch(fetchPatientAppointments(id));
+    }
+  }, [dispatch, id]);
+
+  // Function to render appointment cards
+  const renderAppointmentCards = () => {
+    if (!appointments || appointments.length === 0) {
+      return <p className="text-gray-500">No upcoming appointments</p>;
+    }
+
+    return appointments.slice(0, 3).map((appointment, index) => (
+      <div key={index} className="bg-gray-100 p-4 rounded-md shadow-md mb-4">
+        <p className="font-bold text-black mb-2">Appointment with {appointment.patient_name}</p>
+        <div className="text-gray-700">
+          <p>Status: {appointment.status}</p>
+          <p>Symptoms: {appointment.symtoms}</p>
+          <p>Type: {appointment.appointment_type}</p>
+          <p>Slot: {appointment.slot}</p>
+          <p>Reason: {appointment.reason}</p>
+        </div>
+      </div>
+    ));
+  };
 
   return (
-    <div className="p-4  lg:flex lg:space-x-6">
-    
-      <div className="bg-white p-6 rounded-md shadow-md lg:w-2/3">
-        <div className="flex justify-between ">
-          <span className="font-bold">Jun 2024</span>
-          {/* <span className="font-bold">Monday to Sunday</span> */}
-        </div>
-        <table className="w-full table-fixed">
-          <thead>
-            <tr>
-              <th className="border p-2">Mon</th>
-              <th className="border p-2">Tue</th>
-              <th className="border p-2">Wed</th>
-              <th className="border p-2">Thu</th>
-              <th className="border p-2">Fri</th>
-              <th className="border p-2">Sat</th>
-              <th className="border p-2">Sun</th>
-            </tr>
-          </thead>
-          <tbody>
-         
-            <tr>
-              <td className="border p-2">1</td>
-              <td className="border p-2">2</td>
-              <td className="border p-2">3</td>
-              <td className="border p-2">4</td>
-              <td className="border p-2">5</td>
-              <td className="border p-2">6</td>
-              <td className="border p-2">7</td>
-            </tr>
-          
-          </tbody>
-        </table>
-      </div>
-
-     
-      <div className="bg-white p-6 rounded-md shadow-md lg:w-1/3">
-        <h2 className="font-bold text-lg mb-4">Upcoming Events</h2>
-        <div className="mb-4">
-          <h3 className="font-bold mb-2">Today</h3>
-          {/* Event Component */}
-          <div className="bg-gray-100 p-4 rounded-md shadow-md mb-4">
-            <p className="font-bold text-black mb-2">sit at bench 1 </p>
-            <div className="flex justify-between text-gray-700">
-              <span>10:00pm</span>
-              <span>Nov 10, 2020</span>
-            </div>
+    <div className="p-4 lg:flex lg:space-x-6">
+      
+      {/* Summary Section */}
+      <div className="lg:w-2/3 space-y-6">
+        <div className="grid grid-cols-3 gap-4">
+          {/* Total Appointments */}
+          <div className="bg-blue-100 p-4 rounded-md shadow-md text-center">
+            <h3 className="font-bold text-xl">Total Appointments</h3>
+            <p className="text-2xl font-semibold">{appointments.length}</p>
+          </div>
+          {/* Pending Appointments */}
+          <div className="bg-yellow-100 p-4 rounded-md shadow-md text-center">
+            <h3 className="font-bold text-xl">Pending Appointments</h3>
+            <p className="text-2xl font-semibold">{pendingAppointments.length}</p>
+          </div>
+          {/* Completed Appointments */}
+          <div className="bg-green-100 p-4 rounded-md shadow-md text-center">
+            <h3 className="font-bold text-xl">Completed Appointments</h3>
+            <p className="text-2xl font-semibold">{completedAppointments.length}</p>
           </div>
         </div>
-        <div className="mb-4">
-          <h3 className="font-bold mb-2">Tomorrow</h3>
-         
-          <div className="bg-gray-100 p-4 rounded-md shadow-md mb-4">
-            <p className="font-bold text-black mb-2">attend therspy session
 
-            </p>
-            <div className="flex justify-between text-gray-700">
-              <span>10:00pm</span>
-              <span>Nov 11, 2020</span>
-            </div>
-          </div>
+        {/* Upcoming Appointments */}
+        <div className="bg-white p-6 rounded-md shadow-md">
+          <h2 className="font-bold text-lg mb-4">Upcoming Appointments</h2>
+          {renderAppointmentCards()}
+
+          {/* Button to view all appointments */}
+          {appointments.length > 3 && (
+            <button className="bg-primary_1 text-white py-1 px-3 rounded hover:bg-primary-dark transition">
+              View All Appointments
+            </button>
+          )}
         </div>
-  
       </div>
     </div>
   );

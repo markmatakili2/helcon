@@ -48,11 +48,11 @@ const SignupForm = () => {
                {errors.username && <span className="text-red-500 text-sm">{errors.username.message}</span>}
             </div>
 
-             {message && (
+             {/* {message && (
                <div className="">
                <span className="text-red-500 text-sm">{message}</span>
             </div>
-             )} 
+             )}  */}
 
             <button
                type="submit"

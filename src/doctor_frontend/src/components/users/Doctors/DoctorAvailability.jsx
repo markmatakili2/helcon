@@ -52,16 +52,18 @@ const DoctorAvailability = () => {
         title: "Available",
       };
       setEvents([...events, newEvent]);
-
+  
       // Prepare data for Redux/Backend
       const startDayOfWeek = moment(selectedSlot.start).isoWeekday();
-      const startDate = moment(selectedSlot.start).format('YYYY');
+      const startDate = moment(selectedSlot.start).format('YYYY-MM-DD'); // Format the date
       const monthName = moment(selectedSlot.start).format('MMMM');
       const startTime = moment(selectedSlot.start).format('HH:mm');
-
-      const startTimeWithMonthYear = `${startTime} on ${monthName} ${startDate}`;
+      const dayName = moment(selectedSlot.start).format('dddd');
+  
+      // Concatenate date into the start_time
+      const startTimeWithMonthYear = `${startTime} on ${dayName}, ${monthName} ${startDate}`; // Include date in start_time
       const endTime = moment(selectedSlot.end).format('HH:mm');
-
+  
       const identifier = localStorage.getItem('identifier');
       if (identifier) {
         const queryId = JSON.parse(identifier);
@@ -69,23 +71,24 @@ const DoctorAvailability = () => {
           const result = await dispatch(updateDoctorAvailability({
             doctor_id: Number(queryId.id),
             day_of_week: startDayOfWeek,
-            start_time: startTimeWithMonthYear,
+            start_time: startTimeWithMonthYear, // Send concatenated start_time
             end_time: endTime,
             is_available: true
           })).unwrap();
-
+  
           console.log("Availability updated successfully:", result);
         } catch (error) {
           console.error("Failed to update availability:", error);
         }
       } else {
-        alert("the doctor id is not there");
+        alert("The doctor ID is not there");
       }
-
+  
       setSelectedSlot(null);
+      alert("Availability added successfully!");
     }
-     alert("Availability added successfully!");
   };
+  
 
   return (
     <div className="container mx-auto my-4 p-4">

@@ -1,14 +1,29 @@
 import React, { useState } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css'; // Import default styles
+import { useSelector } from 'react-redux';
 
 const MyCalendar = () => {
-  const highlightDates = [
-    new Date(2024, 6, 22),
-  
-  ];
-
+  const { appointments } = useSelector((state) => state.appointments); // Adjust this path as per your Redux state structure
   const [date, setDate] = useState(new Date());
+
+  // Function to parse the appointment slot to extract the date
+  const parseDateFromSlot = (slot) => {
+    // Assuming the slot is formatted as "14:30 on Monday, September 2024-09-30"
+    const parts = slot.split(" on "); // Split by " on "
+    if (parts.length < 2) return null; // Return null if format is unexpected
+
+    // The date is the second part after " on "
+    const dateString = parts[1]; // "Monday, September 2024-09-30"
+    
+    // Convert it to a date object
+    return new Date(dateString);
+  };
+
+  // Extracting highlight dates from appointments
+  const highlightDates = appointments
+    .map(appointment => parseDateFromSlot(appointment.slot))
+    .filter(date => date !== null); // Filter out any null dates
 
   const handleDateChange = (newDate) => {
     setDate(newDate);
@@ -27,16 +42,12 @@ const MyCalendar = () => {
 
   return (
     <div className="react-calendar-container">
-     <Calendar
+      <Calendar
         onChange={handleDateChange}
         value={date}
         tileClassName={tileClassName}
-      /> 
-       {/* <div
-        className="calendly-inline-widget"
-        data-url="https://calendly.com/info-helcon/30min"
-        style={{ minWidth: '320px', height: '630px' }}
-      ></div> */}
+      />
+      {/* Optional: Add any additional UI components or Calendly widget here */}
     </div>
   );
 };
