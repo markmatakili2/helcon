@@ -1,21 +1,53 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { helcon_backend } from '../../../../declarations/helcon_backend'; 
+import { helcon_backend } from '../../../../declarations/helcon_backend';
+
+
+
 export const createAppointment = createAsyncThunk(
   'appointments/createAppointment',
-  async (appointmentData) => {
-  
-    const response = await helcon_backend.add_appointment()
-    return response; 
+  async (appointmentData, { rejectWithValue }) => {
+    try {
+      console.log(appointmentData)
+      const {
+        patient_id,
+        doctor_id,
+        phone_no,
+        slot,
+        reason,
+        symptoms,
+        status,
+        appointment_type
+      } = appointmentData;
+
+      // Call the backend function with the appropriate parameters
+      const response = await helcon_backend.add_appointment(
+        patient_id,
+        doctor_id,
+        phone_no,
+        slot,
+        reason,
+        symptoms,
+        status,
+        appointment_type
+      );
+
+      return response; // Return the response from the backend
+    } catch (error) {
+      // In case of error, reject with the error message
+      return rejectWithValue(error.message);
+    }
   }
 );
 
-
 export const fetchPatientAppointments = createAsyncThunk(
   'appointments/fetchPatientAppointments',
-  async (patientId) => {
-
-    const response = await helcon_backend.filter_appointments_by_patient_id(patientId)
-    return response; 
+  async (patientId, { rejectWithValue }) => {
+    try {
+      const response = await helcon_backend.filter_appointments_by_patient_id(patientId);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
   }
 );
 
@@ -37,12 +69,12 @@ const appointmentsSlice = createSlice({
       })
       .addCase(createAppointment.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        // Optionally add the new appointment to the existing list
+        console.log(action.payload)
         state.appointments.push(action.payload);
       })
       .addCase(createAppointment.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.error.message;
+        state.error = action.payload; // Assign the error message from the rejected action
       })
       .addCase(fetchPatientAppointments.pending, (state) => {
         state.status = 'loading';
@@ -53,7 +85,7 @@ const appointmentsSlice = createSlice({
       })
       .addCase(fetchPatientAppointments.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.error.message;
+        state.error = action.payload; 
       });
   },
 });

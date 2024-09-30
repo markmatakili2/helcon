@@ -1,13 +1,23 @@
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+  import {createAppointment} from "../../features/Patient/AppointmentSlice"
 import Loading from "../common/Loading";
 
-const BookingCard = ({ handleCloseModal }) => {
+const BookingCard = ({ handleCloseModal,  }) => {
+  const dispatch = useDispatch();
   const { availabilityData, status } = useSelector((state) => state.availability);
+   const {toNum} = useSelector((state)=>state.account.userData.data)
   
   const [selectedDay, setSelectedDay] = useState(new Date());
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    phone_no: '',
+    reason: '',
+    symptoms: '',
+    appointment_type: 'in-person', // Default to in-person
+  });
 
   const groupAvailabilityByTimeSlot = () => {
     const timeSlots = { morning: [], afternoon: [], evening: [] };
@@ -41,19 +51,41 @@ const BookingCard = ({ handleCloseModal }) => {
 
   const timeSlots = groupAvailabilityByTimeSlot();
 
-  const handleTimeSlotClick = (time) => {
-    setSelectedTimeSlot(time);
+  const handleTimeSlotClick = (slot) => {
+    setSelectedTimeSlot(slot);
     setShowForm(true); // Show the booking form
   };
 
-  //  patient_id: u64,
-  //   doctor_id: u64,
-  //   appointment_date: u64,
-  //   time: String,
-  //   phone_no: String,
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value
+    }));
+  };
 
   const handleBookingSubmit = (e) => {
     e.preventDefault();
+
+   
+    const appointmentData = {
+      patient_id: toNum,
+      doctor_id: selectedTimeSlot.doctor_id,
+      phone_no: formData.phone_no,
+      slot: selectedTimeSlot.start_time, 
+      reason: formData.reason,
+      symptoms: formData.symptoms,
+      status: 'pending', 
+      appointment_type: formData.appointment_type
+    };
+
+    // Dispatch the createAppointment action
+    // dispatch(createAppointment(appointmentData));
+    console.log(appointmentData)
+
+    // Close modal or reset form after submission
+    setShowForm(false);
+    handleCloseModal();
     alert('Booking submitted!');
   };
 
@@ -75,7 +107,7 @@ const BookingCard = ({ handleCloseModal }) => {
                     <button
                       key={idx}
                       className="border rounded-lg border-green-500 text-green-500 py-1 px-3 mr-2 mb-2 hover:bg-green-100"
-                      onClick={() => handleTimeSlotClick(slot.formattedTime)}
+                      onClick={() => handleTimeSlotClick(slot)}
                     >
                       {slot.formattedTime} 
                     </button>
@@ -88,7 +120,7 @@ const BookingCard = ({ handleCloseModal }) => {
                     <button
                       key={idx}
                       className="border rounded-lg border-green-500 text-green-500 py-1 px-3 mr-2 mb-2 hover:bg-green-100"
-                      onClick={() => handleTimeSlotClick(slot.formattedTime)}
+                      onClick={() => handleTimeSlotClick(slot)}
                     >
                       {slot.formattedTime} 
                     </button>
@@ -101,7 +133,7 @@ const BookingCard = ({ handleCloseModal }) => {
                     <button
                       key={idx}
                       className="border rounded-lg border-green-500 text-green-500 py-1 px-3 mr-2 mb-2 hover:bg-green-100"
-                      onClick={() => handleTimeSlotClick(slot.formattedTime)}
+                      onClick={() => handleTimeSlotClick(slot)}
                     >
                       {slot.formattedTime} 
                     </button>
@@ -112,12 +144,15 @@ const BookingCard = ({ handleCloseModal }) => {
           ) : (
             <div>
               <h2 className="text-xl font-bold mb-4">Appointment</h2>
-              <p className="text-gray-700 mb-2">You selected: {selectedTimeSlot}</p>
+              <p className="text-gray-700 mb-2">You selected: {selectedTimeSlot.formattedTime}</p>
               <form onSubmit={handleBookingSubmit}>
                 <div className="mb-3">
                   <label className="block text-gray-700">Name</label>
                   <input
                     type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
                     className="w-full border rounded-lg p-2"
                     required
                   />
@@ -126,9 +161,45 @@ const BookingCard = ({ handleCloseModal }) => {
                   <label className="block text-gray-700">Phone Number</label>
                   <input
                     type="tel"
+                    name="phone_no"
+                    value={formData.phone_no}
+                    onChange={handleInputChange}
                     className="w-full border rounded-lg p-2"
                     required
                   />
+                </div>
+                <div className="mb-3">
+                  <label className="block text-gray-700">Reason for Appointment</label>
+                  <input
+                    type="text"
+                    name="reason"
+                    value={formData.reason}
+                    onChange={handleInputChange}
+                    className="w-full border rounded-lg p-2"
+                    required
+                  />
+                </div>
+                <div className="mb-3">
+                  <label className="block text-gray-700">Symptoms</label>
+                  <input
+                    type="text"
+                    name="symptoms"
+                    value={formData.symptoms}
+                    onChange={handleInputChange}
+                    className="w-full border rounded-lg p-2"
+                  />
+                </div>
+                <div className="mb-3">
+                  <label className="block text-gray-700">Appointment Type</label>
+                  <select
+                    name="appointment_type"
+                    value={formData.appointment_type}
+                    onChange={handleInputChange}
+                    className="w-full border rounded-lg p-2"
+                  >
+                    <option value="in-person">In-person</option>
+                    <option value="virtual">Virtual</option>
+                  </select>
                 </div>
                 <button
                   type="submit"
