@@ -146,6 +146,16 @@ fn get_docidentity(docidentity_id: u64) -> Result<DocIdentity, Error> {
     }
 }
 
+#[ic_cdk::update]
+fn delete_docidentity(docidentity_id: u64) -> Result<(), Error> {
+    // Remove report from storage
+    match DOCIDENTITY_STORAGE.with(|service| service.borrow_mut().remove(&docidentity_id)) {
+        Some(_) => Ok(()),
+        None => Err(Error::NotFound {
+            msg: format!("Report with id={} not found", docidentity_id),
+        }),
+    }
+}
 #[ic_cdk::query]
 fn list_docidentities() -> Vec<DocIdentity> {
     DOCIDENTITY_STORAGE.with(|service| {
