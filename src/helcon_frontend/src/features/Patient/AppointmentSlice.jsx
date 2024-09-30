@@ -1,6 +1,17 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { helcon_backend } from '../../../../declarations/helcon_backend';
 
+const extractUserInfo = (response) => {
+  const { id,
+    doctor_id,patient_id, ...rest } = response.Ok || response;
+  return {
+    ...rest,
+    id: Number(id),
+    doctor_id: Number(doctor_id)
+
+
+  };
+}
 
 
 export const createAppointment = createAsyncThunk(
@@ -19,7 +30,6 @@ export const createAppointment = createAsyncThunk(
         appointment_type
       } = appointmentData;
 
-      // Call the backend function with the appropriate parameters
       const response = await helcon_backend.add_appointment(
         patient_id,
         doctor_id,
@@ -30,8 +40,8 @@ export const createAppointment = createAsyncThunk(
         status,
         appointment_type
       );
-
-      return response; // Return the response from the backend
+     let result = extractUserInfo(response)
+      return result 
     } catch (error) {
       // In case of error, reject with the error message
       return rejectWithValue(error.message);
@@ -44,7 +54,8 @@ export const fetchPatientAppointments = createAsyncThunk(
   async (patientId, { rejectWithValue }) => {
     try {
       const response = await helcon_backend.filter_appointments_by_patient_id(patientId);
-      return response;
+        const result = response.map((appointment)=>extractUserInfo(appointment))
+        return result
     } catch (error) {
       return rejectWithValue(error.message);
     }

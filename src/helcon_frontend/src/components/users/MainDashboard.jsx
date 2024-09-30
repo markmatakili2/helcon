@@ -9,11 +9,13 @@ import { MdEventBusy } from 'react-icons/md';
 import { HiMagnifyingGlass } from "react-icons/hi2";
 import { CiLocationOn } from "react-icons/ci";
 import { FaUserCircle } from "react-icons/fa";
-import { useSelector } from 'react-redux';
-import Modal from './Modal';  
+import { useSelector, useDispatch } from 'react-redux';
+import Modal from './Modal';
 import BookingCard from "./Booking"
+import { fetchPatientAppointments } from "../../features/Patient/AppointmentSlice"
 
 const MainDashboard = () => {
+  const dispatch = useDispatch()
   const { data } = useSelector((state) => state.account.userData);
   const [isModalOpen, setModalOpen] = useState(false); // State to manage modal visibility
 
@@ -24,6 +26,8 @@ const MainDashboard = () => {
   const handleCloseModal = () => {
     setModalOpen(false);
   };
+
+  dispatch(fetchPatientAppointments(10))
 
   return (
     <div className="min-h-screen p-4 flex flex-col space-y-4 w-full">
@@ -55,7 +59,7 @@ const MainDashboard = () => {
         </div>
       </div>
 
-  
+
       <div className="grid grid-cols-1 md:grid-cols-1 w-full gap-3 lg:grid-cols-3">
         <div className="lg:col-span-2 w-full ">
           <Banner />
@@ -86,12 +90,12 @@ const MainDashboard = () => {
         </div>
       </div>
       <div className="w-full">
-        <ProfileCard handleOpenModal={handleOpenModal}/>
+        <ProfileCard handleOpenModal={handleOpenModal} />
       </div>
 
       {/* Modal integration */}
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
-      <BookingCard  handleCloseModal={ handleCloseModal}/>
+        <BookingCard handleCloseModal={handleCloseModal} />
       </Modal>
     </div>
   );

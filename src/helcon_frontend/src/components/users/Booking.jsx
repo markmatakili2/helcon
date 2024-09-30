@@ -6,8 +6,7 @@ import Loading from "../common/Loading";
 const BookingCard = ({ handleCloseModal,  }) => {
   const dispatch = useDispatch();
   const { availabilityData, status } = useSelector((state) => state.availability);
-   const {toNum} = useSelector((state)=>state.account.userData.data)
-  
+  const {toNum} = useSelector((state)=> state.account.userData.data)
   const [selectedDay, setSelectedDay] = useState(new Date());
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [showForm, setShowForm] = useState(false);
@@ -80,13 +79,11 @@ const BookingCard = ({ handleCloseModal,  }) => {
     };
 
     // Dispatch the createAppointment action
-    // dispatch(createAppointment(appointmentData));
-    console.log(appointmentData)
-
-    // Close modal or reset form after submission
+    dispatch(createAppointment(appointmentData));
+  
     setShowForm(false);
     handleCloseModal();
-    alert('Booking submitted!');
+   
   };
 
   return (
