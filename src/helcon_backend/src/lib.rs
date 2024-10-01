@@ -88,7 +88,6 @@ enum Error {
     Unauthorized { msg: String },
     AppointmentConflict { msg: String },
     AlreadyExists { msg: String },
-    SlotAlreadyBooked { msg: String },
 }
 
 #[ic_cdk::query]
@@ -343,45 +342,54 @@ fn add_appointment(
     phone_no: String,
     slot: String,
     reason: String,
-    symtoms: String,
+    symtoms: String, 
+    status: String, 
     appointment_type: String,
 ) -> Result<Appointment, Error> {
     // Validate input data
     if phone_no.is_empty() {
         return Err(Error::InvalidInput {
-            msg: "Phone number cannot be empty".to_string(),
+            msg: "phone_no cannot be empty".to_string(),
         });
     }
-
-    // Check if the doctor exists
+    
+    // Check if the doctor and patient exist
     if _get_doctor(&doctor_id).is_none() {
         return Err(Error::NotFound {
             msg: format!("Doctor with id={} not found", doctor_id),
         });
     }
-
-    // Check if the patient exists
     if _get_patient(&patient_id).is_none() {
         return Err(Error::NotFound {
             msg: format!("Patient with id={} not found", patient_id),
         });
     }
 
-    // Check if the slot is already booked for the specific doctor
-    let existing_appointments = filter_appointments_by_doctor_id(doctor_id);
-    if existing_appointments.iter().any(|appt| appt.slot == slot && appt.status == "booked") {
-        return Err(Error::SlotAlreadyBooked {
-            msg: format!("Slot {} is already booked for doctor id={}", slot, doctor_id),
+    // Find the available slot for the doctor
+    let available_slot = AVAILABILITY_STORAGE.with(|service| {
+        service
+            .borrow()
+            .iter()
+            .find(|(_, availability)| availability.doctor_id == doctor_id && availability.is_available && availability.start_time == slot)
+    });
+
+    if available_slot.is_none() {
+        return Err(Error::InvalidInput {
+            msg: "Selected slot is not available".to_string(),
         });
     }
 
-    // Increment ID counter using the provided logic
+    // Mark the slot as unavailable
+    let mut availability = available_slot.unwrap().1.clone();
+    availability.is_available = false;
+    AVAILABILITY_STORAGE.with(|service| service.borrow_mut().insert(availability.id, availability.clone()));
+
     let id = ID_COUNTER
         .with(|counter| {
-            let current_value = *counter.borrow().get(); // Safely get the current value
-            counter.borrow_mut().set(current_value + 1)  // Increment the counter by 1
+            let current_value = *counter.borrow().get();
+            counter.borrow_mut().set(current_value + 1)
         })
-        .expect("cannot increment id counter"); // Handle potential errors with an expectation
+        .expect("cannot increment id counter");
 
     let appointment = Appointment {
         id,
@@ -390,14 +398,12 @@ fn add_appointment(
         phone_no,
         slot,
         reason,
-        symtoms,
-        status: "booked".to_string(), // Default status is "booked"
+        symtoms, 
+        status: "pending".to_string(), 
         appointment_type,
     };
 
-    // Store the appointment
     APPOINTMENT_STORAGE.with(|service| service.borrow_mut().insert(id, appointment.clone()));
-
     Ok(appointment)
 }
 
@@ -409,8 +415,8 @@ fn update_appointment(
     phone_no: String,
     slot: String,
     reason: String,
-    symtoms: String,
-    status: String,
+    symtoms: String, 
+    status: String, 
     appointment_type: String,
 ) -> Result<Appointment, Error> {
     // Validate input data
@@ -421,6 +427,27 @@ fn update_appointment(
     }
 
     // Check if the appointment exists
+    if _get_appointment(&appointment_id).is_none() {
+        return Err(Error::NotFound {
+            msg: format!("Appointment with id={} not found", appointment_id),
+        });
+    }
+
+    // If the appointment is canceled or completed, mark the slot as available
+    if status == "cancelled" || status == "confirmed" {
+        // Find the availability for the doctor and slot
+        if let Some(mut availability) = AVAILABILITY_STORAGE.with(|service| {
+            service
+                .borrow()
+                .iter()
+                .find(|(_, availability)| availability.doctor_id == doctor_id && availability.start_time == slot)
+                .map(|(_, availability)| availability.clone())
+        }) {
+            availability.is_available = true; // Mark the slot as available
+            AVAILABILITY_STORAGE.with(|service| service.borrow_mut().insert(availability.id, availability.clone()));
+        }
+    }
+
     let updated_appointment = Appointment {
         id: appointment_id,
         patient_id,
@@ -428,8 +455,8 @@ fn update_appointment(
         phone_no,
         slot,
         reason,
-        symtoms,
-        status,
+        symtoms, 
+        status, 
         appointment_type,
     };
 
@@ -446,34 +473,79 @@ fn update_appointment(
     }
 }
 
+#[ic_cdk::query]
+fn filter_available_slots_by_doctor_id(doctor_id: u64) -> Vec<Availability> {
+    AVAILABILITY_STORAGE.with(|service| {
+        service
+            .borrow()
+            .iter()
+            .filter(|(_, availability)| availability.doctor_id == doctor_id && availability.is_available)
+            .map(|(_, availability)| availability.clone())
+            .collect()
+    })
+}
+
 #[ic_cdk::update]
-fn cancel_appointment(appointment_id: u64) -> Result<(), Error> {
-    match APPOINTMENT_STORAGE.with(|service| service.borrow_mut().remove(&appointment_id)) {
-        Some(_) => Ok(()),
-        None => Err(Error::NotFound {
-            msg: format!("Appointment with id={} not found", appointment_id),
-        }),
+fn cancel_appointment(appointment_id: u64) -> Result<Appointment, Error> {
+    // Fetch the current appointment
+    let current_appointment = _get_appointment(&appointment_id).ok_or(Error::NotFound {
+        msg: format!("Appointment with id={} not found", appointment_id),
+    })?;
+
+    // Update the appointment status to 'cancelled'
+    let mut updated_appointment = current_appointment.clone();
+    updated_appointment.status = "cancelled".to_string();
+
+    // Find the corresponding availability slot
+    let availability_slot = AVAILABILITY_STORAGE.with(|service| {
+        service
+            .borrow()
+            .iter()
+            .find(|(_, availability)| availability.doctor_id == current_appointment.doctor_id && availability.start_time == current_appointment.slot)
+    });
+
+    if let Some((_, mut availability)) = availability_slot {
+        // Mark the availability as available
+        availability.is_available = true;
+        AVAILABILITY_STORAGE.with(|service| service.borrow_mut().insert(availability.id, availability.clone()));
     }
+
+    // Update the appointment in storage
+    APPOINTMENT_STORAGE.with(|service| service.borrow_mut().insert(appointment_id, updated_appointment.clone()));
+    
+    Ok(updated_appointment)
 }
 
 #[ic_cdk::update]
 fn complete_appointment(appointment_id: u64) -> Result<Appointment, Error> {
-    let mut appointment = match _get_appointment(&appointment_id) {
-        Some(appt) => appt,
-        None => return Err(Error::NotFound {
-            msg: format!("Appointment with id={} not found", appointment_id),
-        }),
-    };
+    // Fetch the current appointment
+    let current_appointment = _get_appointment(&appointment_id).ok_or(Error::NotFound {
+        msg: format!("Appointment with id={} not found", appointment_id),
+    })?;
 
-    // Mark appointment as completed
-    appointment.status = "completed".to_string();
+    // Update the appointment status to 'confirmed'
+    let mut updated_appointment = current_appointment.clone();
+    updated_appointment.status = "confirmed".to_string();
+
+    // Find the corresponding availability slot
+    let availability_slot = AVAILABILITY_STORAGE.with(|service| {
+        service
+            .borrow()
+            .iter()
+            .find(|(_, availability)| availability.doctor_id == current_appointment.doctor_id && availability.start_time == current_appointment.slot)
+    });
+
+    if let Some((_, mut availability)) = availability_slot {
+        // Mark the availability as available (if necessary)
+        availability.is_available = true;  // Typically, you may not want to change this for confirmed appointments
+        AVAILABILITY_STORAGE.with(|service| service.borrow_mut().insert(availability.id, availability.clone()));
+    }
 
     // Update the appointment in storage
-    APPOINTMENT_STORAGE.with(|service| service.borrow_mut().insert(appointment_id, appointment.clone()));
-
-    Ok(appointment)
+    APPOINTMENT_STORAGE.with(|service| service.borrow_mut().insert(appointment_id, updated_appointment.clone()));
+    
+    Ok(updated_appointment)
 }
-
 
 #[ic_cdk::query]
 fn filter_appointments_by_doctor_id(doctor_id: u64) -> Vec<Appointment> {
@@ -561,6 +633,17 @@ fn list_appointments() -> Vec<Appointment> {
             .map(|(_, appointment)| appointment.clone())
             .collect()
     })
+}
+
+#[ic_cdk::update]
+fn delete_appointment(appointment_id: u64) -> Result<(), Error> {
+    // Remove appointment from storage
+    match APPOINTMENT_STORAGE.with(|service| service.borrow_mut().remove(&appointment_id)) {
+        Some(_) => Ok(()),
+        None => Err(Error::NotFound {
+            msg: format!("Appointment with id={} not found", appointment_id),
+        }),
+    }
 }
 
 // Similar implementation for messages and medical records
