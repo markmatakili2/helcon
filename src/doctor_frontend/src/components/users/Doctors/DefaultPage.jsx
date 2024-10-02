@@ -1,18 +1,18 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchAvailability } from "../../../features/Doctors/DoctorAvailability";
-import { fetchPatientAppointments } from "../../../features/Doctors/Appointments";
+import { fetchPatientAppointments, confirmAppointment,deleteAppointment } from "../../../features/Doctors/Appointments";
 
 const DefaultPage = () => {
   const dispatch = useDispatch();
   const { id } = useSelector((state) => state.account.userData.data);
 
   // Fetch appointments from Redux state
-  const {appointments} = useSelector((state) => state.appointment);
-  
+  const { appointments, status,deleteStatus } = useSelector((state) => state.appointment);
+
   // Filtered appointments based on status
   const pendingAppointments = appointments.filter(app => app.status === 'pending');
-  const completedAppointments = appointments.filter(app => app.status === 'completed');
+  const completedAppointments = appointments.filter(app => app.status === 'confirmed');
 
   useEffect(() => {
     if (id) {
@@ -21,29 +21,65 @@ const DefaultPage = () => {
     }
   }, [dispatch, id]);
 
+  // Function to handle confirming an appointment
+  const handleConfirmAppointment = (appointmentId) => {
+    dispatch(confirmAppointment(appointmentId));
+  };
+  const handleDeleteAppointment = (appointmentId)=>{
+    dispatch(deleteAppointment(appointmentId))
+  }
   // Function to render appointment cards
   const renderAppointmentCards = () => {
     if (!appointments || appointments.length === 0) {
       return <p className="text-gray-500">No upcoming appointments</p>;
     }
 
-    return appointments.slice(0, 3).map((appointment, index) => (
-      <div key={index} className="bg-gray-100 p-4 rounded-md shadow-md mb-4">
-        <p className="font-bold text-black mb-2">Appointment with {appointment.patient_name}</p>
-        <div className="text-gray-700">
-          <p>Status: {appointment.status}</p>
-          <p>Symptoms: {appointment.symtoms}</p>
-          <p>Type: {appointment.appointment_type}</p>
-          <p>Slot: {appointment.slot}</p>
-          <p>Reason: {appointment.reason}</p>
+    return appointments.slice(0, 3).map((appointment, index) => {
+      // Set the card color based on appointment status
+      let cardColor = '';
+      if (appointment.status === 'cancelled') {
+        cardColor = 'bg-red-100'; // Red for canceled
+      } else if (appointment.status === 'pending') {
+        cardColor = 'bg-yellow-100'; // Yellow for pending
+      } else if (appointment.status === 'confirmed') {
+        cardColor = 'bg-green-100'; // Green for confirmed
+      }
+
+      return (
+        <div key={index} className={`${cardColor} p-4 rounded-md shadow-md mb-4`}>
+          <p className="font-bold text-black mb-2">Appointment with {appointment.phone_no.split(",")[1]}</p>
+          <div className="text-gray-700">
+            <p>Status: {appointment.status}</p>
+            <p>Symptoms: {appointment.symtoms}</p>
+            <p>Type: {appointment.appointment_type}</p>
+            <p>Time: {appointment.slot}</p>
+            <p>Reason: {appointment.reason}</p>
+          </div>
+          {/* Confirm Button */}
+          {appointment.status === 'pending' && (
+            <button
+              className="mt-2 mr-4 bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600 transition"
+              onClick={() => handleConfirmAppointment(appointment.id)}
+              disabled={status === 'loading'} // Disable if loading
+            >
+              {status === 'loading' ? 'Confirming...' : 'Confirm Appointment'}
+            </button>
+
+          )}
+          <button
+              className="mt-2 bg-red-500 text-white py-1 px-3 rounded hover:bg-blue-600 transition"
+              onClick={() => handleDeleteAppointment(appointment.id)}
+              disabled={deleteStatus === 'loading'} // Disable if loading
+            >
+              {deleteStatus === 'loading' ? 'Deleting...' : 'Delete'}
+            </button>
         </div>
-      </div>
-    ));
+      );
+    });
   };
 
   return (
     <div className="p-4 lg:flex lg:space-x-6">
-      
       {/* Summary Section */}
       <div className="lg:w-2/3 space-y-6">
         <div className="grid grid-cols-3 gap-4">
