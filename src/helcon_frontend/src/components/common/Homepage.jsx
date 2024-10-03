@@ -13,6 +13,9 @@ const HomePage = () => {
   const { principalData, identityData } = useSelector((state) => state.account);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  // let isRegistered = false
+  // let data = null
+  // let loading = false
 
   useEffect(() => {
     // Fetch user data only if there is an identifier

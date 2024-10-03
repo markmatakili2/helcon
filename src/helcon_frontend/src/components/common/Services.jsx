@@ -11,14 +11,16 @@ const Services = () => {
          <Header />
          <div className="mx-20 ">
             <div className="rounded-[16px] bg-gradient-to-r from-[#225364] to-[#002457] h-[262px] w-full pl-4 py-6 flex flex-col items-start md:items-start relative">
-               <div className="text-white gap-[12px] mb-4 md:mb-4 pl-3 pt-3">
-                  <h2 className="font-600 text-[24px] md:text-[30px] leading-[35px] md:leading-[45px]">
-                     Decentralization in <br />Healthcare<br />More Control
+               <div className="text-white gap-[12px] mb-4 md:mb-6 pl-3 pt-3">
+                  <h2 className="font-600 text-[28px] leading-[35px] md:text-[40px] md:leading-[50px] xl:text-[45px] xl:leading-[55px]">
+                     Decentralization in <br />
+                     Healthcare<br />
+                     More Control with Digital Hospitals<br />
+                     Empowering Patients and Doctors Anywhere
                   </h2>
-
                </div>
-
             </div>
+
             <div className="flex flex-col items-start mt-14 mb-20 pr-10 w-full">
                <div className="self-center flex flex-col items-center mb-6">
                   <h2 className='text-3xl font-semibold leading-[71.66px] text-center text-[#404040] px-6 md:px-40'>Our Services</h2>

@@ -8,17 +8,17 @@ import logo from '../../images/helcon_logo.png';
 const Footer = () => {
   return (
     <div className="bg-primary_1 text-white rounded-t-[32px] mt-8">
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-12 md:py-20">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 md:mb-16 space-y-8 md:space-y-0">
-          <div className="flex lg:items-center  md:justify-between">
-            <img src={logo} alt="HelCon Logo" className="w-24 h-auto mr-4 relative left-12 lg:-mt-3 md:-mt-6" />
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-10 md:py-16">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 md:mb-12 space-y-8 md:space-y-0">
+          <div className="flex lg:items-center md:justify-between">
+            <img src={logo} alt="HelCon Logo" className="w-24 h-auto mr-4 relative left-0 md:left-12 lg:-mt-3 md:-mt-6" />
             <div>
               <h2 className="font-semibold text-2xl">HelCon</h2>
               <p className="mt-2 text-base">Your health is our priority</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full md:w-2/3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full md:w-2/3">
             <div>
               <h2 className="font-semibold text-xl mb-4">Important links</h2>
               <ul className="text-sm space-y-2">
@@ -52,17 +52,16 @@ const Footer = () => {
           </div>
         </div>
 
-        <hr className="border-gray-300 mb-12" />
+        <hr className="border-gray-300 mb-10 md:mb-12" />
 
         <div className="flex justify-between items-center flex-col md:flex-row">
           <p className="text-sm text-gray-600 mb-4 md:mb-0">&copy; 2024 HealthConnect. All Rights Reserved by HelCon</p>
           <ul className="flex space-x-4">
             <li><FaLinkedinIn className="w-8 h-8 text-primary_1 bg-white rounded-full p-2" /></li>
             <li><BsTwitter className="w-8 h-8 text-primary_1 bg-white rounded-full p-2" /></li>
-            <li><TbBrandTelegram  className="w-8 h-8 text-primary_1 bg-white rounded-full p-2" /></li>
+            <li><TbBrandTelegram className="w-8 h-8 text-primary_1 bg-white rounded-full p-2" /></li>
           </ul>
         </div>
-
       </div>
     </div>
   );

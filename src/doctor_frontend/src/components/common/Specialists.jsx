@@ -8,10 +8,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, } from 'react-router-dom';
 import { getUserData } from '../../features/auth/account'
 import Loading from './loading';
+
 const Specialists = () => {
    const { principalData, identityData } = useSelector((state) => state.account)
-     
+
    const { isRegistered, data, loading } = useSelector((state) => state.account.userData)
+
    const navigate = useNavigate()
    const dispatch = useDispatch()
    useEffect(() => {
@@ -27,13 +29,11 @@ const Specialists = () => {
       }
    }, [navigate, isRegistered, data])
 
-
    const [availability, setAvailability] = useState(false);
 
    const handleToggle = () => {
       setAvailability(!availability);
    };
-
 
    if (loading && !isRegistered) {
       return <Loading />
@@ -42,18 +42,19 @@ const Specialists = () => {
    if (principalData.loading || identityData.loading) {
       return <Loading />
    }
+
    return (
       <div className='z-40 relative'>
          <Header />
 
-         <div className=" mx-20 md:-pt-6 pt-6 flex flex-col">
-            <div className="flex flex-col items-start space-y-8 p-4 md:p-8 mb-6">
+         <div className="mx-4 md:mx-20 pt-6 md:pt-6 flex flex-col">
+            <div className="flex flex-col items-center space-y-6 md:space-y-8 p-6 md:p-8 mb-6">
 
-               <h2 className="font-600 text-5xl md:text-[49px] leading-tight md:leading-[52px] text-primary_1">
+               <h2 className="font-bold text-4xl md:text-[49px] leading-tight md:leading-[52px] text-primary_1 text-center tracking-wide">
                   We care <br />about your health
                </h2>
 
-               <p className="pt-4 md:pt-6 text-lg md:text-[18.47px] text-[#A7A7A7] font-500 max-w-full md:max-w-[600px] text-balance">
+               <p className="pt-4 md:pt-6 text-lg md:text-[18.47px] text-[#A7A7A7] font-medium max-w-full md:max-w-[600px] text-center">
                   Become one of our HealthConnect Specialists and get to help even more patients.
                </p>
 
@@ -63,7 +64,6 @@ const Specialists = () => {
                </button>
 
             </div>
-
 
             <div className="md:z-50 self-center flex flex-col rounded-md shadow-lg p-2 pb-4 ">
                <h2 className=" font-semibold text-md mb-2">Find a Doctor</h2>
@@ -83,17 +83,14 @@ const Specialists = () => {
                   <div className="flex items-center space-x-2">
                      <label className="text-gray-700">Availability</label>
                      <div
-                        className={`w-12 h-6 flex items-center bg-primary_1 rounded-full p-1 cursor-pointer 
-      }`}
+                        className={`w-12 h-6 flex items-center bg-primary_1 rounded-full p-1 cursor-pointer`}
                         onClick={handleToggle}
                      >
                         <div
-                           className={`bg-white w-4 h-4 rounded-full shadow-md transform duration-300 ease-in-out ${availability ? 'translate-x-6' : ''
-                              }`}
+                           className={`bg-white w-4 h-4 rounded-full shadow-md transform duration-300 ease-in-out ${availability ? 'translate-x-6' : ''}`}
                         ></div>
                      </div>
                   </div>
-
 
                   <button className="text-xl px-6 md:w-full p-2 rounded bg-[#0A1F4B] text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                      Search
@@ -101,12 +98,9 @@ const Specialists = () => {
 
                </div>
 
-
             </div>
 
-
             <div className="mt-20 mb-16 px-4 md:px-24 flex flex-col text-center">
-
                <div className="mb-8">
                   <h2 className="text-3xl font-semibold leading-tight text-[#404040]">
                      Meet Our Doctors
@@ -121,8 +115,9 @@ const Specialists = () => {
                         <span className="self-start bg-gray-300 text-gray-700 rounded-full px-3 py-1 text-sm mb-2 ml-16">
                            Available
                         </span>
-                        <div className="overflow-hidden bg-primary_1 w-full md:w-3/5 h-64  mb-2 rounded-lg relative ">
-                           <img src={doc} alt="a doctor" className="overflow-hidden absolute   md:-top-6 md:-left-2  object-cover -left-2 -top-12" /></div>
+                        <div className="overflow-hidden bg-primary_1 w-full md:w-3/5 h-64 mb-2 rounded-lg relative ">
+                           <img src={doc} alt="a doctor" className="overflow-hidden absolute md:-top-6 md:-left-2 object-cover -left-2 -top-12" />
+                        </div>
                         <p className="text-lg font-semibold">Dr. John Doe</p>
                         <p className="text-sm text-gray-500 mb-2">Cardiologist</p>
                         <div className="flex items-center mb-4">
@@ -132,12 +127,7 @@ const Specialists = () => {
                         <button className="bg-primary_1 text-white rounded-full px-4 py-2">
                            Book an Appointment
                         </button>
-
-
-
-
                      </div>
-
                   ))}
                </div>
                <div className="mt-8">
@@ -145,31 +135,12 @@ const Specialists = () => {
                      See More
                   </button>
                </div>
-
-
-
-
             </div>
-
-
-
          </div>
-
 
          <Footer />
       </div>
-
-
-
-
-
-
-
-
-
-
-
-
    )
 }
-export default Specialists
+
+export default Specialists;

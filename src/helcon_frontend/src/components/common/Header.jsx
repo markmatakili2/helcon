@@ -2,22 +2,23 @@ import React, { useState, useEffect } from 'react';
 import logo from '../../images/helcon_logo.png';
 import { MdOutlineKeyboardArrowDown, MdMenu, MdClose } from "react-icons/md";
 import { NavLink, Navigate } from "react-router-dom";
-import { login } from '../../features/auth/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom'
-import { getPrincipal, addIdentity,} from '../../features/auth/account'
+import { useNavigate } from 'react-router-dom';
+import { getPrincipal, addIdentity } from '../../features/auth/account';
+
 
 const Header = () => {
-
+   
    const navigate = useNavigate()
    const dispatch = useDispatch();
+
+
    const [menuOpen, setMenuOpen] = useState(false);
 
    const toggleMenu = () => {
       setMenuOpen(!menuOpen);
    };
    const handleLogin = async () => {
-
       const result = await dispatch(getPrincipal())
       if (getPrincipal.fulfilled.match(result)) {
          const identityResult = await dispatch(addIdentity({ principal: result.payload }))
@@ -32,7 +33,7 @@ const Header = () => {
       }
 
    }
-   
+  
 
 
    return (
@@ -53,24 +54,20 @@ const Header = () => {
                <NavLink to="/" className={({ isActive }) => isActive ? 'text-primary_1' : 'text-[#404040]'}>Home</NavLink>
             </li>
             <li className="font-medium text-[#404040] text-[18px] leading-[22px] flex relative">
-               <NavLink to="/services" className={({ isActive }) => isActive ? 'text-primary_1' : 'text-[#404040]'}>Services</NavLink>
+               <NavLink to="/" className={({ isActive }) => isActive ? 'text-primary_1' : 'text-[#404040]'}>Services</NavLink>
                <MdOutlineKeyboardArrowDown className="text-primary text-2xl" />
             </li>
             <li className="font-medium text-[#404040] text-[18px] leading-[22px]">
-               <NavLink to="/specialists" className={({ isActive }) => isActive ? 'text-primary_1' : 'text-[#404040]'}>Specialists</NavLink>
+               <NavLink to="/" className={({ isActive }) => isActive ? 'text-primary_1' : 'text-[#404040]'}>Specialists</NavLink>
             </li>
             <li className="font-medium text-[#404040] text-[18px] leading-[22px]">
-               <NavLink to="/about-us" className={({ isActive }) => isActive ? 'text-primary_1' : 'text-[#404040]'}>About us</NavLink>
+               <NavLink to="/" className={({ isActive }) => isActive ? 'text-primary_1' : 'text-[#404040]'}>About us</NavLink>
             </li>
             <li className="font-medium text-[#404040] text-[18px] leading-[22px]">
                <NavLink to="" className={({ isActive }) => isActive ? 'text-primary_1' : 'text-[#404040]'}>FAQ</NavLink>
             </li>
-            <div className="w-full md:hidden flex items-center pl-20">
-            <button className="bg-primary_1 h-10 w-4/5 sm:w-36 lg:w-40 rounded-[6px] text-white py-2 px-4"
-               onClick={handleLogin}>Get Started</button>
-         </div>
          </ul>
-         <div className="hidden md:flex items-center ">
+         <div className="hidden md:flex items-center">
             <button className="bg-primary_1 h-10 w-32 sm:w-36 lg:w-40 rounded-[6px] text-white py-2 px-4"
                onClick={handleLogin}>Get Started</button>
          </div>

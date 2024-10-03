@@ -35,7 +35,7 @@ const MainDashboard = () => {
           <p className="text-gray-600">Hi, {username}</p>
           <h1 className="text-2xl font-bold text-black">Welcome Back</h1>
         </div>
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-4  ">
           <FaBell className="text-xl text-gray-700" />
           <FaUserCircle className="text-2xl ml-4" />
           <p className="-mr-10">Kevin</p>
