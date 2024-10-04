@@ -90,8 +90,8 @@ export const registerUser = createAsyncThunk(
 
 
       try {
-         const {principal_id,fname, lname, dob, specialism, licence_no, id_no, gender, country, city } = data;
-         const response = await helcon_backend.add_doctor(principal_id, fname, lname, dob, specialism, licence_no, id_no, gender, country, city)
+         const {principal_id,fname, lname, dob, specialism, licence_no, id_no, sex, country, city } = data;
+         const response = await helcon_backend.add_doctor(principal_id, fname, lname, dob, specialism, licence_no, id_no, sex, country, city)
          if (response.Ok) {
             const userInfo = extractUserInfo(response);
             dispatch(setQueryId({ id: userInfo.id }));
@@ -106,6 +106,30 @@ export const registerUser = createAsyncThunk(
       }
    }
 );
+export const updateProfile = createAsyncThunk(
+   'auth/updateProfile',
+   async ({ data }, { rejectWithValue, dispatch }) => {
+      console.log(data)
+
+
+      try {
+         const {principal_id,fname, lname, dob, specialism, licence_no, id_no, sex, country, city } = data;
+         const response = await helcon_backend.update_doctor(String(principal_id), fname, lname, dob, specialism, licence_no, id_no, sex, country, city)
+         if (response.Ok) {
+            const userInfo = extractUserInfo(response);
+            dispatch(setQueryId({ id: userInfo.id }));
+            return userInfo;
+         } else {
+            //const { AlreadyExists } = response.Err;
+            return rejectWithValue(response.Err);
+         }
+      } catch (error) {
+         console.error("Error registering user:", error.message);
+         return rejectWithValue(error.message);
+      }
+   }
+);
+
 
 export const getUserData = createAsyncThunk(
    'auth/getUserData',
@@ -195,6 +219,22 @@ const accountSlice = createSlice({
          .addCase(registerUser.rejected, (state, action) => {
             state.userData.message = action.payload;
             state.userData.loading = false;
+         })
+         .addCase(updateProfile.pending, (state) => {
+            state.userData.loading = true;
+            state.userData.message = 'fetching';
+         })
+         .addCase(updateProfile.fulfilled, (state, action) => {
+            state.userData.data = action.payload;
+            state.userData.loading = false;
+            state.userData.message = 'success';
+            state.userData.isRegistered = true
+         })
+         .addCase(updateProfile.rejected, (state, action) => {
+            state.userData.message = action.payload;
+            state.userData.loading = false;
+
+            console.log(action.payload)
          })
          .addCase(getUserData.pending, (state) => {
             state.userData.loading = true;

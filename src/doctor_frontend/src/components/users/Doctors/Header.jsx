@@ -3,9 +3,20 @@ import { useLocation } from 'react-router-dom';
 import { FaBell, } from 'react-icons/fa';
 import { NavLink } from 'react-router-dom';
 import { FaUserCircle } from "react-icons/fa";
-import {useSelector} from 'react-redux'
+import {useSelector,useDispatch} from 'react-redux'
+import { FiMenu,FiX} from 'react-icons/fi';
+import { toggleSidebar } from "../../../features/SidebarBarSlice"
+
 
 const DoctorHeader = () => {
+   const isOpen = useSelector((state) => state.sidebar.isOpen);
+  const dispatch = useDispatch()
+   const closeSidebar = ()=>{
+dispatch(toggleSidebar())
+// alert("hello world")
+   }
+
+
    const {data}  = useSelector((state)=>state.account.userData)
    const location = useLocation()
 
@@ -17,12 +28,28 @@ const DoctorHeader = () => {
                <h1 className="text-2xl font-bold text-black">Profile</h1>
             </div>
             <div className="flex items-center space-x-4">
-               <select className="p-2 rounded-m">
-                  <option>En</option>
-                  {/* Add more languages as needed */}
-               </select>
-               <FaBell className="text-xl" />
-               <FaUserCircle className='text-2xl' />
+            <div className="flex items-center space-x-4 ">
+  {/* Select dropdown, visible from md screens onwards */}
+  <select className="p-2 rounded-md hidden md:block">
+    <option>En</option>
+    {/* Add more languages as needed */}
+  </select>
+
+  {/* Notification bell, visible from md screens onwards */}
+  <FaBell className="text-xl hidden md:block  mx-10 " />
+
+  {/* User icon, visible from md screens onwards */}
+  <FaUserCircle className="text-2xl hidden md:block  " />
+
+  {/* Menu button, visible only below md screens */}
+  <button 
+    className="text-primary_1 text-3xl md:hidden" // Hidden on md and up, visible on small screens
+    onClick={closeSidebar}
+  >
+   {isOpen ? (<FiX/>):(<FiMenu />)} 
+  </button>
+</div>
+
             </div>
          </div>
          <div className="flex justify-between w-full">

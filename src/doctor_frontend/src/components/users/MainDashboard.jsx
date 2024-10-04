@@ -34,7 +34,7 @@ const MainDashboard = () => {
         <div className="flex items-center space-x-4">
           <select className="p-2 rounded-md border border-gray-300">
             <option>En</option>
-            {/* Add more languages as needed */}
+           
           </select>
           <FaBell className="text-xl text-gray-700" />
         

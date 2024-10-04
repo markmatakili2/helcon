@@ -99,7 +99,7 @@ const DefaultPage = () => {
   };
 
   return (
-    <div className="p-4 lg:flex lg:space-x-6">
+    <div className="w-full p-4 lg:flex lg:space-x-6">
       <div className="lg:w-2/3 space-y-6">
         <div className="grid grid-cols-3 gap-4">
           <div className="bg-blue-100 p-4 rounded-md shadow-md text-center">

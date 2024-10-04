@@ -1,15 +1,23 @@
+import {useState} from "react"
 import { FaEdit } from 'react-icons/fa'
 import { useSelector } from 'react-redux'
+import SignupForm  from "../common/SignupForm"
 const GeneralProfile = () => {
+   const [isForm,showForm] = useState(false)
    const { data } = useSelector((state) => state.account.userData)
    // fname, lname, dob, specialism, licence_no, id_no, sex, country, city
+   const {principal_str,id,...userInfo} = data
+
+   const toggleForm =()=>{
+      showForm(!isForm)
+   }
    return (
 
       <div className="flex flex-col space-y-6 p-4">
-         <div className='bg-white p-4'>
+         {!isForm ? (<div className='bg-white p-4'>
             <div className="flex justify-between items-center ">
                <h2 className="text-xl font-bold">Personal Info</h2>
-               <button className="flex items-center space-x-2 p-2  text-[#434966] rounded border ">
+               <button className="flex items-center space-x-2 p-2  text-[#434966] rounded border " onClick={toggleForm}>
                   <span>Edit</span>
                   <FaEdit />
                </button>
@@ -54,7 +62,7 @@ const GeneralProfile = () => {
             </div>
          </div>
 
-
+):(<SignupForm mode='edit' defaultValues={userInfo} userId={id}/>)}
       </div>
    )
 }

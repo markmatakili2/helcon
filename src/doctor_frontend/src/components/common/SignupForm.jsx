@@ -1,32 +1,46 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+
 import { useForm, } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { registerUser } from '../../features/auth/account';
+import { registerUser,updateProfile } from '../../features/auth/account';
 import { useNavigate } from 'react-router-dom';
 
-const SignupForm = () => {
+const SignupForm = ({ mode = 'create', defaultValues = {}, userId=''}) => {
    const  {data} = useSelector((state)=>state.account.identityData)
-   console.log(data)
+   
    const { loading } = useSelector((state) => state.account.userData)
    const navigate = useNavigate()
    const dispatch = useDispatch()
 
-   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm();
-   const id = localStorage.getItem('id')
-   console.log(id)
+   const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm({
+      defaultValues
+   });
+
+   useEffect(() => {
+      reset(defaultValues); // Reset the form with default values when it changes
+   }, [defaultValues, reset]);
 
    const onSubmit = async (data) => {
+      const id = localStorage.getItem('id');
+      let userData 
 
-      const userData = { principal_id:id, ...data }
-      
-      const response = await dispatch(registerUser({data:userData}))
-      const { requestStatus } = response.meta
-      if (requestStatus === 'fulfilled') {
-         navigate('/doctors')
+      let response;
+      if (mode === 'edit') {
+        
+         
+         userData =  { principal_id: userId, ...data };
+         response = await dispatch(updateProfile({ data: userData }));
       } else {
-         console.log('some error occured adding the identity', requestStatus)
+         userData =  { principal_id: id, ...data };
+         response = await dispatch(registerUser({ data: userData }));
       }
 
+      const { requestStatus } = response.meta;
+      if (requestStatus === 'fulfilled') {
+         navigate('/doctors');
+      } else {
+         console.log('Some error occurred:', requestStatus);
+      }
    };
    return (
       <div className="flex justify-center items-center min-h-screen bg-gray-100">
@@ -34,9 +48,12 @@ const SignupForm = () => {
             className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full"
             onSubmit={handleSubmit(onSubmit)}
          >
-            <h2 className="text-xl font-bold text-gray-800 mb-2 text-center">Hey there</h2>
-            <p className="text-gray-600 mb-4 text-center">Join Helcon by creating an account</p>
-
+           <h2 className="text-xl font-bold text-gray-800 mb-2 text-center">
+               {mode === 'edit' ? 'Edit Your Information' : 'Hey there'}
+            </h2>
+            <p className="text-gray-600 mb-4 text-center">
+               {mode === 'edit' ? 'Update your account details' : 'Join Helcon by creating an account'}
+            </p>
 
             <div className="mb-3">
                <label className="block text-gray-700 mb-1">First name</label>
@@ -67,7 +84,7 @@ const SignupForm = () => {
             </div>
             <div className="mb-3">
                <label className="block text-gray-700 mb-1">Gender</label>
-               <select {...register("gender")} className='w-full p-1 border rounded-md border-gray-400 focus:outline-none focus:border-primary_1"'>
+               <select {...register("sex")} className='w-full p-1 border rounded-md border-gray-400 focus:outline-none focus:border-primary_1"'>
                   <option value="female" className="w-2/5">female</option>
                   <option value="male" className="w-2/5">male</option>
 
@@ -140,12 +157,12 @@ const SignupForm = () => {
             </div> */}
 
 
-            <button
+<button
                type="submit"
                className="w-full py-2 px-4 bg-primary_1 text-white rounded-md flex justify-center items-center"
                disabled={loading}
             >
-              {loading ? 'please wait ...':'create account'}
+               {loading ? 'Please wait ...' : (mode === 'edit' ? 'Update Account' : 'Create Account')}
             </button>
          </form>
       </div>
