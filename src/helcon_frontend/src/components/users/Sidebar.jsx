@@ -1,29 +1,32 @@
 import React, { useEffect } from 'react';
 import { FaTachometerAlt, FaCalendarAlt, FaUser, FaQuestionCircle, FaSignOutAlt } from 'react-icons/fa';
 import logo from '../../images/helcon_logo.png';
-import { NavLink, Navigate, useLocation } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { logout } from '../../features/auth/authSlice';
 import { useDispatch, useSelector, } from 'react-redux';
-import {useNavigate} from 'react-router-dom'
+import {hideSidebar} from "../../features/SidebarBarSlice"
 
 const Sidebar = () => {
+  const isOpen = useSelector((state)=>state.sidebar.isOpen)
   const navigate = useNavigate()
   const location = useLocation()
   useEffect(() => {
   }, [location])
 
-  const auth = useSelector((state) => state.auth.authClient)
+ 
 
 
-  const dispatch = useDispatch
+  const dispatch = useDispatch()
   const handleLogout = () => {
-    dispatch(logout({navigate}))
+    localStorage.removeItem('isLoggedIn');
+    navigate("/")
 
   }
+  const closeSidebar = ()=>{
+    dispatch(hideSidebar())
+  }
 
-  // if (!auth) {
-  //   return <Navigate to='/' replace />
-  // }
+ 
 
   const links = [
     { name: 'Dashboard', icon: <FaTachometerAlt />, path: '/home' },
@@ -44,56 +47,65 @@ const Sidebar = () => {
       <nav className="flex-1 pl-4 mb-20">
         <ul>
 
-          {location.pathname.startsWith('/d') ? (<> <li className="my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer">
+          {location.pathname.startsWith('/d') ? (<> <li className="my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer" 
+          onClick={closeSidebar}>
             <NavLink className={({ isActive }) =>
-              `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : 'text-primary'
-              }`
+              `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : (isOpen ? 'text-white':'text-primary')   }`
             } to="/doctors" end> <span className="mr-3"><FaTachometerAlt /></span>Dashboard</NavLink>
 
           </li>
-            <li className="my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer"><NavLink className={({ isActive }) =>
-              `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : 'text-primary'
-              }`
+            <li className="my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer"
+            onClick={closeSidebar}><NavLink className={({ isActive }) =>
+              `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : (isOpen ? 'text-white':'text-primary')   }`
             } to="/doctors/patient-records"> <span className="mr-3"><FaTachometerAlt /></span>Patient Records</NavLink></li>
             <NavLink className={({ isActive }) =>
-              `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : 'text-primary'
-              }`
+              `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : (isOpen ? 'text-white':'text-primary')   }`
             } to="/doctors/availability"> <span className="mr-3"><FaTachometerAlt /></span>My availablity</NavLink>
-            <li className="my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer"> <NavLink className={({ isActive }) =>
-              `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : 'text-primary'
-              }`
+            <li className="my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer" 
+            onClick={closeSidebar}> <NavLink className={({ isActive }) =>
+              `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : (isOpen ? 'text-white':'text-primary')   }`
             } to="/doctors/consults"> <span className="mr-3"><FaTachometerAlt /></span>My consults</NavLink></li>
-            <li className="my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer">            <NavLink className={({ isActive }) =>
-              `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : 'text-primary'
-              }`
+            <li className="my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer" 
+            onClick={closeSidebar}>
+                <NavLink className={({ isActive }) =>
+                  `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : (isOpen ? 'text-white':'text-primary')
+                  }`
+                } to="/doctors/my-account"> <span className="mr-3"> <FaUser /></span>Profile</NavLink>
+              </li>
+            <li className="my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer"
+            onClick={closeSidebar}>            <NavLink className={({ isActive }) =>
+              `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : (isOpen ? 'text-white':'text-primary')   }`
             } to="/doctors/chats"> <span className="mr-3"><FaTachometerAlt /></span>Chats</NavLink></li></>) : (
             <>
-              <li className="my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer">
+              <li className="my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer" 
+              onClick={closeSidebar}>
                 <NavLink className={({ isActive }) =>
-                  `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : 'text-primary'
+                  `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : (isOpen ? 'text-white':'text-primary')
                   }`
                 } to="/home"> <span className="mr-3"><FaTachometerAlt /></span>Dashboard</NavLink>
               </li>
-              <li className="my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer">
+              <li className="my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer" 
+              onClick={closeSidebar}>
                 <NavLink className={({ isActive }) =>
-                  `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : 'text-primary'
+                  `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : (isOpen ? 'text-white':'text-primary')
                   }`
                 } to="/home/profile"> <span className="mr-3"> <FaUser /></span>Profile</NavLink>
               </li>
-              <li className="my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer">
+              <li className="my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer" 
+              onClick={closeSidebar}>
                 <NavLink className={({ isActive }) =>
-                  `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : 'text-primary'
+                  `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : (isOpen ? 'text-white':'text-primary')
                   }`
                 } to="/home/calendar"><span className="mr-3"><FaCalendarAlt /></span> Calendar</NavLink>
               </li>
             </>)}
-          <li className="my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer">
+          <li className="my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer"
+          onClick={closeSidebar}>
             <NavLink className={({ isActive }) =>
-              `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : 'text-primary'
-              }`
+              `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : (isOpen ? 'text-white':'text-primary')   }`
             } to="/home/help"><span className="mr-3"><FaQuestionCircle /></span> Help</NavLink>
           </li>
-          <button className='p-4 my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer'
+          <button className={`p-4 my-2 rounded-md mr-2  flex items-center cursor-pointer ${isOpen ?'text-white':'text-primary'}`}
             onClick={handleLogout}> <span className="mr-3"><FaSignOutAlt /></span>logout</button>
         </ul>
       </nav>

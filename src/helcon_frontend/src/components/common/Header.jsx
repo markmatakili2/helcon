@@ -4,7 +4,7 @@ import { MdOutlineKeyboardArrowDown, MdMenu, MdClose } from "react-icons/md";
 import { NavLink, Navigate } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { getPrincipal, addIdentity } from '../../features/auth/account';
+import { getPrincipal, addIdentity,getUserData } from '../../features/auth/account';
 
 
 const Header = () => {
@@ -19,20 +19,34 @@ const Header = () => {
       setMenuOpen(!menuOpen);
    };
    const handleLogin = async () => {
-      const result = await dispatch(getPrincipal())
+      
+      const result = await dispatch(getPrincipal());
+    
       if (getPrincipal.fulfilled.match(result)) {
-         const identityResult = await dispatch(addIdentity({ principal: result.payload }))
-         if (addIdentity.fulfilled.match(identityResult)) {
-            navigate('/new-account')
-         } else {
-            console.log(identityResult)
-         }
-
+       
+        const identifier = localStorage.getItem('identifier');
+    
+        if (identifier) {
+          // If the identifier exists, skip account creation and fetch user data
+          const queryId = JSON.parse(identifier);
+          dispatch(getUserData({ id: queryId.toNum }));
+        } else {
+          // If identifier doesn't exist, proceed with new account creation (i.e., addIdentity)
+          const identityResult = await dispatch(addIdentity({ principal: result.payload }));
+    
+          if (addIdentity.fulfilled.match(identityResult)) {
+            
+            navigate('/new-account');
+          } else {
+            console.log('Failed to add identity', identityResult);
+          }
+        }
       } else {
-         console.log('some error occured')
+        
+        console.log('Error getting principal');
       }
-
-   }
+    };
+    
   
 
 
@@ -66,6 +80,8 @@ const Header = () => {
             <li className="font-medium text-[#404040] text-[18px] leading-[22px]">
                <NavLink to="" className={({ isActive }) => isActive ? 'text-primary_1' : 'text-[#404040]'}>FAQ</NavLink>
             </li>
+            <button className="md:hidden bg-primary_1 h-10 w-32 sm:w-36 lg:w-40 rounded-[6px] text-white py-2 px-4"
+               onClick={handleLogin}>Get Started</button>
          </ul>
          <div className="hidden md:flex items-center">
             <button className="bg-primary_1 h-10 w-32 sm:w-36 lg:w-40 rounded-[6px] text-white py-2 px-4"

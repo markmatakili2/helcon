@@ -9,8 +9,10 @@ import ProfileCard from '../common/Doctor_profile';
 import AppointmentList from './AppointmentList';  
 import { fetchPatientAppointments } from "../../features/Patient/AppointmentSlice";
 import BookingCard from "./Booking"
-
+import { toggleSidebar } from '../../features/SidebarBarSlice';
+import { FiMenu,FiX} from 'react-icons/fi';
 const MainDashboard = () => {
+  const isOpen = useSelector((state)=>state.sidebar.isOpen)
   const dispatch = useDispatch();
   const {toNum,username } = useSelector((state) => state.account.userData.data);
   const [isModalOpen, setModalOpen] = useState(false);
@@ -22,6 +24,10 @@ const MainDashboard = () => {
   const handleCloseModal = () => {
     setModalOpen(false);
   };
+  const closeSidebar = ()=>{
+    dispatch(toggleSidebar())
+   
+       }
 
   // Dispatching action to fetch appointments when component mounts
   React.useEffect(() => {
@@ -36,9 +42,18 @@ const MainDashboard = () => {
           <h1 className="text-2xl font-bold text-black">Welcome Back</h1>
         </div>
         <div className="flex items-center space-x-4  ">
-          <FaBell className="text-xl text-gray-700" />
-          <FaUserCircle className="text-2xl ml-4" />
-          <p className="-mr-10">Kevin</p>
+        <FaBell className="text-xl hidden md:block  mx-10 " />
+
+{/* User icon, visible from md screens onwards */}
+<FaUserCircle className="text-2xl hidden md:block  " />
+
+{/* Menu button, visible only below md screens */}
+<button 
+  className="text-primary_1 text-3xl md:hidden" // Hidden on md and up, visible on small screens
+  onClick={closeSidebar}
+>
+ {isOpen ? (<FiX/>):(<FiMenu />)} 
+</button>
         </div>
       </div>
 
