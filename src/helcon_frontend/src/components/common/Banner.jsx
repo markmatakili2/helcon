@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { HiMagnifyingGlass } from "react-icons/hi2";
 import { CiLocationOn } from "react-icons/ci";
-import image from '../../images/doctors.png';
+import image from '../../images/home.png';
 import { useLocation } from 'react-router-dom';
 
 const Banner = () => {
@@ -18,11 +18,11 @@ const Banner = () => {
             <div className="rounded-[16px] bg-gradient-to-r from-[#225364] to-[#002457] h-auto md:h-[262px] w-full pl-4 py-6 md:py-10 flex flex-col items-start relative">
                <div className="text-white gap-[12px] mb-6 md:mb-6"> {/* Adjusted margin-bottom for mobile */}
                   <h2 className="font-600 text-[24px] md:text-[30px] leading-[35px] md:leading-[45px]">
-                     No need to visit local hospitals<br />
+                     Revolutionize Your Online Healthcare Experience with us<br />
                      Get your consultation online
                   </h2>
                   <p className="font-500 text-[16px] md:text-[20px] leading-[24px] md:leading-[30px] mt-2 md:mt-4">
-                     Audio/text/video/in-person
+
                   </p>
                </div>
 
@@ -33,7 +33,7 @@ const Banner = () => {
                      <img src={image} alt="Doctor Icon" className="h-[24px] w-[24px] ring ring-white ring-offset-0 rounded-full -mx-1" />
                      <img src={image} alt="Doctor Icon" className="h-[24px] w-[24px] ring ring-white ring-offset-0 rounded-full" />
                   </div>
-                  <p className="text-md leading-[24px] font-500 h-[24px] text-white">+180 doctors are online</p>
+                  <p className="text-md leading-[24px] font-500 h-[24px] text-white">Get a specialist of your choice</p>
                </div>
             </div>
 
