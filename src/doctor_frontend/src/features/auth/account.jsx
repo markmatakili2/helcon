@@ -36,7 +36,7 @@ export const getPrincipal = createAsyncThunk(
                const principal = identity.getPrincipal().toString();
  
                if (principal) {
-                 dispatch(setPrincipal(principal));
+               //   dispatch(setPrincipal(principal));
                  resolve(principal); // Resolve with the principal
                } else {
                  reject(new Error('Principal is undefined'));
@@ -186,7 +186,7 @@ const accountSlice = createSlice({
          .addCase(getPrincipal.fulfilled, (state, action) => {
             state.principalData.loading = false;
             state.principalData.principal = action.payload;
-            console.log('Fulfilled Action Payload:', action.payload);
+            localStorage.setItem('isLoggedIn', true);
          })
          .addCase(getPrincipal.rejected, (state, action) => {
             state.principalData.loading = false;

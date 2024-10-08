@@ -13,13 +13,11 @@ const HomePage = () => {
   const { principalData, identityData } = useSelector((state) => state.account);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  // let isRegistered = false
-  // let data = null
-  // let loading = false
-
+  
   useEffect(() => {
     // Fetch user data only if there is an identifier
     const identifier = localStorage.getItem('identifier');
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
     if (identifier) {
       const queryId = JSON.parse(identifier);
       dispatch(getUserData({ id: queryId.toNum }));
@@ -27,8 +25,10 @@ const HomePage = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    
-    if (!loading && isRegistered && data) {
+    const isLoggedIn = localStorage.getItem('isLoggedIn'); 
+
+    // Navigate to home if logged in and user data is loaded
+    if (isLoggedIn && !loading && isRegistered && data) {
       navigate('/home');
     }
   }, [navigate, isRegistered, data, loading]);
@@ -38,6 +38,7 @@ const HomePage = () => {
     return <Loading />;
   }
 
+  // Render the homepage content if not logged in
   return (
     <div className='overflow-x-hidden w-full'>
       <Header />

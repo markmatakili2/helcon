@@ -18,7 +18,8 @@ const Sidebar = () => {
 
   const dispatch = useDispatch()
   const handleLogout = () => {
-    dispatch(logout({ navigate }))
+    localStorage.removeItem('isLoggedIn');
+    navigate("/")
 
   }
   const closeSidebar = ()=>{
@@ -106,7 +107,7 @@ const Sidebar = () => {
               `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : (isOpen ? 'text-white':'text-primary')   }`
             } to="/home/help"><span className="mr-3"><FaQuestionCircle /></span> Help</NavLink>
           </li>
-          <button className='p-4 my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer'
+          <button className={`p-4 my-2 rounded-md mr-2  flex items-center cursor-pointer ${isOpen ? 'text-white':'text-primary'}`}
             onClick={handleLogout}> <span className="mr-3"><FaSignOutAlt /></span>logout</button>
         </ul>
       </nav>

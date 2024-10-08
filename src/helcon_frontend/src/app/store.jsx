@@ -7,6 +7,7 @@ import doctorListSlice from '../features/Doctors/doctorListSlice';
 import accountSlice from '../features/auth/account'
 import availabilitySlice from "../features/Doctors/Availability"
 import  appointmentsSlice from "../features/Patient/AppointmentSlice"
+import sidebarSlice from "../features/SidebarBarSlice"
 
 export const store = configureStore({
   reducer: {
@@ -18,7 +19,7 @@ export const store = configureStore({
     account:accountSlice,
     availability:availabilitySlice,
     appointments:appointmentsSlice,
-
+    sidebar:sidebarSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

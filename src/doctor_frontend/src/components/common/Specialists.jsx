@@ -17,6 +17,7 @@ const Specialists = () => {
    const navigate = useNavigate()
    const dispatch = useDispatch()
    useEffect(() => {
+      const isLoggedIn = localStorage.getItem('isLoggedIn'); 
       const identifier = localStorage.getItem('identifier')
       if (identifier) {
          const queryId = JSON.parse(identifier)
@@ -24,7 +25,8 @@ const Specialists = () => {
       }
    }, [dispatch])
    useEffect(() => {
-      if (!loading && isRegistered && data) {
+      const isLoggedIn = localStorage.getItem('isLoggedIn'); 
+      if (isLoggedIn && !loading && isRegistered && data) {
          navigate('/doctors')
       }
    }, [navigate, isRegistered, data])
