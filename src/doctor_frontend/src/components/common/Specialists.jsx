@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import Header from './Header';
 import Footer from './Footer';
-import image from '../../images/image_2.png'
+import imageBackground from '../../images/doctor-laptop.webp'
 import Frame from './Frame'
-import doc from '../../images/doc5.png'
+import doctorImage from '../../images/doctorImage.webp'
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, } from 'react-router-dom';
 import { getUserData } from '../../features/auth/account'
@@ -46,102 +46,105 @@ const Specialists = () => {
    }
 
    return (
-      <div className='z-40 relative'>
-         <Header />
+      <div className="z-40 relative">
+ 
+  <div className="fixed top-0 left-0 w-full bg-white z-50">
+    <Header />
+  </div>
 
-         <div className="mx-4 md:mx-20 pt-6 md:pt-6 flex flex-col">
-            <div className="flex flex-col items-center space-y-6 md:space-y-8 p-6 md:p-8 mb-6">
+  
+  <div className="h-screen relative mt-16">
+    <img
+      src={imageBackground}
+      alt="background"
+      className="absolute inset-0 w-full h-full object-cover"
+    />
+      <div className="absolute inset-0 bg-black opacity-30" />
+    <div className="absolute inset-0 flex flex-col items-center space-y-6 md:space-y-8 p-6 md:p-8 mb-6">
+      <h2 className="text-primary_1 font-bold text-4xl md:text-[49px] leading-tight md:leading-[52px]  text-center tracking-wide">
+        We care <br />about your health
+      </h2>
+      <p className="pt-4 md:pt-6 text-lg md:text-[18.47px] text-[#A7A7A7] font-medium max-w-full md:max-w-[600px] text-center text-primary_1">
+        Become one of our HealthConnect Specialists and get to help even more patients.
+      </p>
+      <button
+        className="bg-primary_1 text-white px-10 py-4 rounded-[13.03px] text-lg md:text-base shadow-lg hover:bg-primary_2 transition duration-300"
+        type="button"
+      >
+        Get Started
+      </button>
+    </div>
+  </div>
 
-               <h2 className="font-bold text-4xl md:text-[49px] leading-tight md:leading-[52px] text-primary_1 text-center tracking-wide">
-                  We care <br />about your health
-               </h2>
-
-               <p className="pt-4 md:pt-6 text-lg md:text-[18.47px] text-[#A7A7A7] font-medium max-w-full md:max-w-[600px] text-center">
-                  Become one of our HealthConnect Specialists and get to help even more patients.
-               </p>
-
-               <button className="bg-primary_1 text-white px-10 py-4 rounded-[13.03px] text-lg md:text-base shadow-lg hover:bg-primary_2 transition duration-300"
-                  type="button">
-                  Get Started
-               </button>
-
-            </div>
-
-            <div className="md:z-50 self-center flex flex-col rounded-md shadow-lg p-2 pb-4 ">
-               <h2 className=" font-semibold text-md mb-2">Find a Doctor</h2>
-
-               <div className="flex flex-col space-x-6 md:flex-row md:space-y-0 space-y-6">
-                  <input
-                     type="text"
-                     placeholder="Name of doctor"
-                     className="text-center flex-grow p-2 rounded bg-[#DEDEDE] border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <input
-                     type="text"
-                     placeholder="Speciality"
-                     className="text-center flex-grow p-2 rounded bg-[#DEDEDE] border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-
-                  <div className="flex items-center space-x-2">
-                     <label className="text-gray-700">Availability</label>
-                     <div
-                        className={`w-12 h-6 flex items-center bg-primary_1 rounded-full p-1 cursor-pointer`}
-                        onClick={handleToggle}
-                     >
-                        <div
-                           className={`bg-white w-4 h-4 rounded-full shadow-md transform duration-300 ease-in-out ${availability ? 'translate-x-6' : ''}`}
-                        ></div>
-                     </div>
-                  </div>
-
-                  <button className="text-xl px-6 md:w-full p-2 rounded bg-[#0A1F4B] text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                     Search
-                  </button>
-
-               </div>
-
-            </div>
-
-            <div className="mt-20 mb-16 px-4 md:px-24 flex flex-col text-center">
-               <div className="mb-8">
-                  <h2 className="text-3xl font-semibold leading-tight text-[#404040]">
-                     Meet Our Doctors
-                  </h2>
-                  <p className="text-md text-[#B4B4B4] mt-2">
-                     Well qualified doctors are ready to serve you
-                  </p>
-               </div>
-               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  {[1, 2, 3, 4].map((_, index) => (
-                     <div key={index} className="bg-white rounded-lg shadow-lg p-4 flex flex-col items-center md:w-4/5">
-                        <span className="self-start bg-gray-300 text-gray-700 rounded-full px-3 py-1 text-sm mb-2 ml-16">
-                           Available
-                        </span>
-                        <div className="overflow-hidden bg-primary_1 w-full md:w-3/5 h-64 mb-2 rounded-lg relative ">
-                           <img src={doc} alt="a doctor" className="overflow-hidden absolute md:-top-6 md:-left-2 object-cover -left-2 -top-12" />
-                        </div>
-                        <p className="text-lg font-semibold">Dr. John Doe</p>
-                        <p className="text-sm text-gray-500 mb-2">Cardiologist</p>
-                        <div className="flex items-center mb-4">
-                           <span className="text-primary_1">★★★★☆</span>
-                           <span className="text-sm text-gray-500 ml-2">(120)</span>
-                        </div>
-                        <button className="bg-primary_1 text-white rounded-full px-4 py-2">
-                           Book an Appointment
-                        </button>
-                     </div>
-                  ))}
-               </div>
-               <div className="mt-8">
-                  <button className="bg-primary_1 text-white rounded-full px-6 py-2">
-                     See More
-                  </button>
-               </div>
-            </div>
-         </div>
-
-         <Footer />
+  {/* Content Section */}
+  <section className="py-20 bg-[#F4F4F4]">
+    <div className="container mx-auto flex flex-col md:flex-row items-center space-y-6 md:space-y-0">
+      
+      {/* Doctor Image */}
+      <div className="flex-1">
+        <img
+          src={doctorImage} 
+          alt="Doctor"
+          className="w-full h-full object-cover rounded-lg shadow-lg"
+        />
       </div>
+      
+     
+      <div className="flex-1 text-center md:text-left px-6 md:px-12">
+        <h2 className="text-3xl font-bold text-primary_1">Seamlessly Integrate, Enhance Efficiency, and Attract New Patients</h2>
+        <p className="text-[#A7A7A7] text-lg mt-4">
+        Step into a realm where seamless integration, enhanced efficiency, and a steady influx of new patients become your everyday reality.
+        With healthcare digitization transforming the way medicine is practiced, Helcon is here to be your trusted partner in embracing this shift.
+        </p>
+        <p className="text-[#A7A7A7] text-lg mt-4">
+          Our platform is engineered to effortlessly intertwine with your existing practice, while our telehealth and e-health applications drive operational efficiency to a new peak. The ripple effect? A noticeable influx of new patients, made possible by our tailored business model accompanied by robust marketing and training support.
+        </p>
+        <p className="text-[#A7A7A7] text-lg mt-4">
+          Embrace Helcon, where transitioning to digital healthcare is synonymous with advancing your practice.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {/* Telemedicine Section */}
+  <section className="py-20">
+    <div className="container mx-auto flex flex-col md:flex-row items-center space-y-6 md:space-y-0">
+      
+      {/* Bold Section */}
+      <div className="flex-1 font-bold text-2xl text-primary_1">
+        <h2>Telemedicine: Revolutionizing Healthcare</h2>
+        <p className="mt-4 text-[#A7A7A7]">
+          Telemedicine is transforming the way we deliver healthcare, making it more accessible and efficient for everyone.
+        </p>
+      </div>
+      
+      {/* Additional Content Section */}
+      <div className="flex-1 space-y-6">
+        <div>
+          <h3 className="text-xl font-semibold text-primary_1">Telehealth Solutions</h3>
+          <p className="text-[#A7A7A7]">
+            With our innovative solutions, healthcare providers can easily connect with patients remotely, improving access to care and reducing the need for in-person visits.
+          </p>
+        </div>
+        <div>
+          <h3 className="text-xl font-semibold text-primary_1">Patient Engagement</h3>
+          <p className="text-[#A7A7A7]">
+            Engage your patients like never before with personalized digital experiences that encourage active participation in their health journey.
+          </p>
+        </div>
+        <div>
+          <h3 className="text-xl font-semibold text-primary_1">Data-Driven Insights</h3>
+          <p className="text-[#A7A7A7]">
+            Harness the power of data to improve patient outcomes and optimize your practice’s operations, all while adhering to industry standards and regulations.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Footer />
+</div>
+
    )
 }
 
