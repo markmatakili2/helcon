@@ -51,7 +51,7 @@ const Header = () => {
 
 
    return (
-      <div className="w-full h-20 flex items-center border-b-[1px] border-[#E3E3E3] mb-10 px-5 relative justify-between">
+      <div className="w-full h-20 flex items-center border-b-[1px] border-[#E3E3E3]  px-5 relative justify-between">
          <div className="flex items-center relative">
             <div className="absolute md:-left-5 w-32 h-24 flex items-center -left-16">
                <img src={logo} alt="HelCon Logo" className="w-full h-full object-fit mt-2 ml-2" />
