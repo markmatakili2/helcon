@@ -15,6 +15,16 @@
       "type": "assets",
       "workspace": "helcon_frontend"
     },
+    "doctor_frontend": {
+      "dependencies": [
+        "helcon_backend"
+      ],
+      "source": [
+        "src/doctor_frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "doctor_frontend"
+    },
     "internet_identity": {
       "candid": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity.did",
       "frontend": {},

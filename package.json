@@ -15,6 +15,7 @@
   },
   "type": "module",
   "workspaces": [
-    "src/helcon_frontend"
+    "src/helcon_frontend",
+    "src/doctor_frontend"
   ]
 }
