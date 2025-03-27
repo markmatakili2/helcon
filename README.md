@@ -1,6 +1,4 @@
-# Helcon Documentation
-
-## Introduction
+# HELCON
 
 Helcon is a decentralized healthcare ecosystem built on the Internet Computer (ICP) blockchain. It provides a secure and efficient platform for users to manage healthcare transactions, access medical services, and store health data with privacy and security. This project leverages blockchain technology to ensure transparency, trust, and decentralization in the healthcare sector.
 
