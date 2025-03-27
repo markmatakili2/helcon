@@ -1,61 +1,147 @@
-# `helcon`
+# Helcon Documentation
 
-Welcome to your new `helcon` project and to the Internet Computer development community. By default, creating a new project adds this README and some template files to your project directory. You can edit these template files to customize your project and to include your own code to speed up the development cycle.
+## Introduction
 
-To get started, you might want to explore the project directory structure and the default configuration file. Working with this project in your development environment will not affect any production deployment or identity tokens.
+Helcon is a decentralized healthcare ecosystem built on the Internet Computer (ICP) blockchain. It provides a secure and efficient platform for users to manage healthcare transactions, access medical services, and store health data with privacy and security. This project leverages blockchain technology to ensure transparency, trust, and decentralization in the healthcare sector.
 
-To learn more before you start working with `helcon`, see the following documentation available online:
+## Features
 
-- [Quick Start](https://internetcomputer.org/docs/current/developer-docs/setup/deploy-locally)
-- [SDK Developer Tools](https://internetcomputer.org/docs/current/developer-docs/setup/install)
-- [Rust Canister Development Guide](https://internetcomputer.org/docs/current/developer-docs/backend/rust/)
-- [ic-cdk](https://docs.rs/ic-cdk)
-- [ic-cdk-macros](https://docs.rs/ic-cdk-macros)
-- [Candid Introduction](https://internetcomputer.org/docs/current/developer-docs/backend/candid/)
+- **Decentralized Healthcare Services**: Secure and efficient transactions for healthcare services.
+- **Escrow System**: Ensures trust between patients and healthcare providers.
+- **Internet Identity Integration**: Secure authentication using Internet Identity.
+- **Data Monetization**: Users can opt-in to share data with research organizations for incentives.
+- **Subscription Model**: Multiple tiers for accessing premium healthcare services.
+- **Ad Revenue Model**: Monetization through targeted healthcare advertisements.
 
-If you want to start working on your project right away, you might want to try the following commands:
+## Technology Stack
+
+Helcon is built using the following technologies:
+
+### Backend
+- **Rust**: Used for writing smart contracts (canisters) on the Internet Computer.
+
+### Frontend
+- **React.js**: Frontend framework for user interaction.
+- **Tailwind CSS**: UI styling for a modern and responsive design.
+
+### Deployment
+- **DFINITY SDK**: Tooling for deploying and managing canisters on the ICP network.
+- **ICP Blockchain**: Hosting of smart contracts and decentralized services.
+
+## Getting Started
+
+### Prerequisites
+
+To run Helcon locally, ensure you have the following installed:
+
+- [DFINITY SDK](https://internetcomputer.org/docs/current/developer-docs/setup/install)
+- [Node.js](https://nodejs.org/) (LTS version recommended)
+- [Rust](https://www.rust-lang.org/) (for backend development)
+- [Git](https://git-scm.com/) (for version control)
+
+### Installation
+
+Clone the repository and navigate to the project directory:
 
 ```bash
-cd helcon/
-dfx help
-dfx canister --help
+git clone https://github.com/markmatakili2/helcon.git
+cd helcon
 ```
 
-## Running the project locally
+### Start Local ICP Network
 
-If you want to test your project locally, you can use the following commands:
+Start the Internet Computer local replica:
 
 ```bash
-# Starts the replica, running in the background
 dfx start --background
+```
 
-# Deploys your canisters to the replica and generates your candid interface
+### Deploy Canisters
+
+Deploy the backend and frontend canisters:
+
+```bash
 dfx deploy
 ```
 
-Once the job completes, your application will be available at `http://localhost:4943?canisterId={asset_canister_id}`.
+### Run the Frontend
 
-If you have made changes to your backend canister, you can generate a new candid interface with
-
-```bash
-npm run generate
-```
-
-at any time. This is recommended before starting the frontend development server, and will be run automatically any time you run `dfx deploy`.
-
-If you are making frontend changes, you can start a development server with
+Navigate to the frontend directory and start the development server:
 
 ```bash
+cd helcon_frontend
+npm install
 npm start
 ```
 
-Which will start a server at `http://localhost:8080`, proxying API requests to the replica at port 4943.
+Open your browser and access the application at https://helcon.xyz/ .
 
-### Note on frontend environment variables
+## Usage
 
-If you are hosting frontend code somewhere without using DFX, you may need to make one of the following adjustments to ensure your project does not fetch the root key in production:
+### User Registration
 
-- set`DFX_NETWORK` to `ic` if you are using Webpack
-- use your own preferred method to replace `process.env.DFX_NETWORK` in the autogenerated declarations
-  - Setting `canisters -> {asset_canister_id} -> declarations -> env_override to a string` in `dfx.json` will replace `process.env.DFX_NETWORK` with the string in the autogenerated declarations
-- Write your own `createActor` constructor
+- Users sign up using Internet Identity.
+- After authentication, users can access their dashboard.
+
+### Making Healthcare Transactions
+
+- Users select a healthcare service from listed providers.
+- Payment is processed via an escrow system for secure transactions.
+- Upon service completion, funds are released to the provider.
+
+### Data Sharing & Monetization
+
+- Users can opt to share anonymized health data with research organizations.
+- Incentives are provided for contributing data to medical research.
+
+## Revenue Streams
+
+Helcon generates revenue through:
+
+- **Transaction Fees**: A percentage fee on healthcare transactions.
+- **User Subscriptions**: Premium features for subscribed users.
+- **Data Monetization**: Selling anonymized user data to research institutions.
+- **Advertisements**: Targeted healthcare-related ads.
+
+## Security & Privacy
+
+Helcon prioritizes user data security by:
+
+- Utilizing Internet Identity for authentication.
+- Ensuring end-to-end encryption for sensitive health records.
+- Implementing smart contract escrow to prevent fraud.
+
+## Contributing
+
+Contributions are welcome! Follow these steps:
+
+1. Fork the repository.
+2. Create a new branch:
+   ```bash
+   git checkout -b feature-name
+   ```
+3. Commit your changes:
+   ```bash
+   git commit -m 'Added feature'
+   ```
+4. Push to the branch:
+   ```bash
+   git push origin feature-name
+   ```
+5. Submit a pull request.
+
+## License
+
+Helcon is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Contact
+
+For inquiries or support, contact:
+
+- **Email**: info.helcon@gmail.com
+- **X (Twitter)**: https://x.com/helcon_
+- **LinkedIn**: https://www.linkedin.com/company/helcon1/?viewAsMember=true
+
+## Acknowledgments
+
+Special thanks to ICP Hub Kenya for their support and guidance in the development of Helcon.
