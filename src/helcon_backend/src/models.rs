@@ -1,8 +1,6 @@
-#[macro_use]
-use candid::{Decode, Encode, Principal};
-use ic_stable_structures::memory_manager::{MemoryId, MemoryManager, VirtualMemory};
-use ic_stable_structures::{BoundedStorable, Cell, DefaultMemoryImpl, StableBTreeMap, Storable};
-use std::{borrow::Cow, cell::RefCell};
+use candid::{Decode, Encode};
+use ic_stable_structures::{BoundedStorable, Storable};
+use std::borrow::Cow;
 
 #[derive(candid::CandidType, Serialize, Deserialize, Default, Clone)]
 pub struct MultiMediaContent {
@@ -86,8 +84,8 @@ pub struct Appointment {
     pub phone_no: String,
     pub slot: String,
     pub reason: String,
-    pub symtoms: String, 
-    pub status: String, 
+    pub symtoms: String,
+    pub status: String,
     pub appointment_type: String,
 }
 

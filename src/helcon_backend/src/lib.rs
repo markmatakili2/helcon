@@ -2,8 +2,8 @@
 extern crate serde;
 
 use ic_stable_structures::memory_manager::{MemoryId, MemoryManager, VirtualMemory};
-use ic_stable_structures::{BoundedStorable, Cell, DefaultMemoryImpl, StableBTreeMap, Storable};
-use std::{borrow::Cow, cell::RefCell};
+use ic_stable_structures::{Cell, DefaultMemoryImpl, StableBTreeMap};
+use std::cell::RefCell;
 
 mod models;
 use models::{
@@ -342,8 +342,8 @@ fn add_appointment(
     phone_no: String,
     slot: String,
     reason: String,
-    symtoms: String, 
-    status: String, 
+    symtoms: String,
+    status: String,
     appointment_type: String,
 ) -> Result<Appointment, Error> {
     // Validate input data
@@ -352,7 +352,7 @@ fn add_appointment(
             msg: "phone_no cannot be empty".to_string(),
         });
     }
-    
+
     // Check if the doctor and patient exist
     if _get_doctor(&doctor_id).is_none() {
         return Err(Error::NotFound {
@@ -367,10 +367,11 @@ fn add_appointment(
 
     // Find the available slot for the doctor
     let available_slot = AVAILABILITY_STORAGE.with(|service| {
-        service
-            .borrow()
-            .iter()
-            .find(|(_, availability)| availability.doctor_id == doctor_id && availability.is_available && availability.start_time == slot)
+        service.borrow().iter().find(|(_, availability)| {
+            availability.doctor_id == doctor_id
+                && availability.is_available
+                && availability.start_time == slot
+        })
     });
 
     if available_slot.is_none() {
@@ -382,7 +383,11 @@ fn add_appointment(
     // Mark the slot as unavailable
     let mut availability = available_slot.unwrap().1.clone();
     availability.is_available = false;
-    AVAILABILITY_STORAGE.with(|service| service.borrow_mut().insert(availability.id, availability.clone()));
+    AVAILABILITY_STORAGE.with(|service| {
+        service
+            .borrow_mut()
+            .insert(availability.id, availability.clone())
+    });
 
     let id = ID_COUNTER
         .with(|counter| {
@@ -398,8 +403,8 @@ fn add_appointment(
         phone_no,
         slot,
         reason,
-        symtoms, 
-        status: "pending".to_string(), 
+        symtoms,
+        status: "pending".to_string(),
         appointment_type,
     };
 
@@ -415,8 +420,8 @@ fn update_appointment(
     phone_no: String,
     slot: String,
     reason: String,
-    symtoms: String, 
-    status: String, 
+    symtoms: String,
+    status: String,
     appointment_type: String,
 ) -> Result<Appointment, Error> {
     // Validate input data
@@ -440,11 +445,17 @@ fn update_appointment(
             service
                 .borrow()
                 .iter()
-                .find(|(_, availability)| availability.doctor_id == doctor_id && availability.start_time == slot)
+                .find(|(_, availability)| {
+                    availability.doctor_id == doctor_id && availability.start_time == slot
+                })
                 .map(|(_, availability)| availability.clone())
         }) {
             availability.is_available = true; // Mark the slot as available
-            AVAILABILITY_STORAGE.with(|service| service.borrow_mut().insert(availability.id, availability.clone()));
+            AVAILABILITY_STORAGE.with(|service| {
+                service
+                    .borrow_mut()
+                    .insert(availability.id, availability.clone())
+            });
         }
     }
 
@@ -455,8 +466,8 @@ fn update_appointment(
         phone_no,
         slot,
         reason,
-        symtoms, 
-        status, 
+        symtoms,
+        status,
         appointment_type,
     };
 
@@ -479,7 +490,9 @@ fn filter_available_slots_by_doctor_id(doctor_id: u64) -> Vec<Availability> {
         service
             .borrow()
             .iter()
-            .filter(|(_, availability)| availability.doctor_id == doctor_id && availability.is_available)
+            .filter(|(_, availability)| {
+                availability.doctor_id == doctor_id && availability.is_available
+            })
             .map(|(_, availability)| availability.clone())
             .collect()
     })
@@ -498,21 +511,29 @@ fn cancel_appointment(appointment_id: u64) -> Result<Appointment, Error> {
 
     // Find the corresponding availability slot
     let availability_slot = AVAILABILITY_STORAGE.with(|service| {
-        service
-            .borrow()
-            .iter()
-            .find(|(_, availability)| availability.doctor_id == current_appointment.doctor_id && availability.start_time == current_appointment.slot)
+        service.borrow().iter().find(|(_, availability)| {
+            availability.doctor_id == current_appointment.doctor_id
+                && availability.start_time == current_appointment.slot
+        })
     });
 
     if let Some((_, mut availability)) = availability_slot {
         // Mark the availability as available
         availability.is_available = true;
-        AVAILABILITY_STORAGE.with(|service| service.borrow_mut().insert(availability.id, availability.clone()));
+        AVAILABILITY_STORAGE.with(|service| {
+            service
+                .borrow_mut()
+                .insert(availability.id, availability.clone())
+        });
     }
 
     // Update the appointment in storage
-    APPOINTMENT_STORAGE.with(|service| service.borrow_mut().insert(appointment_id, updated_appointment.clone()));
-    
+    APPOINTMENT_STORAGE.with(|service| {
+        service
+            .borrow_mut()
+            .insert(appointment_id, updated_appointment.clone())
+    });
+
     Ok(updated_appointment)
 }
 
@@ -529,21 +550,29 @@ fn complete_appointment(appointment_id: u64) -> Result<Appointment, Error> {
 
     // Find the corresponding availability slot
     let availability_slot = AVAILABILITY_STORAGE.with(|service| {
-        service
-            .borrow()
-            .iter()
-            .find(|(_, availability)| availability.doctor_id == current_appointment.doctor_id && availability.start_time == current_appointment.slot)
+        service.borrow().iter().find(|(_, availability)| {
+            availability.doctor_id == current_appointment.doctor_id
+                && availability.start_time == current_appointment.slot
+        })
     });
 
     if let Some((_, mut availability)) = availability_slot {
         // Mark the availability as available (if necessary)
-        availability.is_available = true;  // Typically, you may not want to change this for confirmed appointments
-        AVAILABILITY_STORAGE.with(|service| service.borrow_mut().insert(availability.id, availability.clone()));
+        availability.is_available = true; // Typically, you may not want to change this for confirmed appointments
+        AVAILABILITY_STORAGE.with(|service| {
+            service
+                .borrow_mut()
+                .insert(availability.id, availability.clone())
+        });
     }
 
     // Update the appointment in storage
-    APPOINTMENT_STORAGE.with(|service| service.borrow_mut().insert(appointment_id, updated_appointment.clone()));
-    
+    APPOINTMENT_STORAGE.with(|service| {
+        service
+            .borrow_mut()
+            .insert(appointment_id, updated_appointment.clone())
+    });
+
     Ok(updated_appointment)
 }
 
