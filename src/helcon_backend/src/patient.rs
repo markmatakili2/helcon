@@ -1,5 +1,7 @@
+mod lib;
+use crate::MESSAGE_STORAGE;
 #[ic_cdk::query]
-fn get_patient(patient_id: u64) -> Result<Patient, Error> {
+pub fn get_patient(patient_id: u64) -> Result<Patient, Error> {
     match _get_patient(&patient_id) {
         Some(patient) => Ok(patient),
         None => Err(Error::NotFound {
@@ -9,7 +11,7 @@ fn get_patient(patient_id: u64) -> Result<Patient, Error> {
 }
 
 #[ic_cdk::update]
-fn add_identity(principal: String) -> Result<Identity, Error> {
+pub fn add_identity(principal: String) -> Result<Identity, Error> {
     // Validate input data
     if principal.is_empty() {
         return Err(Error::InvalidInput {
@@ -45,7 +47,7 @@ fn add_identity(principal: String) -> Result<Identity, Error> {
 }
 
 #[ic_cdk::query]
-fn get_identity(identity_id: u64) -> Result<Identity, Error> {
+pub fn get_identity(identity_id: u64) -> Result<Identity, Error> {
     match _get_identity(&identity_id) {
         Some(identity) => Ok(identity),
         None => Err(Error::NotFound {
@@ -55,7 +57,7 @@ fn get_identity(identity_id: u64) -> Result<Identity, Error> {
 }
 
 #[ic_cdk::query]
-fn list_identities() -> Vec<Identity> {
+pub fn list_identities() -> Vec<Identity> {
     IDENTITY_STORAGE.with(|service| {
         service
             .borrow()
@@ -65,7 +67,7 @@ fn list_identities() -> Vec<Identity> {
     })
 }
 #[ic_cdk::update]
-fn delete_identity(identity_id: u64) -> Result<(), Error> {
+pub fn delete_identity(identity_id: u64) -> Result<(), Error> {
     // Remove report from storage
     match IDENTITY_STORAGE.with(|service| service.borrow_mut().remove(&identity_id)) {
         Some(_) => Ok(()),
@@ -76,7 +78,7 @@ fn delete_identity(identity_id: u64) -> Result<(), Error> {
 }
 
 #[ic_cdk::query]
-fn does_identity_exist(input_principal: String) -> bool {
+pub fn does_identity_exist(input_principal: String) -> bool {
     // Get the list of identities
     let identities = list_identities();
 
@@ -91,7 +93,7 @@ fn does_identity_exist(input_principal: String) -> bool {
 }
 
 #[ic_cdk::update]
-fn register_patient(username: String, identity_id: u64) -> Result<Patient, Error> {
+pub fn register_patient(username: String, identity_id: u64) -> Result<Patient, Error> {
     // Validate input data
     if username.is_empty() {
         return Err(Error::InvalidInput {
@@ -141,7 +143,7 @@ fn register_patient(username: String, identity_id: u64) -> Result<Patient, Error
 }
 
 #[ic_cdk::update]
-fn delete_patient(patient_id: u64) -> Result<(), Error> {
+pub fn delete_patient(patient_id: u64) -> Result<(), Error> {
     // Remove patient from storage
     match PATIENT_STORAGE.with(|service| service.borrow_mut().remove(&patient_id)) {
         Some(_) => Ok(()),
@@ -152,7 +154,7 @@ fn delete_patient(patient_id: u64) -> Result<(), Error> {
 }
 
 #[ic_cdk::query]
-fn get_appointment(appointment_id: u64) -> Result<Appointment, Error> {
+pub fn get_appointment(appointment_id: u64) -> Result<Appointment, Error> {
     match _get_appointment(&appointment_id) {
         Some(appointment) => Ok(appointment),
         None => Err(Error::NotFound {
@@ -162,7 +164,7 @@ fn get_appointment(appointment_id: u64) -> Result<Appointment, Error> {
 }
 
 #[ic_cdk::update]
-fn add_appointment(
+pub fn add_appointment(
     patient_id: u64,
     doctor_id: u64,
     phone_no: String,
@@ -239,7 +241,7 @@ fn add_appointment(
 }
 
 #[ic_cdk::update]
-fn update_appointment(
+pub fn update_appointment(
     appointment_id: u64,
     patient_id: u64,
     doctor_id: u64,
@@ -311,7 +313,7 @@ fn update_appointment(
 }
 
 #[ic_cdk::query]
-fn filter_available_slots_by_doctor_id(doctor_id: u64) -> Vec<Availability> {
+pub fn filter_available_slots_by_doctor_id(doctor_id: u64) -> Vec<Availability> {
     AVAILABILITY_STORAGE.with(|service| {
         service
             .borrow()
@@ -325,7 +327,7 @@ fn filter_available_slots_by_doctor_id(doctor_id: u64) -> Vec<Availability> {
 }
 
 #[ic_cdk::update]
-fn cancel_appointment(appointment_id: u64) -> Result<Appointment, Error> {
+pub fn cancel_appointment(appointment_id: u64) -> Result<Appointment, Error> {
     // Fetch the current appointment
     let current_appointment = _get_appointment(&appointment_id).ok_or(Error::NotFound {
         msg: format!("Appointment with id={} not found", appointment_id),
@@ -364,7 +366,7 @@ fn cancel_appointment(appointment_id: u64) -> Result<Appointment, Error> {
 }
 
 #[ic_cdk::update]
-fn complete_appointment(appointment_id: u64) -> Result<Appointment, Error> {
+pub fn complete_appointment(appointment_id: u64) -> Result<Appointment, Error> {
     // Fetch the current appointment
     let current_appointment = _get_appointment(&appointment_id).ok_or(Error::NotFound {
         msg: format!("Appointment with id={} not found", appointment_id),
@@ -403,7 +405,7 @@ fn complete_appointment(appointment_id: u64) -> Result<Appointment, Error> {
 }
 
 #[ic_cdk::query]
-fn filter_appointments_by_doctor_id(doctor_id: u64) -> Vec<Appointment> {
+pub fn filter_appointments_by_doctor_id(doctor_id: u64) -> Vec<Appointment> {
     APPOINTMENT_STORAGE.with(|service| {
         service
             .borrow()
@@ -415,7 +417,7 @@ fn filter_appointments_by_doctor_id(doctor_id: u64) -> Vec<Appointment> {
 }
 
 #[ic_cdk::query]
-fn filter_appointments_by_patient_id(patient_id: u64) -> Vec<Appointment> {
+pub fn filter_appointments_by_patient_id(patient_id: u64) -> Vec<Appointment> {
     APPOINTMENT_STORAGE.with(|service| {
         service
             .borrow()
@@ -427,7 +429,7 @@ fn filter_appointments_by_patient_id(patient_id: u64) -> Vec<Appointment> {
 }
 
 #[ic_cdk::query]
-fn get_message(message_id: u64) -> Result<Message, Error> {
+pub fn get_message(message_id: u64) -> Result<Message, Error> {
     match _get_message(&message_id) {
         Some(message) => Ok(message),
         None => Err(Error::NotFound {
@@ -437,7 +439,7 @@ fn get_message(message_id: u64) -> Result<Message, Error> {
 }
 
 #[ic_cdk::update]
-fn send_message(
+pub fn send_message(
     sender_id: u64,
     receiver_id: u64,
     content: String,
@@ -470,7 +472,7 @@ fn send_message(
 }
 
 #[ic_cdk::query]
-fn get_medical_record(record_id: u64) -> Result<MedicalRecord, Error> {
+pub fn get_medical_record(record_id: u64) -> Result<MedicalRecord, Error> {
     match _get_medical_record(&record_id) {
         Some(record) => Ok(record),
         None => Err(Error::NotFound {
@@ -480,7 +482,7 @@ fn get_medical_record(record_id: u64) -> Result<MedicalRecord, Error> {
 }
 
 #[ic_cdk::query]
-fn list_appointments() -> Vec<Appointment> {
+pub fn list_appointments() -> Vec<Appointment> {
     APPOINTMENT_STORAGE.with(|service| {
         service
             .borrow()
@@ -491,7 +493,7 @@ fn list_appointments() -> Vec<Appointment> {
 }
 
 #[ic_cdk::update]
-fn delete_appointment(appointment_id: u64) -> Result<(), Error> {
+pub fn delete_appointment(appointment_id: u64) -> Result<(), Error> {
     // Remove appointment from storage
     match APPOINTMENT_STORAGE.with(|service| service.borrow_mut().remove(&appointment_id)) {
         Some(_) => Ok(()),
@@ -504,7 +506,7 @@ fn delete_appointment(appointment_id: u64) -> Result<(), Error> {
 // Similar implementation for messages and medical records
 
 #[ic_cdk::update]
-fn update_message(
+pub fn update_message(
     message_id: u64,
     sender_id: u64,
     receiver_id: u64,
@@ -540,7 +542,7 @@ fn update_message(
 }
 
 #[ic_cdk::update]
-fn delete_message(message_id: u64) -> Result<(), Error> {
+pub fn delete_message(message_id: u64) -> Result<(), Error> {
     // Remove message from storage
     match MESSAGE_STORAGE.with(|service| service.borrow_mut().remove(&message_id)) {
         Some(_) => Ok(()),
@@ -551,7 +553,7 @@ fn delete_message(message_id: u64) -> Result<(), Error> {
 }
 
 #[ic_cdk::query]
-fn list_messages() -> Vec<Message> {
+pub fn list_messages() -> Vec<Message> {
     MESSAGE_STORAGE.with(|service| {
         service
             .borrow()
