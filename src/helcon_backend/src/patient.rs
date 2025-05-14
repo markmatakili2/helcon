@@ -1,4 +1,3 @@
-mod lib;
 use crate::MESSAGE_STORAGE;
 #[ic_cdk::query]
 pub fn get_patient(patient_id: u64) -> Result<Patient, Error> {

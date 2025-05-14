@@ -4,8 +4,6 @@ extern crate serde;
 use ic_stable_structures::memory_manager::{MemoryId, MemoryManager, VirtualMemory};
 use ic_stable_structures::{Cell, DefaultMemoryImpl, StableBTreeMap};
 use std::cell::RefCell;
-mod doctor;
-mod patient;
 
 mod models;
 use models::{
