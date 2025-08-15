@@ -1,18 +1,44 @@
+//! Doctor management functionality
+
+use crate::error::Error;
+use crate::models::Doctor;
+use crate::storage::DOCTOR_STORAGE;
+use crate::utils::generate_id;
+
 #[ic_cdk::update]
-fn add_docidentity(principal: String) -> Result<DocIdentity, Error> {
+pub fn add_doctor(
+    principal_str: String,
+    fname: String,
+    lname: String,
+    dob: String,
+    specialism: String,
+    licence_no: u64,
+    id_no: u64,
+    sex: String,
+    country: String,
+    city: String,
+) -> Result<Doctor, Error> {
     // Validate input data
-    if principal.is_empty() {
+    if principal_str.is_empty()
+        || fname.is_empty()
+        || lname.is_empty()
+        || dob.is_empty()
+        || specialism.is_empty()
+        || sex.is_empty()
+        || country.is_empty()
+        || city.is_empty()
+    {
         return Err(Error::InvalidInput {
-            msg: "Principal cannot be empty".to_string(),
+            msg: "All fields must be filled".to_string(),
         });
     }
 
     // Check if the principal already exists
-    let exists = DOCIDENTITY_STORAGE.with(|service| {
+    let exists = DOCTOR_STORAGE.with(|service| {
         service
             .borrow()
             .iter()
-            .any(|(_, docidentity)| docidentity.principal == principal)
+            .any(|(_, doctor)| doctor.principal_str == principal_str)
     });
 
     if exists {
@@ -21,15 +47,121 @@ fn add_docidentity(principal: String) -> Result<DocIdentity, Error> {
         });
     }
 
-    let id = ID_COUNTER
-        .with(|counter| {
-            let current_value = *counter.borrow().get();
-            counter.borrow_mut().set(current_value + 1)
-        })
-        .expect("cannot increment id counter");
+    let id = generate_id();
 
-    let docidentity = DocIdentity { id, principal };
+    let doctor = Doctor {
+        id,
+        principal_str,
+        fname,
+        lname,
+        dob,
+        specialism,
+        licence_no,
+        id_no,
+        sex,
+        country,
+        city,
+    };
 
-    DOCIDENTITY_STORAGE.with(|service| service.borrow_mut().insert(id, docidentity.clone()));
-    Ok(docidentity)
+    DOCTOR_STORAGE.with(|service| service.borrow_mut().insert(id, doctor.clone()));
+    Ok(doctor)
+}
+
+#[ic_cdk::update]
+pub fn update_doctor(
+    principal_str: String,
+    fname: String,
+    lname: String,
+    dob: String,
+    specialism: String,
+    licence_no: u64,
+    id_no: u64,
+    sex: String,
+    country: String,
+    city: String,
+) -> Result<Doctor, Error> {
+    // Validate input data
+    if fname.is_empty()
+        || lname.is_empty()
+        || dob.is_empty()
+        || specialism.is_empty()
+        || sex.is_empty()
+        || country.is_empty()
+        || city.is_empty()
+    {
+        return Err(Error::InvalidInput {
+            msg: "All fields must be provided".to_string(),
+        });
+    }
+
+    let identity_id = principal_str
+        .parse::<u64>()
+        .map_err(|_| Error::InvalidInput {
+            msg: "Invalid Identity ID format".to_string(),
+        })?;
+
+    let doctor_exists = DOCTOR_STORAGE.with(|service| service.borrow().contains_key(&identity_id));
+
+    if !doctor_exists {
+        return Err(Error::NotFound {
+            msg: "Doctor with this Identity ID does not exist".to_string(),
+        });
+    }
+
+    let updated_doctor = Doctor {
+        id: identity_id,
+        principal_str: identity_id.to_string(),
+        fname,
+        lname,
+        dob,
+        specialism,
+        licence_no,
+        id_no,
+        sex,
+        country,
+        city,
+    };
+
+    DOCTOR_STORAGE.with(|service| {
+        service
+            .borrow_mut()
+            .insert(identity_id, updated_doctor.clone())
+    });
+
+    Ok(updated_doctor)
+}
+
+#[ic_cdk::query]
+pub fn get_doctor(docidentity_id: u64) -> Result<Doctor, Error> {
+    match get_doctor_by_id(&docidentity_id) {
+        Some(doctor) => Ok(doctor),
+        None => Err(Error::NotFound {
+            msg: format!("Doctor with docidentity_id={} not found", docidentity_id),
+        }),
+    }
+}
+
+#[ic_cdk::update]
+pub fn delete_doctor(doctor_id: u64) -> Result<(), Error> {
+    match DOCTOR_STORAGE.with(|service| service.borrow_mut().remove(&doctor_id)) {
+        Some(_) => Ok(()),
+        None => Err(Error::NotFound {
+            msg: format!("Doctor with id={} not found", doctor_id),
+        }),
+    }
+}
+
+#[ic_cdk::query]
+pub fn list_doctors() -> Vec<Doctor> {
+    DOCTOR_STORAGE.with(|service| {
+        service
+            .borrow()
+            .iter()
+            .map(|(_, doctor)| doctor.clone())
+            .collect()
+    })
+}
+
+pub fn get_doctor_by_id(docidentity_id: &u64) -> Option<Doctor> {
+    DOCTOR_STORAGE.with(|service| service.borrow().get(docidentity_id))
 }
