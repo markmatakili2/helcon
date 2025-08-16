@@ -4,12 +4,17 @@
 #[macro_use]
 extern crate serde;
 
+// Import models module to make types available for candid export
+mod models;
+use models::*;
+
 // Re-export all public APIs
 pub use crate::appointment::*;
 pub use crate::availability::*;
 pub use crate::calendly::*;
 pub use crate::data::*;
 pub use crate::doctor::*;
+pub use crate::error::*;
 pub use crate::identity::*;
 pub use crate::medical_record::*;
 pub use crate::message::*;
@@ -26,7 +31,6 @@ mod error;
 mod identity;
 mod medical_record;
 mod message;
-mod models;
 mod patient;
 mod report;
 mod storage;
