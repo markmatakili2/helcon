@@ -1,6 +1,4 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { useFetchUserData } from './features/custom'
-import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import HomePage from './components/common/Homepage';
 import About from './components/common/About';
 import Services from './components/common/Services';
@@ -14,10 +12,10 @@ import Document from './components/users/Document';
 import SignupForm from './components/common/SignupForm';
 import MyCalendar from './components/common/Calendar';
 import ProtectedRoute from './components/routes/PrivateRoutes';
+import HelconAI from './components/common/HelconAI';
+import Blog from './components/common/Blog';
 
 function App() {
-
-
   return (
     <Router>
       <Routes>
@@ -25,10 +23,13 @@ function App() {
         <Route path="/about-us" element={<About />} />
         <Route path="/services" element={<Services />} />
         <Route path="/specialists" element={<Specialists />} />
+        <Route path="/helcon-ai" element={<HelconAI />} />
+        <Route path="/helcon-ai/*" element={<HelconAI />} />
+        <Route path="/blog" element={<Blog />} />
         <Route path="/new-account" element={<SignupForm />} />
-         <Route path="/home" element={ <ProtectedRoute element={<Dashboard  />}/>}>
+        <Route path="/home" element={<ProtectedRoute element={<Dashboard />} />}>
           <Route path="" element={<MainDashboard />} />
-          <Route path="profile" element={<ProfilePage />} >
+          <Route path="profile" element={<ProfilePage />}>
             <Route index element={<GeneralProfile />} />
             <Route path="consultation-history" element={<Consultation />} />
             <Route path="my-documents" element={<Document />} />
