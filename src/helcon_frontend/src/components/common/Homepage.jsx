@@ -11,6 +11,7 @@ import StatsSection from './StatsSection';
 import TestimonialsSection from './TestimonialsSection';
 import CTASection from './CTASection';
 import FAQSection from './FAQS';
+import ChatBot from './ChatBot';
 
 const HomePage = () => {
   const { isRegistered, data, loading } = useSelector((state) => state.account.userData);
@@ -49,6 +50,7 @@ const HomePage = () => {
       <CTASection />
       <FAQSection />
       <Footer />
+      <ChatBot />
     </div>
   );
 };

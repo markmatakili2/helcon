@@ -1,6 +1,7 @@
 import React from 'react';
 import Header from './Header';
 import Footer from './Footer';
+import ChatBot from './ChatBot';
 import { FaRocket, FaShieldAlt, FaGlobe, FaUsers, FaChartLine, FaBrain, FaHeart, FaLightbulb } from 'react-icons/fa';
 
 const About = () => {
@@ -452,6 +453,7 @@ const About = () => {
       </section>
 
       <Footer />
+      <ChatBot />
     </div>
   );
 };

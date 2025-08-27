@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import Header from './Header';
 import Footer from './Footer';
+import ChatBot from './ChatBot';
 import image from '../../images/image_2.png'
 import Frame from './Frame'
 import doc from '../../images/doc5.png'
@@ -121,6 +122,7 @@ const Specialists = () => {
          </div>
 
          <Footer />
+         <ChatBot />
       </div>
    )
 }
