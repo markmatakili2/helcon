@@ -72,6 +72,7 @@ const Header = () => {
                <div className="font-medium text-gray-700 text-lg flex items-center cursor-pointer hover:text-blue-600 transition-colors"
                     onMouseEnter={() => setServicesOpen(true)}
                     onMouseLeave={() => setServicesOpen(false)}>
+                  <FaStethoscope className="text-lg mr-2" />
                   <span>Services</span>
                   <MdOutlineKeyboardArrowDown className="ml-1 text-xl" />
                </div>

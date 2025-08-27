@@ -14,6 +14,8 @@ import MyCalendar from './components/common/Calendar';
 import ProtectedRoute from './components/routes/PrivateRoutes';
 import HelconAI from './components/common/HelconAI';
 import Blog from './components/common/Blog';
+import AIInsights from './components/users/AIinsights';
+import PaymentDashboard from './components/users/PaymentDashboard';
 
 function App() {
   return (
@@ -23,12 +25,15 @@ function App() {
         <Route path="/about-us" element={<About />} />
         <Route path="/services" element={<Services />} />
         <Route path="/specialists" element={<Specialists />} />
+        <Route path="/services" element={<Services />} />
         <Route path="/helcon-ai" element={<HelconAI />} />
         <Route path="/helcon-ai/*" element={<HelconAI />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/new-account" element={<SignupForm />} />
         <Route path="/home" element={<ProtectedRoute element={<Dashboard />} />}>
           <Route path="" element={<MainDashboard />} />
+          <Route path="ai-insights" element={<AIInsights />} />
+          <Route path="payments" element={<PaymentDashboard />} />
           <Route path="profile" element={<ProfilePage />}>
             <Route index element={<GeneralProfile />} />
             <Route path="consultation-history" element={<Consultation />} />

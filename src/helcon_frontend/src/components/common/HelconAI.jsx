@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Header from './Header';
 import Footer from './Footer';
+import ChatBot from './ChatBot';
 import { FaRobot, FaComments, FaEnvelope, FaPhone, FaGraduationCap, FaCog, FaUsers, FaChartLine, FaArrowRight, FaCheck } from 'react-icons/fa';
 
 const HelconAI = () => {
@@ -256,6 +257,7 @@ const HelconAI = () => {
       </section>
 
       <Footer />
+      <ChatBot />
     </div>
   );
 };

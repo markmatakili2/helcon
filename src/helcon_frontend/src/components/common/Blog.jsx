@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Header from './Header';
 import Footer from './Footer';
+import ChatBot from './ChatBot';
 import { FaBlog, FaCalendar, FaUser, FaArrowRight, FaSearch, FaTags } from 'react-icons/fa';
 
 const Blog = () => {
@@ -322,6 +323,7 @@ const Blog = () => {
       </section>
 
       <Footer />
+      <ChatBot />
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import React from 'react';
 import Header from './Header';
 import Footer from './Footer';
+import ChatBot from './ChatBot';
 import { FaRocket, FaShieldAlt, FaGlobe, FaUsers, FaChartLine, FaBrain, FaHeart, FaLightbulb } from 'react-icons/fa';
 
 const About = () => {
@@ -98,7 +99,7 @@ const About = () => {
           </h1>
           
           <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed mb-12">
-            HelCon is pioneering the future of healthcare by leveraging blockchain technology, artificial intelligence, 
+            Helcon is pioneering the future of healthcare by leveraging blockchain technology, artificial intelligence, 
             and decentralized systems to create a more accessible, secure, and efficient healthcare ecosystem for everyone.
           </p>
 
@@ -452,6 +453,7 @@ const About = () => {
       </section>
 
       <Footer />
+      <ChatBot />
     </div>
   );
 };

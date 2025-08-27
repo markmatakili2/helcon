@@ -17,5 +17,16 @@
   "workspaces": [
     "src/helcon_frontend",
     "src/doctor_frontend"
-  ]
+  ],
+  "dependencies": {
+    "@dfinity/agent": "^3.2.3",
+    "@dfinity/auth-client": "^3.2.3",
+    "@dfinity/candid": "^3.2.3",
+    "@dfinity/identity": "^3.2.3",
+    "@dfinity/ledger-icp": "^4.1.0",
+    "@dfinity/principal": "^3.2.3",
+    "@dfinity/utils": "^2.14.0",
+    "@nfid/embed": "^0.10.3",
+    "@nfid/identitykit": "^1.0.14"
+  }
 }

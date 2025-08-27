@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { FaTachometerAlt, FaCalendarAlt, FaUser, FaQuestionCircle, FaSignOutAlt } from 'react-icons/fa';
+import { FaTachometerAlt, FaCalendarAlt, FaUser, FaQuestionCircle, FaSignOutAlt, FaBrain, FaCreditCard } from 'react-icons/fa';
 import logo from '../../images/helcon_logo.png';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { logout } from '../../features/auth/authSlice';
@@ -97,6 +97,20 @@ const Sidebar = () => {
                   `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : (isOpen ? 'text-white':'text-primary')
                   }`
                 } to="/home/calendar"><span className="mr-3"><FaCalendarAlt /></span> Calendar</NavLink>
+              </li>
+              <li className="my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer" 
+              onClick={closeSidebar}>
+                <NavLink className={({ isActive }) =>
+                  `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : (isOpen ? 'text-white':'text-primary')
+                  }`
+                } to="/home/ai-insights"><span className="mr-3"><FaBrain /></span> AI Insights</NavLink>
+              </li>
+              <li className="my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer" 
+              onClick={closeSidebar}>
+                <NavLink className={({ isActive }) =>
+                  `flex items-center p-4 rounded-md w-full ${isActive ? 'bg-[#0A1F4B] text-white' : (isOpen ? 'text-white':'text-primary')
+                  }`
+                } to="/home/payments"><span className="mr-3"><FaCreditCard /></span> Payments</NavLink>
               </li>
             </>)}
           <li className="my-2 rounded-md mr-2 text-primary flex items-center cursor-pointer"
