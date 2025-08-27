@@ -1,15 +1,9 @@
 // src/authSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { AuthClient } from '@dfinity/auth-client';
+import { NFID } from '@nfid/embed';
 import { HttpAgent } from '@dfinity/agent';
 import { helcon_backend } from '../../../../declarations/helcon_backend';
-let authClient;
-const initializeAuthClient = async () => {
-  if (!authClient) {
-    authClient = await AuthClient.create();
-  }
-  return authClient;
-};
+
 export const registerPatient = createAsyncThunk(
   'auth/registerPatient',
   async ({ navigate, data }, { dispatch, rejectWithValue }) => {
@@ -42,63 +36,51 @@ export const login = createAsyncThunk(
   'auth/login',
   async ({ navigate }, { dispatch, rejectWithValue }) => {
     try {
-      const client = await initializeAuthClient();
-
-      await client.login({
-        onSuccess: async () => {
-          try {
-            const identity = client.getIdentity();
-            const agent = new HttpAgent({ identity, host: "http://localhost:8080" });
-            const principal = identity.getPrincipal().toString();
-
-            if (principal) {
-              try {
-                const response = await helcon_backend.add_identity(principal)
-
-                if (response.Ok) {
-                  const { id, principal } = response.Ok;
-                  const toNumber = Number(id);
-                  let data = {
-                    toNumber, principal
-                  };
-                  dispatch(setAuthClient(true));
-                  localStorage.setItem('id', JSON.stringify(data))
-                  dispatch(setPrincipals(principal))
-                  dispatch(setAuthClient(true));
-                  navigate('/new-account')
-                  console.log('your principal_id', principal)
-
-                } else {
-                  console.log('some error occured', response.Err)
-                  let identifier = JSON.parse(localStorage.getItem('identifier'))
-                  if (identifier) {
-                    const response = await helcon_backend.get_patient(identifier)
-                    if (response.Ok) {
-                      let { username } = response.Ok
-                      dispatch(setUser({ username }))
-                      dispatch(setAuthClient(true));
-                      navigate('/home')
-                    } else {
-                      console.log('an error occured', response.Err)
-                    }
-                  }
-                }
-
-              } catch (error) {
-                console.error("Error fetching user from backend:", error.message);
-                return rejectWithValue("Error fetching user from backend");
-              }
-            }
-          } catch (error) {
-            console.error("Error during login onSuccess callback:", error.message);
-            return rejectWithValue(error.message);
-          }
-        },
-        onError: (error) => {
-          console.error("Login failed:", error.message);
-          return rejectWithValue(error.message);
+      const nfid = await NFID.init({
+        application: {
+          name: "HelCon",
+          logo: "https://helcon.xyz/favicon.ico"
         }
       });
+
+      const identity = await nfid.getDelegation({
+        targets: [process.env.CANISTER_ID_HELCON_BACKEND],
+        derivationOrigin: "https://helcon.xyz"
+      });
+
+      const principal = identity.getPrincipal().toString();
+
+      if (principal) {
+        try {
+          const response = await helcon_backend.add_identity(principal);
+
+          if (response.Ok) {
+            const { id, principal } = response.Ok;
+            const toNumber = Number(id);
+            let data = {
+              toNumber, principal
+            };
+            dispatch(setAuthClient(true));
+            localStorage.setItem('id', JSON.stringify(data));
+            dispatch(setPrincipals(principal));
+            navigate('/new-account');
+          } else {
+            let identifier = JSON.parse(localStorage.getItem('identifier'));
+            if (identifier) {
+              const response = await helcon_backend.get_patient(identifier);
+              if (response.Ok) {
+                let { username } = response.Ok;
+                dispatch(setUser({ username }));
+                dispatch(setAuthClient(true));
+                navigate('/home');
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Error fetching user from backend:", error.message);
+          return rejectWithValue("Error fetching user from backend");
+        }
+      }
     } catch (error) {
       console.error("Login caught error:", error.message);
       return rejectWithValue(error.message);
@@ -110,12 +92,15 @@ export const logout = createAsyncThunk(
   'auth/logout',
   async ({ navigate }, { dispatch }) => {
     try {
-      const client = await initializeAuthClient();
-      await client.logout();
+      // Clear local storage and reset state
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('identifier');
+      localStorage.removeItem('id');
+      localStorage.removeItem('principal');
 
       dispatch(setAuthClient(null));
-      dispatch(setActor(null));
       dispatch(setPrincipals(null));
+      dispatch(setUser(null));
 
       navigate('/')
     } catch (error) {
