@@ -243,6 +243,4 @@ const ChatBot = () => {
 };
 
 export default ChatBot;
-import React, { useState, useRef, useEffect } from 'react';
-import { FaRobot, FaTimes, FaPaperPlane, FaUser } from 'react-icons/fa';
 
