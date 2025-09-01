@@ -21,7 +21,7 @@ const HelconAI = () => {
       title: "Intelligent Chatbots",
       description: "Deploy sophisticated AI chatbots that understand context, provide accurate responses, and learn from every interaction.",
       features: ["Natural Language Processing", "Multi-language Support", "24/7 Availability", "Learning Capabilities"],
-      price: "From $299/month",
+
       gradient: "from-purple-500 to-purple-700"
     },
     {
@@ -29,7 +29,7 @@ const HelconAI = () => {
       title: "Automation Suite",
       description: "Streamline your operations with AI-powered automation for emails, SMS, calls, and workflow management.",
       features: ["Email Automation", "SMS Campaigns", "Voice Automation", "Workflow Integration"],
-      price: "From $199/month",
+
       gradient: "from-green-500 to-green-700"
     },
     {
@@ -37,7 +37,7 @@ const HelconAI = () => {
       title: "AI Training & Education",
       description: "Comprehensive training programs to help your team understand and implement AI solutions effectively.",
       features: ["Custom Training Programs", "Hands-on Workshops", "Certification Courses", "Ongoing Support"],
-      price: "From $499/course",
+
       gradient: "from-orange-500 to-orange-700"
     },
     {
@@ -45,7 +45,7 @@ const HelconAI = () => {
       title: "CRM Integration",
       description: "Seamlessly integrate AI capabilities into your existing CRM systems to enhance customer relationships.",
       features: ["CRM Enhancement", "Customer Insights", "Predictive Analytics", "Automated Follow-ups"],
-      price: "From $399/month",
+
       gradient: "from-pink-500 to-pink-700"
     },
     {
@@ -70,7 +70,7 @@ const HelconAI = () => {
   return (
     <div className="min-h-screen bg-white">
       <Header />
-      
+
       {/* Hero Section */}
       <section className="pt-20 pb-16 bg-gradient-to-br from-purple-50 via-white to-blue-50 relative overflow-hidden">
         <div className="absolute inset-0">
@@ -90,9 +90,9 @@ const HelconAI = () => {
               HelconAI
             </span>
           </h1>
-          
+
           <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed mb-12">
-            Empowering businesses, organizations, and individuals with cutting-edge AI solutions. 
+            Empowering businesses, organizations, and individuals with cutting-edge AI solutions.
             From intelligent automation to custom AI agents, we're your partner in the AI revolution.
           </p>
 
@@ -101,7 +101,7 @@ const HelconAI = () => {
               <span>Get Free Consultation</span>
               <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
             </button>
-            
+
             <button className="border-2 border-purple-600 text-purple-600 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-purple-600 hover:text-white transition-all transform hover:scale-105">
               Explore AI Services
             </button>
@@ -123,18 +123,18 @@ const HelconAI = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {services.map((service, index) => (
-              <div 
+              <div
                 key={index}
                 className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100"
               >
                 <div className={`w-16 h-16 bg-gradient-to-r ${service.gradient} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
                   {service.icon}
                 </div>
-                
+
                 <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-purple-600 transition-colors">
                   {service.title}
                 </h3>
-                
+
                 <p className="text-gray-600 leading-relaxed mb-6">
                   {service.description}
                 </p>
@@ -174,7 +174,7 @@ const HelconAI = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {industries.map((industry, index) => (
-              <div 
+              <div
                 key={index}
                 className="group bg-gradient-to-br from-gray-50 to-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100"
               >
@@ -240,14 +240,14 @@ const HelconAI = () => {
             <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-12">
               Start your AI journey today with a free consultation. Let's explore how artificial intelligence can transform your business.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
               <button className="group bg-gradient-to-r from-purple-600 to-blue-600 text-white px-10 py-5 rounded-2xl font-bold text-xl hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105 shadow-2xl flex items-center justify-center space-x-3">
                 <FaRobot />
                 <span>Get Free AI Consultation</span>
                 <FaArrowRight className="group-hover:translate-x-2 transition-transform" />
               </button>
-              
+
               <button className="border-2 border-purple-600 text-purple-600 px-10 py-5 rounded-2xl font-bold text-xl hover:bg-purple-600 hover:text-white transition-all transform hover:scale-105">
                 View Case Studies
               </button>
