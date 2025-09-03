@@ -5,6 +5,7 @@ import { NavLink } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { getPrincipal, addIdentity, getUserData } from '../../features/auth/account';
+import AuthModal from '../auth/AuthModal';
 
 const Header = () => {
    const navigate = useNavigate();
@@ -12,36 +13,19 @@ const Header = () => {
    const [menuOpen, setMenuOpen] = useState(false);
    const [servicesOpen, setServicesOpen] = useState(false);
    const [aiServicesOpen, setAiServicesOpen] = useState(false);
+   const [authModalOpen, setAuthModalOpen] = useState(false);
 
    const toggleMenu = () => {
       setMenuOpen(!menuOpen);
    };
 
-   const handleLogin = async () => {
-      const result = await dispatch(getPrincipal());
-    
-      if (getPrincipal.fulfilled.match(result)) {
-        const identifier = localStorage.getItem('identifier');
-    
-        if (identifier) {
-          const queryId = JSON.parse(identifier);
-          dispatch(getUserData({ id: queryId.toNum }));
-        } else {
-          const identityResult = await dispatch(addIdentity({ principal: result.payload }));
-    
-          if (addIdentity.fulfilled.match(identityResult)) {
-            navigate('/new-account');
-          } else {
-            console.log('Failed to add identity', identityResult);
-          }
-        }
-      } else {
-        console.log('Error getting principal');
-      }
+   const handleGetStarted = () => {
+      setAuthModalOpen(true);
    };
 
    return (
-      <div className="w-full h-20 flex items-center border-b border-gray-200 bg-white/95 backdrop-blur-md px-5 relative justify-between shadow-sm sticky top-0 z-50">
+      <>
+      <div className="w-full h-20 flex items-center border-b border-gray-200 bg-white/95 backdrop-blur-md px-5 relative justify-between shadow-sm sticky top-0 z-40">
          <div className="flex items-center">
             <div className="flex items-center space-x-3">
                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl flex items-center justify-center">
@@ -186,11 +170,17 @@ const Header = () => {
 
          <div className="hidden md:flex items-center">
             <button className="bg-gradient-to-r from-blue-600 to-blue-800 text-white px-6 py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-blue-900 transition-all transform hover:scale-105 shadow-lg"
-               onClick={handleLogin}>
+               onClick={handleGetStarted}>
                Get Started
             </button>
          </div>
       </div>
+      
+      <AuthModal 
+         isOpen={authModalOpen} 
+         onClose={() => setAuthModalOpen(false)} 
+      />
+      </>
    );
 };
 
