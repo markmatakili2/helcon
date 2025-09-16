@@ -5,7 +5,6 @@ import { NavLink } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { getPrincipal, addIdentity, getUserData } from '../../features/auth/account';
-import AuthModal from '../auth/AuthModal';
 
 const Header = () => {
    const navigate = useNavigate();
@@ -13,14 +12,31 @@ const Header = () => {
    const [menuOpen, setMenuOpen] = useState(false);
    const [servicesOpen, setServicesOpen] = useState(false);
    const [aiServicesOpen, setAiServicesOpen] = useState(false);
-   const [authModalOpen, setAuthModalOpen] = useState(false);
 
    const toggleMenu = () => {
       setMenuOpen(!menuOpen);
    };
 
-   const handleGetStarted = () => {
-      setAuthModalOpen(true);
+   const handleGetStarted = async () => {
+      const result = await dispatch(getPrincipal());
+    
+      if (getPrincipal.fulfilled.match(result)) {
+        const identifier = localStorage.getItem('identifier');
+    
+        if (identifier) {
+          const queryId = JSON.parse(identifier);
+          dispatch(getUserData({ id: queryId.toNum }));
+        } else {
+          const identityResult = await dispatch(addIdentity({ principal: result.payload }));
+          if (addIdentity.fulfilled.match(identityResult)) {
+            navigate('/new-account');
+          } else {
+            console.log(identityResult);
+          }
+        }
+      } else {
+        console.log('Error getting principal');
+      }
    };
 
    return (
@@ -175,11 +191,6 @@ const Header = () => {
             </button>
          </div>
       </div>
-      
-      <AuthModal 
-         isOpen={authModalOpen} 
-         onClose={() => setAuthModalOpen(false)} 
-      />
       </>
    );
 };
